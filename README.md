@@ -25,11 +25,24 @@ dir_name/
     package-lock.json
 ```
 
-3) Create a directory: `dir_name/public/`
+3) Create a file: `dir_name/index.js`, you will start the server from here. For now, I'm using this code:
+```javascript
+import * as app from "easy-educational-games"
+import path from 'path';
+import {fileURLToPath} from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename)
+
+console.log(app)
+
+app.startServer(path.join(__dirname,"public"))
+```
+
+5) Create a directory: `dir_name/public/`
    - your client side will be in here (.html, .css, .js files)
    - image resources also
 
-4) `dir_name/public/index.html` is your test page. Feel free to copy this code:
+6) `dir_name/public/index.html` is your test page. Feel free to copy this code:
 ```html
 <!DOCTYPE html>
 <html lang="en">
