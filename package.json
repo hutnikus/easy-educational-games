@@ -1,6 +1,6 @@
 {
   "name": "easy-educational-games",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "javascript library for easy educational game development",
   "main": "server.mjs",
   "scripts": {
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hutnikus/bakalarska-praca.git"
+    "url": "git+https://github.com/hutnikus/easy-educational-games.git"
   },
   "author": "Daniel Hutňan",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hutnikus/bakalarska-praca/issues"
+    "url": "https://github.com/hutnikus/easy-educational-games/issues"
   },
-  "homepage": "https://github.com/hutnikus/bakalarska-praca#readme",
+  "homepage": "https://github.com/hutnikus/easy-educational-games#readme",
   "dependencies": {
     "express": "^4.17.2",
     "socket.io": "^4.4.1"

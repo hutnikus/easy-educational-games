@@ -5,7 +5,9 @@
 1) Create package.json:
 `npm init -y`
 
-2) Install this package:
+Node is required. If you don't have it installed, find it on https://nodejs.org/en/download/
+
+3) Install this package:
 `npm install easy-educational-games --save`
 
 
@@ -105,3 +107,5 @@ game.animate();
 
 6) To show images, you need to create a new folder: `dir_name/public/resources`.
 Every image or gif goes there.
+
+7) Start the server by: `node index.js`
