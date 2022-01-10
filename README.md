@@ -5,7 +5,17 @@
 1) Create package.json:
 `npm init -y`
 
-Node is required. If you don't have it installed, find it on https://nodejs.org/en/download/
+   - __Node is required. If you don't have it installed, find it on https://nodejs.org/en/download/__
+   
+2) Modify `dir_name/package.json` - add new line:
+```
+{
+   ...,
+   "type": "module",
+   ...,        
+}
+```
+
 
 3) Install this package:
 `npm install easy-educational-games --save`
