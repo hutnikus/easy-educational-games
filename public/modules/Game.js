@@ -53,12 +53,11 @@ class Game {
         const mousePos = this.getMousePos(event)
         // console.log('mouse',mousePos)
 
-        for (const i in this.elements) {
-            const el = this.elements.at(this.elements.length-1-i)
+        const clickableElements = this.elements.filter(el=>el.clickable)
+
+        for (const i in clickableElements) {
+            const el = clickableElements.at(this.elements.length-1-i)
             if (await el.isInside(mousePos, this.tempContext)) {
-                if (!el.clickable) {
-                    continue;
-                }
                 if (el.onClick.length !== 0) {
                     el.click(mousePos)
                 }
@@ -103,6 +102,10 @@ class Game {
             }
         }
         return null
+    }
+
+    clear() {
+        this.elements = []
     }
 }
 

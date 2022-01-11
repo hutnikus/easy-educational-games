@@ -28,13 +28,15 @@ class GameElement {
         this.level = (attrs.level === undefined) ? 0 : Number(attrs.level);
     }
 
-    addChild(child) {
+    addChild(child,sort=true) {
         const nameIsUsed = this.children.filter(c => c.name === child.name && child.name !== undefined).length > 0
         if (nameIsUsed) {
             throw `used name "${child.name}"`;
         }
         this.children.push(child)
-        this.children = this.children.sort(((a, b) => a.level - b.level))
+        if (sort) {
+            this.children = this.children.sort(((a, b) => a.level - b.level))
+        }
     }
 
     getChildByName(name) {
@@ -52,9 +54,6 @@ class GameElement {
         //wait for loading all images
         for (const e of this.children) {
             e.img = await e.img
-        }
-        //wait for loading all gif data
-        for (const e of this.children) {
             e.imgData = await e.imgData
         }
 
@@ -94,6 +93,13 @@ class GameElement {
         for (const onClickElement of this.onClick) {
             onClickElement[0](onClickElement[1])
         }
+    }
+
+    copy() {
+        return new GameElement(
+            this.center.x,this.center.y,
+            this.children
+        )
     }
 }
 
