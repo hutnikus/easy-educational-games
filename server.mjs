@@ -23,7 +23,7 @@ function startServer(staticFolder) {
     io = new socketio.Server(server)
 
     // Set static folder
-    app.use("/static",express.static(staticFolder))
+    app.use(express.static(staticFolder))
 
     // Set module folder
     app.use("/modules",express.static(path.join(__dirname,"public/modules")))
