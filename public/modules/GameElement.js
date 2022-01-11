@@ -1,24 +1,30 @@
+import {Point} from "./Misc.js";
+
 class GameElement {
+    name = undefined;
+
     //relative to parent game object
-    level = undefined
+    level = undefined;
 
     //centered coordinates
-    x = undefined;
-    y = undefined;
+    center = undefined;
 
     //everything drawable
     children = []
 
     clickable = undefined
 
+    onClick = []
+
     constructor(x,y,children,attrs={}) {
-        this.x = x;
-        this.y = y;
+        this.name = attrs.name;
+        this.center = Point(x,y);
+
         for (const child of children) {
             this.addChild(child)
         }
 
-        this.clickable = (attrs.clickable === undefined) ? false : attrs.clickable;
+        this.clickable = (attrs.clickable === undefined) ? true : attrs.clickable;
         this.level = (attrs.level === undefined) ? 0 : Number(attrs.level);
     }
 
@@ -28,6 +34,7 @@ class GameElement {
             throw `used name "${child.name}"`;
         }
         this.children.push(child)
+        this.children = this.children.sort(((a, b) => a.level - b.level))
     }
 
     getChildByName(name) {
@@ -51,10 +58,9 @@ class GameElement {
             e.imgData = await e.imgData
         }
 
-        this.children = this.children.sort(((a, b) => a.level - b.level))
-
-        this.children
-            .forEach(obj=>obj.draw(ctx,this.x,this.y))
+        for (const obj of this.children) {
+            await obj.draw(ctx, this.center);
+        }
     }
 
     async animate() {
@@ -64,22 +70,30 @@ class GameElement {
     }
 
     //checks if mouse position is within any of the drawables
-    isInside(mouse, tempContext) {
+    async isInside(mouse, tempContext) {
         if (!this.clickable) {
             return false
         }
 
-        let centeredMouse = {
-            x: mouse.x - this.x,
-            y: mouse.y - this.y
-        }
-
         for (const child of this.children) {
-            if (child.isInside(centeredMouse, tempContext, this.x, this.y)) {
+            const insideChild = await child.isInside(mouse, tempContext, this.center)
+            // console.log('inside child',insideChild, child)
+            if (insideChild) {
+                // console.error("was inside", child)
                 return true;
             }
         }
         return false;
+    }
+
+    addOnClickListener(callback,attrs) {
+        this.onClick.push([callback,attrs])
+    }
+
+    click() {
+        for (const onClickElement of this.onClick) {
+            onClickElement[0](onClickElement[1])
+        }
     }
 }
 

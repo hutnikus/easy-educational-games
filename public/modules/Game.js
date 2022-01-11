@@ -24,15 +24,18 @@ class Game {
         this.tempContext = this.tempCanvas.getContext('2d');
 
         canvas.addEventListener('click',(event) => this.onClick(event))
-        canvas.addEventListener('mousemove',(event) => this.drawInside(event))
+
+        this.animate()
     }
 
-    drawInside(event) {
+    async drawInside(event) {
         const mousePos = this.getMousePos(event)
 
         let wasInside = false
         for (const el of this.elements) {
-            if (el.isInside(mousePos,this.tempContext)) {
+            const insideElement = await el.isInside(mousePos,this.tempContext)
+            // console.log('inside element', insideElement)
+            if (insideElement) {
                 wasInside = true
             }
         }
@@ -41,32 +44,41 @@ class Game {
             new GameElement(
                 mousePos.x,mousePos.y,
                 [new GameShape('oval',{rX:2,rY:2,fill:(wasInside) ? 'green' : 'red',level:100})],
-                {level:100}
+                {level:100,clickable:false}
             )
         )
     }
 
-    onClick(event) {
+    async onClick(event) {
         const mousePos = this.getMousePos(event)
-        console.log('mouse',mousePos)
+        // console.log('mouse',mousePos)
 
-        for (const el of this.elements) {
-            if (el.isInside(mousePos, this.tempContext)) {
-                console.log('is inside',el)
+        for (const i in this.elements) {
+            const el = this.elements.at(this.elements.length-1-i)
+            if (await el.isInside(mousePos, this.tempContext)) {
+                if (!el.clickable) {
+                    continue;
+                }
+                if (el.onClick.length !== 0) {
+                    el.click(mousePos)
+                }
+                // console.log(`is inside "${el.name}"`)
+                return
             }
         }
     }
 
     addElement(element) {
+        const nameIsUsed = this.elements.filter(c => c.name === element.name && element.name !== undefined).length > 0
+        if (nameIsUsed) {
+            throw `used name "${element.name}"`;
+        }
         this.elements.push(element)
         this.elements = this.elements.sort(((a, b) => a.level - b.level))
     }
 
     async draw() {
         this.context.clearRect(0,0,this.canvas.width,this.canvas.width)
-
-        this.elements = this.elements.sort(((a, b) => a.level - b.level))
-
 
         for (const obj of this.elements) {
             await obj.draw(this.context)
@@ -80,16 +92,31 @@ class Game {
     getMousePos(event) {
         const rect = this.canvas.getBoundingClientRect();
         return new Point(event.clientX - rect.left, event.clientY - rect.top);
-    };
+    }
+
+    // return element at pos or null
+    async getElementAtPos(position) {
+        for (const i in this.elements) {
+            const el = this.elements.at(this.elements.length-1-i)
+            if (await el.isInside(position, this.tempContext)) {
+                return el
+            }
+        }
+        return null
+    }
 }
 
 function animationLoop(game) {
-    game.draw()
+    const animation = function () {
+        game.draw()
 
-    game.elements
-        .forEach(obj => {
-            obj.animate()
-        })
+        game.elements
+            .forEach(obj => {
+                obj.animate()
+            })
+    }
+
+    window.requestAnimationFrame(animation)
 }
 
 // module.exports = Game

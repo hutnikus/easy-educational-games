@@ -1,37 +1,37 @@
-class GameText {
-    name = undefined
-    //relative level in parent GameElement
-    level = undefined;
+import {GameDrawable} from "./GameDrawable.js";
 
-    //deviation from center of parent GameElement
-    dx = undefined;
-    dy = undefined;
+//todo add rotation and isinside
 
+class GameText extends GameDrawable {
     color = undefined;
     text = undefined;
     font = undefined;
 
     constructor(text='sample text',attrs={}) {
-        this.name = attrs.name
+        super(attrs)
         this.text = text;
-        this.dx = (attrs.dx === undefined) ? 0 : Number(attrs.dx);
-        this.dy = (attrs.dy === undefined) ? 0 : Number(attrs.dy);
         this.color = (attrs.color === undefined) ? 'black' : attrs.color;
         this.font = (attrs.font === undefined) ? '20px arial' : attrs.font;
-        this.level = (attrs.level === undefined) ? 1 : Number(attrs.level);
     }
 
-    draw(ctx,centerX,centerY) {
+    draw(ctx,center) {
         ctx.font = this.font;
         ctx.color = this.color
         ctx.fillStyle = this.color;
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
-        ctx.fillText(this.text,(centerX+this.dx),(centerY+this.dy))
+        ctx.fillText(this.text,(center.x+this.dx),(center.y+this.dy))
     }
 
-    isInside(centeredMouse) {
-        return false
+    async isInside(mouse, tempContext, center) {
+        const drawFunction = async function (ctx, attrs) {
+            await attrs.obj.draw(ctx,attrs.center)
+        }
+        const drawAttrs = {
+            obj: this,
+            center: center
+        }
+        return await super.isInside(mouse, tempContext, drawFunction, drawAttrs)
     }
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "easy-educational-games",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "javascript library for easy educational game development",
   "main": "server.mjs",
   "scripts": {

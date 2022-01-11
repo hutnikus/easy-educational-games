@@ -1,53 +1,42 @@
-const TYPES = ['rectangle','polygon','oval','line']
+import {GameDrawable} from "./GameDrawable.js";
+import {Point} from "../index.js"
 
 // const Misc = require("../Misc.js")
 // const Point = Misc.Point
 
-import {Point} from "../index.js"
+class GameShape extends GameDrawable {
+    type = undefined;       // TYPES = ['rectangle','polygon','oval','line']
+    fill = undefined;       // color
+    stroke = undefined;     // color
+    lineWidth = undefined;  // width of stroke/outline
 
-class GameShape {
-    name = undefined;
-    //relative level in parent GameElement
-    level = undefined;
-    //relative center pos in parent GameElement
-    dx = undefined;
-    dy = undefined;
-
-    type = undefined;
-
-    fill = undefined;
-    stroke = undefined;
-    lineWidth = undefined;
-    width = undefined;
-    height = undefined;
+    // sizes in oval
     rY = undefined;
     rX = undefined;
 
-    rotation = undefined; //in radians
+    coords = undefined;     // points in line / polygon in format [x1,y1,...,xn,yn]
 
     constructor(type='rectangle',attrs={}) {
-        this.fill = attrs.fill;
-        this.name = attrs.name;
-        this.stroke = attrs.stroke;
+        super(attrs)
+
+        function randomColor() {
+            return "#"+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)
+        }
+
+        this.fill = (attrs.fill === 'random') ? randomColor() : attrs.fill;
+        this.stroke = (attrs.stroke === 'random') ? randomColor() : attrs.stroke;
         this.lineWidth = (attrs.lineWidth === undefined) ? 0 : Number(attrs.lineWidth);
-        this.level = (attrs.level === undefined) ? 0 : Number(attrs.level);
         this.type = type;
-        this.dx = (attrs.dx === undefined) ? 0 : Number(attrs.dx);
-        this.dy = (attrs.dy === undefined) ? 0 : Number(attrs.dy);
-        this.rotation = (attrs.rotation === undefined) ? 0 : Number(attrs.rotation);
 
         if (type === 'rectangle') {
-            if (attrs.width === undefined) {
+            if (this.width === undefined) {
                 console.error('rectangle needs a defined width!');
-            } else {
-                this.width = Number(attrs.width);
             }
-            if (attrs.height === undefined) {
+            if (this.height === undefined) {
                 console.error('rectangle needs a defined height!');
-            } else {
-                this.height = Number(attrs.height);
             }
-        } else if (type === 'oval') {
+        }
+        else if (type === 'oval') {
             if (attrs.rX === undefined) {
                 console.error('oval needs a defined rX!');
             } else {
@@ -58,7 +47,8 @@ class GameShape {
             } else {
                 this.rY = Number(attrs.rY);
             }
-        } else if (type === 'polygon' || type === 'line') {
+        }
+        else if (type === 'polygon' || type === 'line') {
             if (attrs.coords === undefined) {
                 console.error(type, 'needs a defined array of coords!');
             } else {
@@ -79,12 +69,19 @@ class GameShape {
         }
     }
 
-    draw(ctx,centerX,centerY) {
+    addPoint(point) {
+        if (this.coords === undefined) {
+            throw "Undefined coords!"
+        }
+        this.coords.push(point.x,point.y)
+    }
+
+    draw(ctx,center) {
         ctx.color = this.fill
 
         if (this.type === 'rectangle') {
             ctx.save()
-            ctx.translate(centerX+this.dx,centerY+this.dy)
+            ctx.translate(center.x+this.dx,center.y+this.dy)
             ctx.rotate(this.rotation)
             if (this.fill !== undefined) {
                 ctx.fillStyle = this.fill;
@@ -96,23 +93,25 @@ class GameShape {
                 ctx.strokeRect((this.dx) - (this.width / 2), (this.dy) - (this.height / 2), this.width, this.height)
             }
             ctx.restore()
-        } else if (this.type === 'oval') {
+        }
+        else if (this.type === 'oval') {
             if (this.fill !== undefined) {
                 ctx.fillStyle = this.fill;
                 ctx.beginPath();
-                ctx.ellipse(centerX+this.dx,centerY+this.dy,this.rX,this.rY,this.rotation,0,2*Math.PI);
+                ctx.ellipse(center.x+this.dx,center.y+this.dy,this.rX,this.rY,this.rotation,0,2*Math.PI);
                 ctx.fill();
             }
             if (this.stroke !== undefined) {
                 ctx.strokeStyle = this.stroke
                 ctx.lineWidth = this.lineWidth
                 ctx.beginPath();
-                ctx.ellipse(centerX+this.dx,centerY+this.dy,this.rX,this.rY,this.rotation,0,2*Math.PI);
+                ctx.ellipse(center.x+this.dx,center.y+this.dy,this.rX,this.rY,this.rotation,0,2*Math.PI);
                 ctx.stroke();
             }
-        } else if (this.type === 'polygon' || this.type === 'line') {
+        }
+        else if (this.type === 'polygon' || this.type === 'line') {
             ctx.save()
-            ctx.translate(centerX+this.dx,centerY+this.dy)
+            ctx.translate(center.x+this.dx,center.y+this.dy)
             ctx.rotate(this.rotation)
             if (this.fill !== undefined && this.type === 'polygon') {
                 ctx.fillStyle = this.fill;
@@ -141,97 +140,108 @@ class GameShape {
         }
     }
 
-    isInside(centeredMouse) {
-        centeredMouse.x -= this.dx
-        centeredMouse.y -= this.dy
-
-        // console.log('adjusted',centeredMouse)
-
-        if (this.type === 'rectangle') {
-            let topleft = new Point(- (this.width / 2) - (this.lineWidth/2),- (this.height/ 2) - (this.lineWidth/2))
-
-            let rotatedX = centeredMouse.x * Math.cos(-this.rotation) - centeredMouse.y * Math.sin(-this.rotation);
-            let rotatedY = centeredMouse.y * Math.cos(-this.rotation) + centeredMouse.x * Math.sin(-this.rotation);
-
-            let horizontal = topleft.x <= rotatedX && rotatedX <= topleft.x + this.width + this.lineWidth
-            let vertical = topleft.y <= rotatedY && rotatedY <= topleft.y + this.height + this.lineWidth
-
-            return horizontal && vertical
+    async isInside(mouse, tempContext, center) {
+        const drawFunction = async function (ctx, attrs) {
+            await attrs.obj.draw(ctx,attrs.center)
         }
-        else if (this.type === 'oval') {
-            let a,b,f1,f2
-            if (this.rX > this.rY) {
-                // console.log('na sirku')
-                //na sirku
-                a = this.rX + this.lineWidth/2
-                b = this.rY + this.lineWidth/2
-                let f = Math.sqrt(Math.pow(a,2)-Math.pow(b,2))
-
-                f1 = new Point(-f * Math.cos(this.rotation), -f * Math.sin(this.rotation))
-                f2 = new Point(f * Math.cos(this.rotation), f * Math.sin(this.rotation))
-            }
-            else {
-                // console.log('na vysku')
-                a = this.rY + this.lineWidth/2
-                b = this.rX + this.lineWidth/2
-                let f = Math.sqrt(Math.pow(a,2)-Math.pow(b,2))
-
-                f1 = {
-                    x: 0 - -f * Math.sin(this.rotation),
-                    y: -f * Math.cos(this.rotation)
-                }
-                f2 = {
-                    x: 0 - f * Math.sin(this.rotation),
-                    y: f * Math.cos(this.rotation)
-                }
-                f1 = new Point(0 - -f * Math.sin(this.rotation), -f * Math.cos(this.rotation))
-                f2 = new Point(0 - f * Math.sin(this.rotation), f * Math.cos(this.rotation))
-            }
-
-            let d1 = centeredMouse.distanceTo(f1);
-            let d2 = centeredMouse.distanceTo(f2);
-
-            return d1 + d2 < 2 * a;
-
+        const drawAttrs = {
+            obj: this,
+            center: center
         }
-        else if (this.type === 'polygon') {
-            //this doesn't work with line width
-            const vs = []
-            for (let i = 0; i < this.coords.length-1; i+=2) {
-                vs.push([this.coords[i],this.coords[i+1]])
-            }
-            let rotatedX = centeredMouse.x * Math.cos(-this.rotation) - centeredMouse.y * Math.sin(-this.rotation);
-            let rotatedY = centeredMouse.y * Math.cos(-this.rotation) + centeredMouse.x * Math.sin(-this.rotation);
-
-            return insidePolygon(new Point(rotatedX,rotatedY),vs)
-        }
-        else if (this.type === 'line') {
-            //this doesn't work for sharp edges but close enough
-            for (let i = 0; i < this.coords.length-3; i+=2) {
-                const lp1 = new Point(this.coords[i], this.coords[i+1])
-                const lp2 = new Point(this.coords[i+2], this.coords[i+3])
-                const angle = getLineAngle(lp1,lp2)
-                const lineLength = lp1.distanceTo(lp2)
-
-                let topleft = new Point(lp1.x,lp1.y-this.lineWidth/2)
-
-                let rotatedX = (centeredMouse.x - lp1.x) * Math.cos(-angle) - (centeredMouse.y - lp1.y) * Math.sin(-angle);
-                let rotatedY = (centeredMouse.y - lp1.y) * Math.cos(-angle) + (centeredMouse.x - lp1.x) * Math.sin(-angle);
-
-                rotatedX += lp1.x
-                rotatedY += lp1.y
-
-                let horizontal = topleft.x <= rotatedX && rotatedX <= topleft.x + lineLength
-                let vertical = topleft.y <= rotatedY && rotatedY <= topleft.y + this.lineWidth
-
-
-                if (horizontal && vertical) {
-                    return true
-                }
-            }
-            return false
-        }
+        return await super.isInside(mouse, tempContext, drawFunction, drawAttrs)
     }
+
+    // I'll just leave this here so I can ponder my pain
+
+    // isInside(centeredMouse) {
+    //     centeredMouse.x -= this.dx
+    //     centeredMouse.y -= this.dy
+    //
+    //     if (this.type === 'rectangle') {
+    //         let topleft = new Point(- (this.width / 2) - (this.lineWidth/2),- (this.height/ 2) - (this.lineWidth/2))
+    //
+    //         let rotatedX = centeredMouse.x * Math.cos(-this.rotation) - centeredMouse.y * Math.sin(-this.rotation);
+    //         let rotatedY = centeredMouse.y * Math.cos(-this.rotation) + centeredMouse.x * Math.sin(-this.rotation);
+    //
+    //         let horizontal = topleft.x <= rotatedX && rotatedX <= topleft.x + this.width + this.lineWidth
+    //         let vertical = topleft.y <= rotatedY && rotatedY <= topleft.y + this.height + this.lineWidth
+    //
+    //         return horizontal && vertical
+    //     }
+    //     else if (this.type === 'oval') {
+    //         let a,b,f1,f2
+    //         if (this.rX > this.rY) {
+    //             // console.log('na sirku')
+    //             //na sirku
+    //             a = this.rX + this.lineWidth/2
+    //             b = this.rY + this.lineWidth/2
+    //             let f = Math.sqrt(Math.pow(a,2)-Math.pow(b,2))
+    //
+    //             f1 = new Point(-f * Math.cos(this.rotation), -f * Math.sin(this.rotation))
+    //             f2 = new Point(f * Math.cos(this.rotation), f * Math.sin(this.rotation))
+    //         }
+    //         else {
+    //             // console.log('na vysku')
+    //             a = this.rY + this.lineWidth/2
+    //             b = this.rX + this.lineWidth/2
+    //             let f = Math.sqrt(Math.pow(a,2)-Math.pow(b,2))
+    //
+    //             f1 = {
+    //                 x: 0 - -f * Math.sin(this.rotation),
+    //                 y: -f * Math.cos(this.rotation)
+    //             }
+    //             f2 = {
+    //                 x: 0 - f * Math.sin(this.rotation),
+    //                 y: f * Math.cos(this.rotation)
+    //             }
+    //             f1 = new Point(0 - -f * Math.sin(this.rotation), -f * Math.cos(this.rotation))
+    //             f2 = new Point(0 - f * Math.sin(this.rotation), f * Math.cos(this.rotation))
+    //         }
+    //
+    //         let d1 = centeredMouse.distanceTo(f1);
+    //         let d2 = centeredMouse.distanceTo(f2);
+    //
+    //         return d1 + d2 < 2 * a;
+    //
+    //     }
+    //     else if (this.type === 'polygon') {
+    //         //this doesn't work with line width
+    //         const vs = []
+    //         for (let i = 0; i < this.coords.length-1; i+=2) {
+    //             vs.push([this.coords[i],this.coords[i+1]])
+    //         }
+    //         let rotatedX = centeredMouse.x * Math.cos(-this.rotation) - centeredMouse.y * Math.sin(-this.rotation);
+    //         let rotatedY = centeredMouse.y * Math.cos(-this.rotation) + centeredMouse.x * Math.sin(-this.rotation);
+    //
+    //         return insidePolygon(new Point(rotatedX,rotatedY),vs)
+    //     }
+    //     else if (this.type === 'line') {
+    //         //this doesn't work for sharp edges but close enough
+    //         for (let i = 0; i < this.coords.length-3; i+=2) {
+    //             const lp1 = new Point(this.coords[i], this.coords[i+1])
+    //             const lp2 = new Point(this.coords[i+2], this.coords[i+3])
+    //             const angle = getLineAngle(lp1,lp2)
+    //             const lineLength = lp1.distanceTo(lp2)
+    //
+    //             let topleft = new Point(lp1.x,lp1.y-this.lineWidth/2)
+    //
+    //             let rotatedX = (centeredMouse.x - lp1.x) * Math.cos(-angle) - (centeredMouse.y - lp1.y) * Math.sin(-angle);
+    //             let rotatedY = (centeredMouse.y - lp1.y) * Math.cos(-angle) + (centeredMouse.x - lp1.x) * Math.sin(-angle);
+    //
+    //             rotatedX += lp1.x
+    //             rotatedY += lp1.y
+    //
+    //             let horizontal = topleft.x <= rotatedX && rotatedX <= topleft.x + lineLength
+    //             let vertical = topleft.y <= rotatedY && rotatedY <= topleft.y + this.lineWidth
+    //
+    //
+    //             if (horizontal && vertical) {
+    //                 return true
+    //             }
+    //         }
+    //         return false
+    //     }
+    // }
 }
 
 function getDistanceLinePoint(lp1, lp2, p) {
@@ -253,14 +263,14 @@ function insidePolygon(point, vs) {
     // ray-casting algorithm based on
     // https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html/pnpoly.html
 
-    var x = point.x, y = point.y;
+    const x = point.x, y = point.y;
 
-    var inside = false;
-    for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-        var xi = vs[i][0], yi = vs[i][1];
-        var xj = vs[j][0], yj = vs[j][1];
+    let inside = false;
+    for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+        const xi = vs[i][0], yi = vs[i][1];
+        const xj = vs[j][0], yj = vs[j][1];
 
-        var intersect = ((yi > y) !== (yj > y))
+        const intersect = ((yi > y) !== (yj > y))
             && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
         if (intersect) inside = !inside;
     }
