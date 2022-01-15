@@ -28,6 +28,10 @@ class Game {
         this.animate()
     }
 
+    updateLevels() {
+        this.elements = this.elements.sort(((a, b) => a.level - b.level))
+    }
+
     async drawInside(event) {
         const mousePos = this.getMousePos(event)
 
@@ -67,13 +71,15 @@ class Game {
         }
     }
 
-    addElement(element) {
+    addElement(element,sort=true) {
         const nameIsUsed = this.elements.filter(c => c.name === element.name && element.name !== undefined).length > 0
         if (nameIsUsed) {
             throw `used name "${element.name}"`;
         }
         this.elements.push(element)
-        this.elements = this.elements.sort(((a, b) => a.level - b.level))
+        if (sort) {
+            this.updateLevels()
+        }
     }
 
     async draw() {
