@@ -9,10 +9,12 @@
 
 import {GameShape, GameElement, Point} from "./index.js";
 
-const TYPES = []
-
 class Game {
     elements = [];
+
+    //for dragging
+    selectedElement = undefined
+    deltaClick = undefined
 
     constructor(canvas) {
         this.canvas = canvas;
@@ -23,7 +25,11 @@ class Game {
         this.tempCanvas.height = this.canvas.height
         this.tempContext = this.tempCanvas.getContext('2d');
 
-        canvas.addEventListener('click',(event) => this.onClick(event))
+        // canvas.addEventListener('click',(event) => this.onClick(event))
+
+        canvas.addEventListener('mousedown',(async ev => await this.onClick(ev)))
+        canvas.addEventListener('mousemove',(ev => this.onDrag(ev)))
+        canvas.addEventListener('mouseup',(ev => this.onFinishDragging(ev)))
 
         this.animate()
     }
@@ -55,20 +61,53 @@ class Game {
 
     async onClick(event) {
         const mousePos = this.getMousePos(event)
-        // console.log('mouse',mousePos)
 
-        const clickableElements = this.elements.filter(el=>el.clickable)
-
-        for (const i in clickableElements) {
-            const el = clickableElements.at(this.elements.length-1-i)
-            if (await el.isInside(mousePos, this.tempContext)) {
-                if (el.onClick.length !== 0) {
-                    el.click(mousePos)
-                }
-                // console.log(`is inside "${el.name}"`)
-                return
-            }
+        //get topmost element
+        const el = await this.getElementAtPos(mousePos)
+        if (el === null) {
+            return
         }
+
+        console.log(`is inside "${el.name}"`)
+
+        if (!el.clickable && !el.draggable) {
+            console.error('clicked unresponsive element')
+            return
+        }
+        if (el.clickable) {
+            el.click()
+        }
+        if (el.draggable) {
+            this.selectedElement = el
+            this.delta = Point(
+                mousePos.x - el.center.x,
+                mousePos.y - el.center.y
+            )
+        }
+    }
+
+    onDrag(event) {
+        if (this.selectedElement === undefined) {
+            return
+        }
+        const mousePos = this.getMousePos(event)
+
+        this.selectedElement.center = Point(
+            mousePos.x - this.delta.x,
+            mousePos.y - this.delta.y
+        )
+
+        // this.selectedElement.drag()
+    }
+
+    onFinishDragging(event) {
+        if (this.selectedElement === undefined) {
+            return
+        }
+        this.selectedElement.finishDragging()
+
+        this.selectedElement = undefined
+        this.delta = undefined
     }
 
     addElement(element,sort=true) {

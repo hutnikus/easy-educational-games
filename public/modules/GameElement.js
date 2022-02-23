@@ -13,8 +13,10 @@ class GameElement {
     children = []
 
     clickable = undefined
+    draggable = undefined
 
-    onClick = []
+    onClick = []    //[[callback,attrs],...]
+    onFinishDragging = []    //[[callback,attrs],...]
 
     constructor(x,y,children,attrs={}) {
         this.name = attrs.name;
@@ -24,7 +26,8 @@ class GameElement {
             this.addChild(child)
         }
 
-        this.clickable = (attrs.clickable === undefined) ? true : attrs.clickable;
+        this.clickable = (attrs.clickable === undefined) ? false : attrs.clickable;
+        this.draggable = (attrs.draggable === undefined) ? false : attrs.draggable;
         this.level = (attrs.level === undefined) ? 0 : Number(attrs.level);
     }
 
@@ -89,9 +92,19 @@ class GameElement {
         this.onClick.push([callback,attrs])
     }
 
+    addOnFinishDraggingListener(callback,attrs) {
+        this.onFinishDragging.push([callback,attrs])
+    }
+
     click() {
         for (const onClickElement of this.onClick) {
             onClickElement[0](onClickElement[1])
+        }
+    }
+
+    finishDragging() {
+        for (const onFinishDraggingElement of this.onFinishDragging) {
+            onFinishDraggingElement[0](onFinishDraggingElement[1])
         }
     }
 
