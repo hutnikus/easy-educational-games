@@ -10,7 +10,12 @@ class GameDrawable {
     width = undefined;
     height = undefined;
 
-    rotation = undefined;   // in radians, 0 = not rotated
+    // in radians, default 0
+    rotation = undefined;
+
+    //scaling, default 1 for both
+    hScale = undefined;
+    vScale = undefined;
 
     constructor(attrs={}) {
         this.name = attrs.name;
@@ -20,10 +25,21 @@ class GameDrawable {
         this.width = attrs.width;
         this.height = attrs.height;
         this.rotation = (attrs.rotation === undefined) ? 0 : Number(attrs.rotation);
+
+
+        this.hScale = (attrs.hScale === undefined) ? 1 : Number(attrs.hScale);
+        this.vScale = (attrs.vScale === undefined) ? 1 : Number(attrs.vScale);
     }
 
-    async draw(ctx,center) {
-        console.error('Calling parent class!')
+    async draw(ctx,center,drawable) {
+        ctx.save()
+        ctx.setTransform(this.hScale,0,0,this.vScale,center.x+this.dx,center.y+this.dy);
+
+        ctx.rotate(this.rotation)
+
+        await drawable.drawFunction(ctx)
+
+        ctx.restore()
     }
 
     async isInside(mouse, tempContext, drawFunction, drawAttrs) {

@@ -13,16 +13,16 @@ class GameImage extends GameDrawable {
         this.img = loadImage(url)
     }
 
+    async drawFunction(ctx) {
+        ctx.drawImage(
+            await this.img,
+            -(this.width / 2), -(this.height / 2),this.width,this.height
+        );
+    }
+
     async draw(ctx,center) {
         if (this.width !== undefined && this.height !== undefined) {
-            ctx.save()
-            ctx.translate(center.x+this.dx,center.y+this.dy)
-            ctx.rotate(this.rotation)
-            ctx.drawImage(
-                await this.img,
-                -(this.width / 2), -(this.height / 2),this.width,this.height
-            );
-            ctx.restore()
+            await super.draw(ctx,center,this)
         } else {
             this.width = this.img.width
             this.height = this.img.height

@@ -35,19 +35,21 @@ class GameGif extends GameDrawable {
         }
     }
 
+    async drawFunction(ctx) {
+        let fw = this.imgData.frame_width
+        let fh = this.imgData.frame_height
+        ctx.drawImage(
+            await this.img,
+            this.currentFrame * fw, 0, fw, fh,
+            -(this.width / 2), -(this.height / 2),this.width,this.height
+        );
+    }
+
     async draw(ctx,center) {
         let fw = this.imgData.frame_width
         let fh = this.imgData.frame_height
         if (this.width !== undefined && this.height !== undefined) {
-            ctx.save()
-            ctx.translate(center.x+this.dx,center.y+this.dy)
-            ctx.rotate(this.rotation)
-            ctx.drawImage(
-                await this.img,
-                this.currentFrame * fw, 0, fw, fh,
-                -(this.width / 2), -(this.height / 2),this.width,this.height
-            );
-            ctx.restore()
+            await super.draw(ctx,center,this)
         } else {
             if (this.width === undefined) {
                 this.width = fw

@@ -14,13 +14,17 @@ class GameText extends GameDrawable {
         this.font = (attrs.font === undefined) ? '20px arial' : attrs.font;
     }
 
-    draw(ctx,center) {
+    drawFunction(ctx) {
         ctx.font = this.font;
         ctx.color = this.color
         ctx.fillStyle = this.color;
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
-        ctx.fillText(this.text,(center.x+this.dx),(center.y+this.dy))
+        ctx.fillText(this.text,0,0)
+    }
+
+    async draw(ctx,center) {
+        await super.draw(ctx,center,this)
     }
 
     async isInside(mouse, tempContext, center) {
