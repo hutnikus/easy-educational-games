@@ -4,7 +4,16 @@ function Point(x,y) {
         y: y,
         distanceTo(point2) {
             return Math.sqrt((Math.pow(this.x-point2.x,2))+(Math.pow(this.y-point2.y,2)))
-        }
+        },
+        copy() {
+            return new Point(this.x,this.y)
+        },
+        asString() {
+            return 'X: ' + this.x + ', Y: ' + this.y
+        },
+        asArray() {
+            return [this.x,this.y]
+        },
     }
 }
 

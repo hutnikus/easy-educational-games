@@ -14,7 +14,13 @@ class Game {
 
     //for dragging
     selectedElement = undefined
-    deltaClick = undefined
+    delta = undefined
+
+    //shared with elements
+    shared = {
+        mousePos: undefined,
+        tempContext: undefined
+    }
 
     constructor(canvas) {
         this.canvas = canvas;
@@ -24,6 +30,8 @@ class Game {
         this.tempCanvas.width = this.canvas.width
         this.tempCanvas.height = this.canvas.height
         this.tempContext = this.tempCanvas.getContext('2d');
+
+        this.shared.tempContext = this.tempContext
 
         // canvas.addEventListener('click',(event) => this.onClick(event))
 
@@ -36,6 +44,11 @@ class Game {
 
     updateLevels() {
         this.elements = this.elements.sort(((a, b) => a.level - b.level))
+    }
+
+    changeLevel(element,newLevel) {
+        element.level = newLevel
+        this.updateLevels()
     }
 
     async drawInside(event) {
@@ -68,8 +81,6 @@ class Game {
             return
         }
 
-        console.log(`is inside "${el.name}"`)
-
         if (!el.clickable && !el.draggable) {
             console.error('clicked unresponsive element')
             return
@@ -92,18 +103,15 @@ class Game {
         }
         const mousePos = this.getMousePos(event)
 
-        this.selectedElement.center = Point(
-            mousePos.x - this.delta.x,
-            mousePos.y - this.delta.y
-        )
-
-        // this.selectedElement.drag()
+        this.selectedElement.drag(mousePos,this.delta)
     }
 
     onFinishDragging(event) {
         if (this.selectedElement === undefined) {
             return
         }
+        const mousePos = this.getMousePos(event)
+
         this.selectedElement.finishDragging()
 
         this.selectedElement = undefined
@@ -115,6 +123,7 @@ class Game {
         if (nameIsUsed) {
             throw `used name "${element.name}"`;
         }
+        element.shared = this.shared
         this.elements.push(element)
         if (sort) {
             this.updateLevels()
@@ -135,7 +144,11 @@ class Game {
 
     getMousePos(event) {
         const rect = this.canvas.getBoundingClientRect();
-        return new Point(event.clientX - rect.left, event.clientY - rect.top);
+        const pos = new Point(event.clientX - rect.left, event.clientY - rect.top);
+
+        this.shared.mousePos = pos.copy()
+
+        return pos
     }
 
     // return element at pos or null

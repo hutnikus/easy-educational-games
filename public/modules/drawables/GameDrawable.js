@@ -17,6 +17,8 @@ class GameDrawable {
     hScale = undefined;
     vScale = undefined;
 
+    visible = undefined
+
     constructor(attrs={}) {
         this.name = attrs.name;
         this.level = (attrs.level === undefined) ? 0 : Number(attrs.level);
@@ -25,6 +27,7 @@ class GameDrawable {
         this.width = attrs.width;
         this.height = attrs.height;
         this.rotation = (attrs.rotation === undefined) ? 0 : Number(attrs.rotation);
+        this.visible = (attrs.visible === undefined) ? true : attrs.visible;
 
 
         this.hScale = (attrs.hScale === undefined) ? 1 : Number(attrs.hScale);
