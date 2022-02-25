@@ -12,8 +12,8 @@ class GameElement {
     //everything drawable
     children = []
 
-    clickable = undefined
-    draggable = undefined
+    clickable = undefined       //will respond to click
+    draggable = undefined       //will respond to drag
     stationary = undefined      //can use draggable function call, but will stay put
 
     onClick = []    //[[callback,attrs],...]
@@ -21,6 +21,11 @@ class GameElement {
     onFinishDragging = []    //[[callback,attrs],...]
 
     shared = undefined      //object of shared values
+
+    hitboxes = []
+    hitboxVisible = false
+
+    rotation = 0
 
     constructor(center,children,attrs={}) {
         this.name = attrs.name;
@@ -30,10 +35,18 @@ class GameElement {
             this.addChild(child)
         }
 
+        if (attrs.hitboxes !== undefined && !Array.isArray(attrs.hitboxes)) {
+            throw "Hitboxes need to be in an array"
+        }
+        this.hitboxes = (Array.isArray(attrs.hitboxes)) ? attrs.hitboxes : []
+        this.hitboxVisible = (attrs.hitboxVisible === undefined) ? false : attrs.hitboxVisible;
+
         this.clickable = (attrs.clickable === undefined) ? false : attrs.clickable;
         this.draggable = (attrs.draggable === undefined) ? false : attrs.draggable;
         this.stationary = (attrs.stationary === undefined) ? false : attrs.stationary;
         this.level = (attrs.level === undefined) ? 0 : Number(attrs.level);
+
+        this.rotation = (attrs.rotation === undefined) ? 0 : Number(attrs.rotation);
     }
 
     addChild(child,sort=true) {
@@ -65,11 +78,23 @@ class GameElement {
             e.imgData = await e.imgData
         }
 
-        for (const obj of this.children) {
-            if (obj.visible) {
-                await obj.draw(ctx, this.center);
+        ctx.save()
+        //set center and rotation
+        ctx.setTransform(1,0,0,1,this.center.x,this.center.y);
+        ctx.rotate(this.rotation)
+
+        for (const drawable of this.children) {
+            if (drawable.visible) {
+                await drawable.draw(ctx, this.center);
             }
         }
+        if (this.hitboxVisible) {
+            for (const hb of this.hitboxes) {
+                hb.draw(ctx, this.center);
+            }
+        }
+
+        ctx.restore()
     }
 
     async animate() {
@@ -84,8 +109,15 @@ class GameElement {
         //     return false
         // }
 
+
+
+        this.shared.tempContext.setTransform(1,0,0,1,this.center.x,this.center.y);
+        this.shared.tempContext.rotate(this.rotation)
+
         for (const child of this.children) {
+            this.shared.tempContext.save()
             const insideChild = await child.isInside(mouse, this.shared.tempContext, this.center)
+            this.shared.tempContext.restore()
             // console.log('inside child',insideChild, child)
             if (insideChild) {
                 // console.error("was inside", child)
@@ -137,6 +169,27 @@ class GameElement {
             this.center.x,this.center.y,
             this.children
         )
+    }
+
+    collidesWith(other) {
+        if (this.hitboxes.length === 0) {
+            return false
+        }
+        if (other.hitboxes.length === 0) {
+            return false
+        }
+        for (const hb1 of this.hitboxes) {
+            const pos1 = this.center.copy().add(hb1.delta).rotateAround(this.center,this.rotation)
+            for (const hb2 of other.hitboxes) {
+                const pos2 = other.center.copy().add(hb2.delta).rotateAround(other.center,other.rotation)
+
+                const distance = pos1.distanceTo(pos2)
+                if (distance < hb1.r + hb2.r) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 }
 

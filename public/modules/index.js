@@ -14,6 +14,7 @@ import {GameShape} from "./drawables/GameShape.js";
 import {Point} from "./Misc.js";
 import {GameCanvas} from "./GameCanvas.js";
 import {GameButton} from "./GameButton.js";
+import {GameHitbox} from "./GameHitbox.js";
 
 
 // module.exports = {
@@ -25,4 +26,4 @@ import {GameButton} from "./GameButton.js";
 //     GameText,
 // }
 
-export {Game, GameText, GameGif, GameShape, GameElement, GameImage, Point, GameCanvas, GameButton}
+export {Game, GameText, GameGif, GameShape, GameElement, GameImage, Point, GameCanvas, GameButton, GameHitbox}

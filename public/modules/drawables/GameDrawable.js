@@ -36,8 +36,11 @@ class GameDrawable {
 
     async draw(ctx,center,drawable) {
         ctx.save()
-        ctx.setTransform(this.hScale,0,0,this.vScale,center.x+this.dx,center.y+this.dy);
+        // let t = getTransform(ctx);
+        // let rad = Math.atan2(t.b, t.a);
+        ctx.transform(this.hScale,0,0,this.vScale,this.dx,this.dy);
 
+        // ctx.rotate(rad)
         ctx.rotate(this.rotation)
 
         await drawable.drawFunction(ctx)
@@ -46,8 +49,11 @@ class GameDrawable {
     }
 
     async isInside(mouse, tempContext, drawFunction, drawAttrs) {
+        tempContext.save()
+        tempContext.setTransform(1,0,0,1,0,0);
         //clear the temp context
         tempContext.clearRect(0, 0,tempContext.canvas.width,tempContext.canvas.height);
+        tempContext.restore()
 
         // call the draw function
         await drawFunction(tempContext,drawAttrs)

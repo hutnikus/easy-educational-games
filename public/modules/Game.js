@@ -22,11 +22,21 @@ class Game {
         tempContext: undefined
     }
 
-    constructor(canvas) {
+    //for counting frames
+    debug = undefined
+    lt = 0
+    tpf = 0
+
+    constructor(canvas,tempCanvas=undefined, debug = false) {
+        this.debug = debug
         this.canvas = canvas;
         this.context = canvas.getContext('2d');
 
-        this.tempCanvas = document.createElement('canvas')
+        if (tempCanvas === undefined) {
+            this.tempCanvas = document.createElement('canvas')
+        } else {
+            this.tempCanvas = tempCanvas
+        }
         this.tempCanvas.width = this.canvas.width
         this.tempCanvas.height = this.canvas.height
         this.tempContext = this.tempCanvas.getContext('2d');
@@ -40,6 +50,14 @@ class Game {
         canvas.addEventListener('mouseup',(ev => this.onFinishDragging(ev)))
 
         this.animate()
+
+        if (debug) {
+            function performanceLoop(game) {
+                console.log('current time per frame:',game.tpf)
+
+            }
+            setInterval(()=>performanceLoop(this),2000)
+        }
     }
 
     updateLevels() {
@@ -55,21 +73,26 @@ class Game {
         const mousePos = this.getMousePos(event)
 
         let wasInside = false
-        for (const el of this.elements) {
+        for (const el of this.elements.filter((e)=>e.name!=="drawInside")) {
             const insideElement = await el.isInside(mousePos,this.tempContext)
-            // console.log('inside element', insideElement)
             if (insideElement) {
                 wasInside = true
+                // console.log(el)
             }
         }
 
-        this.addElement(
-            new GameElement(
-                mousePos.x,mousePos.y,
-                [new GameShape('oval',{rX:2,rY:2,fill:(wasInside) ? 'green' : 'red',level:100})],
-                {level:100,clickable:false}
+        let drawElement;
+        try {
+            drawElement = this.getElementByName("drawInside")
+        } catch (e) {
+            drawElement = new GameElement(
+                Point(0,0),
+                [],
+                {level:100,clickable:false,name:"drawInside"}
             )
-        )
+            this.addElement(drawElement)
+        }
+        drawElement.addChild(new GameShape('oval',{rX:2,rY:2,dx:mousePos.x,dy:mousePos.y,fill:(wasInside) ? 'green' : 'red',level:100}))
     }
 
     async onClick(event) {
@@ -130,7 +153,29 @@ class Game {
         }
     }
 
+    getElementByName(name) {
+        let el = this.elements.filter(e => e.name === name)
+        if (el.length === 0) {
+            throw `No child of ${this} has name:${name}`
+        } else if (el.length > 1) {
+            throw `There are multiple children with name:${name} in ${this}`
+        }
+        return el[0]
+    }
+
+    popElementByName(name) {
+        let el = this.elements.filter(e => e.name === name)
+        if (el.length === 0) {
+            throw `No child of ${this} has name:${name}`
+        } else if (el.length > 1) {
+            throw `There are multiple children with name:${name} in ${this}`
+        }
+        this.elements = this.elements.filter(e => e.name !== name)
+        return el[0]
+    }
+
     async draw() {
+        this.context.setTransform(1,0,0,1,0,0);
         this.context.clearRect(0,0,this.canvas.width,this.canvas.width)
 
         for (const obj of this.elements) {
@@ -139,7 +184,26 @@ class Game {
     }
 
     animate() {
-        setInterval(()=>animationLoop(this),50)
+        setInterval(()=>this.animationLoop(this),30)
+    }
+
+    animationLoop(game) {
+        const animation = function () {
+            game.draw()
+
+            game.elements
+                .forEach(obj => {
+                    obj.animate()
+                })
+
+            if (game.debug) {
+                const timeDelta = performance.now() - game.lt
+                game.lt = performance.now()
+                game.tpf = (game.tpf + timeDelta) / 2
+            }
+        }
+
+        window.requestAnimationFrame(animation)
     }
 
     getMousePos(event) {
@@ -155,7 +219,12 @@ class Game {
     async getElementAtPos(position) {
         for (const i in this.elements) {
             const el = this.elements.at(this.elements.length-1-i)
+            if (!el.clickable && !el.draggable) {
+                // console.log("clicked unresponsive element")
+                continue
+            }
             if (await el.isInside(position, this.tempContext)) {
+                // console.log(el)
                 return el
             }
         }
@@ -164,6 +233,19 @@ class Game {
 
     clear() {
         this.elements = []
+    }
+
+    checkCollisions(element) {
+        const collisions = []
+        for (const other of this.elements) {
+            if (element === other) {
+                continue
+            }
+            if (element.collidesWith(other)) {
+                collisions.push(other)
+            }
+        }
+        return collisions
     }
 }
 
