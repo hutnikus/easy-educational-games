@@ -47,7 +47,7 @@ class GameCanvas extends GameElement {
     startDrawing(self) {
         const mouse = self.shared.mousePos
         const position = new Point(mouse.x-self.center.x,mouse.y-self.center.y)
-        position.rotateAround(Point(0,0),-self.rotation)
+            .rotateAround(new Point(0,0),-self.rotation)
         self.current = new GameShape('line',{
             level:0,
             coords:[...position.asArray(),...position.asArray()],
