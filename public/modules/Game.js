@@ -86,7 +86,7 @@ class Game {
             drawElement = this.getElementByName("drawInside")
         } catch (e) {
             drawElement = new GameElement(
-                Point(0,0),
+                new Point(0,0),
                 [],
                 {level:100,clickable:false,name:"drawInside"}
             )
@@ -113,7 +113,7 @@ class Game {
         }
         if (el.draggable) {
             this.selectedElement = el
-            this.delta = Point(
+            this.delta = new Point(
                 mousePos.x - el.center.x,
                 mousePos.y - el.center.y
             )

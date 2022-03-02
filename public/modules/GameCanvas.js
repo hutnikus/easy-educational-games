@@ -63,8 +63,8 @@ class GameCanvas extends GameElement {
             return;
         }
         const mouse = self.shared.mousePos
-        const position = new Point(mouse.x-self.center.x,mouse.y-self.center.y)
-        position.rotateAround(Point(0,0),-self.rotation)
+        let position = new Point(mouse.x-self.center.x,mouse.y-self.center.y)
+        position = position.rotateAround(new Point(0,0),-self.rotation)
 
         if (!await self.isInside(mouse)) {
             self.current = undefined
@@ -79,8 +79,8 @@ class GameCanvas extends GameElement {
             return;
         }
         const mouse = self.shared.mousePos
-        const position = new Point(mouse.x-self.center.x,mouse.y-self.center.y)
-        position.rotateAround(Point(0,0),-self.rotation)
+        let position = new Point(mouse.x-self.center.x,mouse.y-self.center.y)
+        position = position.rotateAround(new Point(0,0),-self.rotation)
         self.current.addPoint(position)
         self.current = undefined;
         clearInterval(self.interval)

@@ -147,7 +147,7 @@ class GameElement {
 
     drag(mousePos,delta) {
         if (!this.stationary) {
-            this.center = Point(
+            this.center = new Point(
                 mousePos.x - delta.x,
                 mousePos.y - delta.y
             )
@@ -179,9 +179,9 @@ class GameElement {
             return false
         }
         for (const hb1 of this.hitboxes) {
-            const pos1 = this.center.copy().add(hb1.delta).rotateAround(this.center,this.rotation)
+            const pos1 = this.center.add(hb1.delta).rotateAround(this.center,this.rotation)
             for (const hb2 of other.hitboxes) {
-                const pos2 = other.center.copy().add(hb2.delta).rotateAround(other.center,other.rotation)
+                const pos2 = other.center.add(hb2.delta).rotateAround(other.center,other.rotation)
 
                 const distance = pos1.distanceTo(pos2)
                 if (distance < hb1.r + hb2.r) {

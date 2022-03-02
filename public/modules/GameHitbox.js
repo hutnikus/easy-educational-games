@@ -9,7 +9,7 @@ class GameHitbox {
             throw "Hitbox needs a valid radius"
         }
         this.r = r
-        this.delta = Point(
+        this.delta = new Point(
             (dx === undefined) ? 0 : Number(dx),
             (dy === undefined) ? 0 : Number(dy),
         )
