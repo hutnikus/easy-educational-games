@@ -4,6 +4,8 @@ import {Point} from "../index.js"
 // const Misc = require("../Misc.js")
 // const Point = Misc.Point
 
+const shapes = ["rectangle","oval","polygon","line"]
+
 class GameShape extends GameDrawable {
     type = undefined;       // TYPES = ['rectangle','polygon','oval','line']
     fill = undefined;       // color
@@ -18,6 +20,10 @@ class GameShape extends GameDrawable {
 
     constructor(type='rectangle',attrs={}) {
         super(attrs)
+
+        if (!shapes.includes(type)) {
+            throw new Error(`Incorrect type name. Should be of "${shapes}", is ${type}`)
+        }
 
         function randomColor() {
             return "#"+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)
