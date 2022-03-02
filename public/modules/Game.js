@@ -72,6 +72,10 @@ class Game {
         this.elements = this.elements.sort(((a, b) => a.level - b.level))
     }
 
+    highestLevel() {
+        return Math.max(...this.elements.map(el => el.level))
+    }
+
     changeLevelOfElement(element,newLevel) {
         element.level = newLevel
         this.updateLevels()

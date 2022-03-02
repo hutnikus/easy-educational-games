@@ -113,12 +113,6 @@ class GameElement {
 
     //checks if mouse position is within any of the drawables
     async isInside(mouse) {
-        // if (!this.clickable) {
-        //     return false
-        // }
-
-
-
         this.shared.tempContext.setTransform(1,0,0,1,this.center.x,this.center.y);
         this.shared.tempContext.rotate(this.rotation)
 

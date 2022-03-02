@@ -133,6 +133,10 @@ class GameShape extends GameDrawable {
         }
     }
 
+    setLine(from,to) {
+        this.initLine([...from.asArray(),...to.asArray()])
+    }
+
     addPoint(point) {
         if (this.coords === undefined) {
             throw "Undefined coords!"
