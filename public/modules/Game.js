@@ -64,7 +64,7 @@ class Game {
         this.elements = this.elements.sort(((a, b) => a.level - b.level))
     }
 
-    changeLevel(element,newLevel) {
+    changeLevelOfElement(element,newLevel) {
         element.level = newLevel
         this.updateLevels()
     }
@@ -142,6 +142,10 @@ class Game {
     }
 
     addElement(element,sort=true) {
+        if (!(element instanceof GameElement)) {
+            throw new Error("Incorrect element instance!")
+        }
+
         const nameIsUsed = this.elements.filter(c => c.name === element.name && element.name !== undefined).length > 0
         if (nameIsUsed) {
             throw `used name "${element.name}"`;

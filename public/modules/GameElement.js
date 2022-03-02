@@ -1,4 +1,5 @@
 import {Point} from "./Misc.js";
+import {GameDrawable} from "./drawables/GameDrawable.js";
 
 class GameElement {
     name = undefined;
@@ -50,6 +51,10 @@ class GameElement {
     }
 
     addChild(child,sort=true) {
+        if (!(child instanceof GameDrawable)) {
+            throw new Error("Incorrect instance of child!")
+        }
+
         const nameIsUsed = this.children.filter(c => c.name === child.name && child.name !== undefined).length > 0
         if (nameIsUsed) {
             throw `used name "${child.name}"`;
