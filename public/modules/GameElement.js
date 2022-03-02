@@ -21,6 +21,9 @@ class GameElement {
     onDrag = []    //[[callback,attrs],...]
     onFinishDragging = []    //[[callback,attrs],...]
 
+    onKeyPress = {}         //{"key":[[callback,attrs]]}
+    onKeyHold = {}         //{"key":[[callback,attrs]]}
+
     shared = undefined      //object of shared values
 
     hitboxes = []
@@ -144,6 +147,20 @@ class GameElement {
         this.onFinishDragging.push([callback,attrs])
     }
 
+    addOnKeyPressListener(key,callback,attrs) {
+        if (!Array.isArray(this.onKeyPress[key])) {
+            this.onKeyPress[key] = []
+        }
+        this.onKeyPress[key].push([callback,attrs])
+    }
+
+    addOnKeyHoldListener(key,callback,attrs) {
+        if (!Array.isArray(this.onKeyHold[key])) {
+            this.onKeyHold[key] = []
+        }
+        this.onKeyHold[key].push([callback,attrs])
+    }
+
     click() {
         for (const onClickElement of this.onClick) {
             onClickElement[0](onClickElement[1])
@@ -166,6 +183,28 @@ class GameElement {
     finishDragging() {
         for (const onFinishDraggingElement of this.onFinishDragging) {
             onFinishDraggingElement[0](onFinishDraggingElement[1])
+        }
+    }
+
+    keyPress(keyArray) {
+        for (const key of keyArray) {
+            const events = this.onKeyPress[key]
+            if (events !== undefined && events.length !== 0) {
+                for (const onPress of events) {
+                    onPress[0](onPress[1])
+                }
+            }
+        }
+    }
+
+    keyHold(keyArray) {
+        for (const key of keyArray) {
+            const events = this.onKeyHold[key]
+            if (events !== undefined && events.length !== 0) {
+                for (const onHold of events) {
+                    onHold[0](onHold[1])
+                }
+            }
         }
     }
 
@@ -195,6 +234,10 @@ class GameElement {
             }
         }
         return false
+    }
+
+    move(delta) {
+        this.center = this.center.add(delta)
     }
 }
 

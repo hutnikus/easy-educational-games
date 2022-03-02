@@ -16,6 +16,10 @@ class Game {
     selectedElement = undefined
     delta = undefined
 
+    //for key press
+    pressedKeys = []
+    keyPressInterval = undefined
+
     //shared with elements
     shared = {
         mousePos: undefined,
@@ -48,6 +52,10 @@ class Game {
         canvas.addEventListener('mousedown',(async ev => await this.onClick(ev)))
         canvas.addEventListener('mousemove',(ev => this.onDrag(ev)))
         canvas.addEventListener('mouseup',(ev => this.onFinishDragging(ev)))
+        document.addEventListener('keydown',(ev => this.onKeyDown(ev)))
+        document.addEventListener('keyup',(ev => this.onKeyUp(ev)))
+
+        setInterval(()=>this.keyHoldLoop(),20)
 
         this.animate()
 
@@ -139,6 +147,51 @@ class Game {
 
         this.selectedElement = undefined
         this.delta = undefined
+    }
+
+    keyHoldLoop() {
+        if (this.pressedKeys.length === 0) {
+            return
+        }
+        // console.log("pressed:",this.pressedKeys)
+
+        const listeners = this.elements.filter((el) => {
+            const keys = Object.keys(el.onKeyHold)
+            return keys.filter(value => this.pressedKeys.includes(value))
+        })
+
+        for (const el of listeners) {
+            el.keyHold(this.pressedKeys)
+        }
+    }
+
+    onKeyDown(event) {
+        const key = event.key
+        console.log(key)
+        if (!this.pressedKeys.includes(key)) {
+            //if not yet pressed - add to array
+            this.pressedKeys.push(key)
+
+            //first press
+            const listeners = this.elements.filter((el) => {
+                const keys = Object.keys(el.onKeyPress)
+                return keys.filter(value => this.pressedKeys.includes(value))
+            })
+
+            for (const el of listeners) {
+                el.keyPress(this.pressedKeys)
+            }
+        }
+    }
+
+    onKeyUp(event) {
+        const key = event.key
+        const indexInArray = this.pressedKeys.indexOf(key)
+        if (indexInArray !== -1) {
+            //if pressed
+            this.pressedKeys.splice(indexInArray,1)
+            // console.log(this.pressedKeys)
+        }
     }
 
     addElement(element,sort=true) {
