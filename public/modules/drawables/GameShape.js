@@ -7,10 +7,52 @@ import {Point} from "../index.js"
 const shapes = ["rectangle","oval","polygon","line"]
 
 class GameShape extends GameDrawable {
-    type = undefined;       // TYPES = ['rectangle','polygon','oval','line']
-    fill = undefined;       // color
-    stroke = undefined;     // color
-    lineWidth = undefined;  // width of stroke/outline
+    #typeValue = undefined;       // TYPES = ['rectangle','polygon','oval','line']
+    set type(newType) {
+        if (!shapes.includes(newType)) {
+            throw new Error(`Incorrect type name. Should be of "${shapes}", is ${type}`)
+        }
+        this.#typeValue = newType
+    }
+    get type() {
+        return this.#typeValue
+    }
+    #fillValue = undefined;       // color
+    set fill(newFill) {
+        if (newFill === "random") {
+            this.#fillValue = randomColor()
+            return
+        }
+        this.#fillValue = newFill
+    }
+    get fill() {
+        return this.#fillValue
+    }
+    #strokeValue = undefined;     // color
+    set stroke(newStroke) {
+        if (newStroke === "random") {
+            this.#strokeValue = randomColor()
+            return
+        }
+        this.#strokeValue = newStroke
+    }
+    get stroke() {
+        return this.#strokeValue
+    }
+    #lineWidthValue = undefined;  // width of stroke/outline
+    set lineWidth(newLineWidth) {
+        if (newLineWidth === undefined) {
+            this.#lineWidthValue = 0
+            return
+        }
+        if (isNaN(newLineWidth)) {
+            throw new Error("Line width value is not a number!")
+        }
+        this.#lineWidthValue = newLineWidth
+    }
+    get lineWidth() {
+        return this.#lineWidthValue
+    }
 
     // sizes in oval
     rY = undefined;
@@ -18,60 +60,76 @@ class GameShape extends GameDrawable {
 
     coords = undefined;     // points in line / polygon in format [x1,y1,...,xn,yn]
 
+    initRectangle() {
+        if (this.width === undefined) {
+            throw new Error("Rectangle needs a defined width!")
+        }
+        if (this.height === undefined) {
+            throw new Error("Rectangle needs a defined height!")
+        }
+    }
+    initOval(rx,ry) {
+        if (rx === undefined) {
+            throw new Error("Oval needs a defined rX!")
+        } else {
+            this.rX = Number(rx);
+        }
+        if (ry === undefined) {
+            throw new Error("Oval needs a defined rY!")
+        } else {
+            this.rY = Number(ry);
+        }
+    }
+    initPolygon(coords) {
+        if (!Array.isArray(coords)) {
+            throw new Error("Polygon needs a defined coords array!")
+        }
+        if (coords.length < 6) {
+            throw new Error("Array of coords must be at least 3 points (6 items) long!")
+        }
+        if (coords.length % 2 !== 0) {
+            throw new Error("Array of coords needs to be of even size!")
+        }
+        this.coords = []
+        for (let i = 0; i < coords.length; i+=2) {
+            this.addPoint(new Point(coords[i],coords[i+1]))
+        }
+    }
+    initLine(coords) {
+        if (!Array.isArray(coords)) {
+            throw new Error("Line needs a defined coords array!")
+        }
+        if (coords.length < 4) {
+            throw new Error("Array of coords must be at least 2 points (4 items) long!")
+        }
+        if (coords.length % 2 !== 0) {
+            throw new Error("Array of coords needs to be of even size!")
+        }
+        this.coords = []
+        for (let i = 0; i < coords.length; i+=2) {
+            this.addPoint(new Point(coords[i],coords[i+1]))
+        }
+    }
+
     constructor(type='rectangle',attrs={}) {
         super(attrs)
-
-        if (!shapes.includes(type)) {
-            throw new Error(`Incorrect type name. Should be of "${shapes}", is ${type}`)
-        }
-
-        function randomColor() {
-            return "#"+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)
-        }
-
-        this.fill = (attrs.fill === 'random') ? randomColor() : attrs.fill;
-        this.stroke = (attrs.stroke === 'random') ? randomColor() : attrs.stroke;
-        this.lineWidth = (attrs.lineWidth === undefined) ? 0 : Number(attrs.lineWidth);
         this.type = type;
+        this.fill = attrs.fill
+        this.stroke = attrs.stroke
+        this.lineWidth = attrs.lineWidth
+
 
         if (type === 'rectangle') {
-            if (this.width === undefined) {
-                console.error('rectangle needs a defined width!');
-            }
-            if (this.height === undefined) {
-                console.error('rectangle needs a defined height!');
-            }
+            this.initRectangle()
         }
         else if (type === 'oval') {
-            if (attrs.rX === undefined) {
-                console.error('oval needs a defined rX!');
-            } else {
-                this.rX = Number(attrs.rX);
-            }
-            if (attrs.rY === undefined) {
-                console.error('oval needs a defined rY!');
-            } else {
-                this.rY = Number(attrs.rY);
-            }
+            this.initOval(attrs.rX,attrs.rY)
         }
-        else if (type === 'polygon' || type === 'line') {
-            if (attrs.coords === undefined) {
-                console.error(type, 'needs a defined array of coords!');
-            } else {
-                if (!Array.isArray(attrs.coords) || attrs.coords.length % 2 !== 0) {
-                    console.error('wrong format, it needs to be an array (of Numbers) of even size!');
-                } else {
-                    if (type === 'polygon' && attrs.coords.length < 6) {
-                        console.error('array of coords must be at least 3 points (6 items) long!');
-                    } else {
-                        if (type === 'line' && attrs.coords.length < 4) {
-                            console.error('array of coords must be at least 2 points (4 items) long!');
-                        } else {
-                            this.coords = attrs.coords;
-                        }
-                    }
-                }
-            }
+        else if (type === 'polygon') {
+            this.initPolygon(attrs.coords)
+        }
+        else if (type === 'line') {
+            this.initLine(attrs.coords)
         }
     }
 
@@ -170,6 +228,16 @@ function insidePolygon(point, vs) {
     }
 
     return inside;
+}
+
+function randomColor() {
+    return "#"+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)
+}
+
+function isColor(strColor) {
+    const s = new Option().style;
+    s.color = strColor;
+    return s.color !== '';
 }
 
 // module.exports = GameShape
