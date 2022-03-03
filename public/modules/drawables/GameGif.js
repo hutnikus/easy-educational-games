@@ -9,9 +9,15 @@ class GameGif extends GameDrawable {
     stagger = undefined;    // number of frames to skip, higher = slower animation
     stg = 0;                // variable of currently skipped frames
 
-    constructor(gifName='',attrs={}) {
+    constructor(gifName,attrs={}) {
         super(attrs)
         this.stagger = (attrs.stagger === undefined) ? 0 : Number(attrs.stagger);
+
+        if (gifName === undefined) {
+            this.imgData = attrs.imgData
+            this.img = attrs.img
+            return
+        }
 
         const url = `resources/${gifName}_sheet.png`
 
@@ -70,6 +76,26 @@ class GameGif extends GameDrawable {
             center: center
         }
         return await super.isInside(mouse, tempContext, drawFunction, drawAttrs)
+    }
+
+    getAttrs() {
+        return Object.assign({
+            img : this.img,
+            currentFrame : 0,
+            imgData : this.imgData,
+            stagger : this.stagger,
+            stg : 0,
+        },super.getAttrs())
+    }
+
+    copy(newName) {
+        const attrs = this.getAttrs()
+        if (newName === undefined) {
+            attrs.name = (attrs.name === undefined) ? undefined : attrs.name + "_copy"
+        } else {
+            attrs.name = newName
+        }
+        return new GameGif(undefined,attrs)
     }
 }
 

@@ -70,6 +70,31 @@ class GameDrawable {
         // clicked pixel is not empty
         return alpha !== 0
     }
+
+    getAttrs() {
+        return {
+            name : this.name,
+            level : this.level,
+            dx : this.dx,
+            dy : this.dy,
+            width : this.width,
+            height : this.height,
+            rotation : this.rotation,
+            hScale : this.hScale,
+            vScale : this.vScale,
+            visible : this.visible,
+        }
+    }
+
+    copy(newName) {
+        const attrs = this.getAttrs()
+        if (newName === undefined) {
+            attrs.name = (attrs.name === undefined) ? undefined : attrs.name + "_copy"
+        } else {
+            attrs.name = newName
+        }
+        return new GameDrawable(attrs)
+    }
 }
 
 async function loadImage(imageUrl) {

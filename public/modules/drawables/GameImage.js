@@ -6,10 +6,15 @@ import {GameDrawable, loadImage} from "./GameDrawable.js";
 class GameImage extends GameDrawable {
     img = undefined;
 
-    constructor(name='',extension='png',attrs={}) {
+    constructor(imageName,attrs={}) {
         super(attrs)
 
-        const url = `resources/${name}.${extension}`
+        if (imageName === undefined) {
+            this.img = attrs.img
+            return
+        }
+
+        const url = `resources/${imageName}`
         this.img = loadImage(url)
     }
 
@@ -42,6 +47,22 @@ class GameImage extends GameDrawable {
             }
         }
         return await super.isInside(mouse, tempContext, drawFunction, drawAttrs)
+    }
+
+    getAttrs() {
+        return Object.assign({
+            img : this.img,
+        },super.getAttrs())
+    }
+
+    copy(newName) {
+        const attrs = this.getAttrs()
+        if (newName === undefined) {
+            attrs.name = (attrs.name === undefined) ? undefined : attrs.name + "_copy"
+        } else {
+            attrs.name = newName
+        }
+        return new GameImage(undefined,attrs)
     }
 }
 

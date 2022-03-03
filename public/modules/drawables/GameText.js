@@ -6,7 +6,7 @@ class GameText extends GameDrawable {
     color = undefined;
     text = undefined;
     font = undefined;
-    maxWidth = undefined
+    maxWidth = undefined;
 
     constructor(text='sample text',attrs={}) {
         super(attrs)
@@ -38,6 +38,25 @@ class GameText extends GameDrawable {
             center: center
         }
         return await super.isInside(mouse, tempContext, drawFunction, drawAttrs)
+    }
+
+    getAttrs() {
+        return Object.assign({
+            color : this.color,
+            text : this.text,
+            font : this.font,
+            maxWidth : this.maxWidth,
+        },super.getAttrs())
+    }
+
+    copy(newName) {
+        const attrs = this.getAttrs()
+        if (newName === undefined) {
+            attrs.name = (attrs.name === undefined) ? undefined : attrs.name + "_copy"
+        } else {
+            attrs.name = newName
+        }
+        return new GameText(attrs.text,attrs)
     }
 
     measureText(ctx) {

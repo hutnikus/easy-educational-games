@@ -113,6 +113,18 @@ class GameShape extends GameDrawable {
 
     constructor(type='rectangle',attrs={}) {
         super(attrs)
+
+        if (type === "undefined") {
+            this.type = attrs.type
+            this.fill = attrs.fill
+            this.stroke = attrs.stroke
+            this.lineWidth = attrs.lineWidth
+            this.rX = attrs.rX
+            this.rY = attrs.rY
+            this.coords = attrs.coords
+            return
+        }
+
         this.type = type;
         this.fill = attrs.fill
         this.stroke = attrs.stroke
@@ -197,6 +209,28 @@ class GameShape extends GameDrawable {
             center: center
         }
         return await super.isInside(mouse, tempContext, drawFunction, drawAttrs)
+    }
+
+    getAttrs() {
+        return Object.assign({
+            type : this.type,
+            fill : this.fill,
+            stroke : this.stroke,
+            lineWidth : this.lineWidth,
+            rX : this.rX,
+            rY : this.rY,
+            coords : [...this.coords],
+        },super.getAttrs())
+    }
+
+    copy(newName) {
+        const attrs = this.getAttrs()
+        if (newName === undefined) {
+            attrs.name = (attrs.name === undefined) ? undefined : attrs.name + "_copy"
+        } else {
+            attrs.name = newName
+        }
+        return new GameShape("undefined",attrs)
     }
 }
 
