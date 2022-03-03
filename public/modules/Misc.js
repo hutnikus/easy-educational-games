@@ -57,16 +57,8 @@ class Point {
     }
 }
 
-function Pixel(r,g,b,a) {
-    return {
-        r:r,
-        g:g,
-        b:b,
-        a:a,
-        isBlank() {
-            return a === 0
-        }
-    }
+function randomColor() {
+    return "#"+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)
 }
 
 // module.exports = {
@@ -74,4 +66,4 @@ function Pixel(r,g,b,a) {
 //     Pixel
 // }
 
-export { Point, Pixel }
+export { Point, randomColor }

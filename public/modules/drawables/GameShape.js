@@ -1,5 +1,5 @@
 import {GameDrawable} from "./GameDrawable.js";
-import {Point} from "../index.js"
+import {Point,randomColor} from "../Misc.js"
 
 // const Misc = require("../Misc.js")
 // const Point = Misc.Point
@@ -234,9 +234,7 @@ function insidePolygon(point, vs) {
     return inside;
 }
 
-function randomColor() {
-    return "#"+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)
-}
+
 
 function isColor(strColor) {
     const s = new Option().style;
