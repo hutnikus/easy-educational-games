@@ -1,4 +1,32 @@
-import {GameDrawable} from "./GameDrawable.js";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: drawables/GameShape.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: drawables/GameShape.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {GameDrawable} from "./GameDrawable.js";
 import {Point,randomColor} from "../Misc.js"
 
 // const Misc = require("../Misc.js")
@@ -16,7 +44,7 @@ const shapes = ["rectangle","oval","polygon","line"]
  * @property {number} lineWidth Width of the line/outline
  * @property {number} rX Radius of oval on X axis
  * @property {number} rY Radius of oval on Y axis
- * @property {Array<number>} coords Array of points in line/polygon in format [x1,y1,...,xn,yn]
+ * @property {Array&lt;number>} coords Array of points in line/polygon in format [x1,y1,...,xn,yn]
  */
 class GameShape extends GameDrawable {
     #typeValue;
@@ -90,14 +118,14 @@ class GameShape extends GameDrawable {
         if (!Array.isArray(coords)) {
             throw new Error("Polygon needs a defined coords array!")
         }
-        if (coords.length < 6) {
+        if (coords.length &lt; 6) {
             throw new Error("Array of coords must be at least 3 points (6 items) long!")
         }
         if (coords.length % 2 !== 0) {
             throw new Error("Array of coords needs to be of even size!")
         }
         this.coords = []
-        for (let i = 0; i < coords.length; i+=2) {
+        for (let i = 0; i &lt; coords.length; i+=2) {
             this.addPoint(new Point(coords[i],coords[i+1]))
         }
     }
@@ -105,14 +133,14 @@ class GameShape extends GameDrawable {
         if (!Array.isArray(coords)) {
             throw new Error("Line needs a defined coords array!")
         }
-        if (coords.length < 4) {
+        if (coords.length &lt; 4) {
             throw new Error("Array of coords must be at least 2 points (4 items) long!")
         }
         if (coords.length % 2 !== 0) {
             throw new Error("Array of coords needs to be of even size!")
         }
         this.coords = []
-        for (let i = 0; i < coords.length; i+=2) {
+        for (let i = 0; i &lt; coords.length; i+=2) {
             this.addPoint(new Point(coords[i],coords[i+1]))
         }
     }
@@ -182,7 +210,7 @@ class GameShape extends GameDrawable {
     /**
      * Called when drawing
      * @param {CanvasRenderingContext2D} ctx Rendering context on which the method draws
-     * @returns {Promise<void>}
+     * @returns {Promise&lt;void>}
      */
     async drawFunction(ctx) {
         ctx.color = this.fill
@@ -206,7 +234,7 @@ class GameShape extends GameDrawable {
         else if (this.type === 'polygon' || this.type === 'line') {
             ctx.beginPath();
             ctx.moveTo(this.coords[0],this.coords[1])
-            for (let i = 2; i < this.coords.length-1; i+=2) {
+            for (let i = 2; i &lt; this.coords.length-1; i+=2) {
                 ctx.lineTo(this.coords[i],this.coords[i+1])
             }
             if (this.type === 'polygon') {
@@ -228,7 +256,7 @@ class GameShape extends GameDrawable {
      * Calls parent draw function
      * @param {CanvasRenderingContext2D} ctx Rendering context on which the method draws
      * @param {Point} center Center Point of parent Element
-     * @returns {Promise<void>}
+     * @returns {Promise&lt;void>}
      */
     async draw(ctx,center) {
         await super.draw(ctx,center,this)
@@ -239,7 +267,7 @@ class GameShape extends GameDrawable {
      * @param {Point} mouse Mouse position on canvas.
      * @param {CanvasRenderingContext2D} tempContext Hidden rendering context to check pixel state.
      * @param {Point} center Center Point of parent Element
-     * @returns {Promise<boolean>} True when mouse is inside drawable, false otherwise.
+     * @returns {Promise&lt;boolean>} True when mouse is inside drawable, false otherwise.
      */
     async isInside(mouse, tempContext, center) {
         const drawFunction = async function (ctx, attrs) {
@@ -306,12 +334,12 @@ function insidePolygon(point, vs) {
     const x = point.x, y = point.y;
 
     let inside = false;
-    for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+    for (let i = 0, j = vs.length - 1; i &lt; vs.length; j = i++) {
         const xi = vs[i][0], yi = vs[i][1];
         const xj = vs[j][0], yj = vs[j][1];
 
         const intersect = ((yi > y) !== (yj > y))
-            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+            &amp;&amp; (x &lt; (xj - xi) * (y - yi) / (yj - yi) + xi);
         if (intersect) inside = !inside;
     }
 
@@ -328,4 +356,26 @@ function isColor(strColor) {
 
 // module.exports = GameShape
 
-export {GameShape}
+export {GameShape}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Game.html">Game</a></li><li><a href="GameButton.html">GameButton</a></li><li><a href="GameCanvas.html">GameCanvas</a></li><li><a href="GameDrawable.html">GameDrawable</a></li><li><a href="GameElement.html">GameElement</a></li><li><a href="GameGif.html">GameGif</a></li><li><a href="GameHitbox.html">GameHitbox</a></li><li><a href="GameImage.html">GameImage</a></li><li><a href="GameShape.html">GameShape</a></li><li><a href="GameText.html">GameText</a></li><li><a href="GameTextInput.html">GameTextInput</a></li><li><a href="Point.html">Point</a></li></ul><h3>Global</h3><ul><li><a href="global.html#loadImage">loadImage</a></li><li><a href="global.html#randomColor">randomColor</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Sun Mar 06 2022 21:02:36 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

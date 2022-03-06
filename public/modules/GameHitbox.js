@@ -1,9 +1,18 @@
 import {Point} from "./Misc.js";
 
+/**
+ * GameHibox class. Used for collision detection
+ *
+ * @property {Point} delta Deviation from center point of parent Element
+ * @property {number} r Radius of the hitbox circle
+ */
 class GameHitbox {
-    delta = undefined       //point dx dy
-    r = undefined           //radius from center + delta
-
+    /**
+     * Constructor for GameHibox
+     * @param r     Radius of the circle
+     * @param {number} dx Horizontal deviation from center of the element
+     * @param {number} dy Vertical deviation from center of the element
+     */
     constructor(r,dx=0,dy=0, ) {
         if (r <= 0) {
             throw "Hitbox needs a valid radius"
@@ -15,6 +24,11 @@ class GameHitbox {
         )
     }
 
+    /**
+     * Draw function for the hitbox. Draws a coloured circle
+     * @param {CanvasRenderingContext2D} ctx Context on which the hitbox is drawn
+     * @param {Point} center Center of the parent Element
+     */
     draw(ctx, center) {
         ctx.strokeStyle = 'red'
         ctx.lineWidth = 5

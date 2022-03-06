@@ -1,4 +1,32 @@
-import {Point} from "./Misc.js";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: GameElement.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: GameElement.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {Point} from "./Misc.js";
 import {GameDrawable} from "./drawables/GameDrawable.js";
 import {GameHitbox} from "./GameHitbox.js";
 import {GameGif} from "./drawables/GameGif.js";
@@ -16,17 +44,17 @@ import {GameGif} from "./drawables/GameGif.js";
  * @property {string} name Name of the element. Undefined or unique
  * @property {number} level Level of the element in relation to its siblings
  * @property {Point} center Center of the element. Absolute value
- * @property {Array<GameDrawable>} children Array of drawables linked to the element
+ * @property {Array&lt;GameDrawable>} children Array of drawables linked to the element
  * @property {boolean} clickable Element will respond to click
  * @property {boolean} draggable Element will respond to holding
  * @property {boolean} stationary Element will respond to holding, but won't change its position
- * @property {Array<callbackValue>} onClick Array of [callback,attribute_object] called on click
- * @property {Array<callbackValue>} onDrag Array of [callback,attribute_object] called on dragging/holding
- * @property {Array<callbackValue>} onFinishDragging Array of [callback,attribute_object] called when finished dragging/holding
+ * @property {Array&lt;callbackValue>} onClick Array of [callback,attribute_object] called on click
+ * @property {Array&lt;callbackValue>} onDrag Array of [callback,attribute_object] called on dragging/holding
+ * @property {Array&lt;callbackValue>} onFinishDragging Array of [callback,attribute_object] called when finished dragging/holding
  * @property {Object} onKeyPress Map of (keyboard) keys mapped to an array of [callback,attribute_object] called on key press todo transform to Map
  * @property {Object} onKeyHold Map of (keyboard) keys mapped to an array of [callback,attribute_object] called on key hold
  * @property {Object} shared Shared object passed from Game
- * @property {Array<GameHitbox>} hitboxes Array of hitboxes linked to the element
+ * @property {Array&lt;GameHitbox>} hitboxes Array of hitboxes linked to the element
  * @property {boolean} hitboxVisible Hitboxes are drawn on true, else are hidden
  * @property {number} rotation Rotation of element in radians
  */
@@ -34,7 +62,7 @@ class GameElement {
     /**
      * Constructor of the GameElement class
      * @param {Point} center Absolute position of the element
-     * @param {Array<GameDrawable>} children Array of drawables
+     * @param {Array&lt;GameDrawable>} children Array of drawables
      * @param {Object} attrs Attribute object
      */
     constructor(center,children,attrs={}) {
@@ -52,7 +80,7 @@ class GameElement {
             this.addChild(child)
         }
 
-        if (attrs.hitboxes !== undefined && !Array.isArray(attrs.hitboxes)) {
+        if (attrs.hitboxes !== undefined &amp;&amp; !Array.isArray(attrs.hitboxes)) {
             throw "Hitboxes need to be in an array"
         }
         this.hitboxes = (Array.isArray(attrs.hitboxes)) ? attrs.hitboxes : []
@@ -76,7 +104,7 @@ class GameElement {
             throw new Error("Incorrect instance of child!")
         }
 
-        const nameIsUsed = this.children.filter(c => c.name === child.name && child.name !== undefined).length > 0
+        const nameIsUsed = this.children.filter(c => c.name === child.name &amp;&amp; child.name !== undefined).length > 0
         if (nameIsUsed) {
             throw `used name "${child.name}"`;
         }
@@ -104,7 +132,7 @@ class GameElement {
     /**
      * Transforms the canvas context and calls draw function of every visible child
      * @param {CanvasRenderingContext2D} ctx Rendering context of the canvas
-     * @returns {Promise<void>}
+     * @returns {Promise&lt;void>}
      */
     async draw(ctx) {
         //wait for loading all images
@@ -134,7 +162,7 @@ class GameElement {
 
     /**
      * Updates the animation on every child of type GameGif
-     * @returns {Promise<void>}
+     * @returns {Promise&lt;void>}
      */
     async animate() {
         this.children
@@ -145,7 +173,7 @@ class GameElement {
     /**
      * Checks if mouse is inside any of the instance's child
      * @param {Point} mouse Mouse position
-     * @returns {Promise<boolean>} True when inside
+     * @returns {Promise&lt;boolean>} True when inside
      */
     async isInside(mouse) {
         this.shared.tempContext.setTransform(1,0,0,1,this.center.x,this.center.y);
@@ -255,12 +283,12 @@ class GameElement {
 
     /**
      * Calls the functions in the onKeyPress object that are assigned to the passed keys
-     * @param {Array<string>} keyArray Array of currently pressed keys
+     * @param {Array&lt;string>} keyArray Array of currently pressed keys
      */
     keyPress(keyArray) {
         for (const key of keyArray) {
             const events = this.onKeyPress[key]
-            if (events !== undefined && events.length !== 0) {
+            if (events !== undefined &amp;&amp; events.length !== 0) {
                 for (const onPress of events) {
                     onPress[0](onPress[1])
                 }
@@ -270,12 +298,12 @@ class GameElement {
 
     /**
      * Calls the functions in the onKeyHold object that are assigned to the passed keys
-     * @param {Array<string>} keyArray Array of currently pressed keys
+     * @param {Array&lt;string>} keyArray Array of currently pressed keys
      */
     keyHold(keyArray) {
         for (const key of keyArray) {
             const events = this.onKeyHold[key]
-            if (events !== undefined && events.length !== 0) {
+            if (events !== undefined &amp;&amp; events.length !== 0) {
                 for (const onHold of events) {
                     onHold[0](onHold[1])
                 }
@@ -312,7 +340,7 @@ class GameElement {
                 const pos2 = other.center.add(hb2.delta).rotateAround(other.center,other.rotation)
 
                 const distance = pos1.distanceTo(pos2)
-                if (distance < hb1.r + hb2.r) {
+                if (distance &lt; hb1.r + hb2.r) {
                     return true
                 }
             }
@@ -331,4 +359,26 @@ class GameElement {
 
 // module.exports = GameElement
 
-export { GameElement }
+export { GameElement }</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Game.html">Game</a></li><li><a href="GameButton.html">GameButton</a></li><li><a href="GameCanvas.html">GameCanvas</a></li><li><a href="GameDrawable.html">GameDrawable</a></li><li><a href="GameElement.html">GameElement</a></li><li><a href="GameGif.html">GameGif</a></li><li><a href="GameHitbox.html">GameHitbox</a></li><li><a href="GameImage.html">GameImage</a></li><li><a href="GameShape.html">GameShape</a></li><li><a href="GameText.html">GameText</a></li><li><a href="GameTextInput.html">GameTextInput</a></li><li><a href="Point.html">Point</a></li></ul><h3>Global</h3><ul><li><a href="global.html#loadImage">loadImage</a></li><li><a href="global.html#randomColor">randomColor</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Sun Mar 06 2022 21:02:36 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

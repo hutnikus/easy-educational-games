@@ -1,4 +1,32 @@
-// const GameShape = require("./drawables/GameShape.js")
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Game.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Game.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// const GameShape = require("./drawables/GameShape.js")
 // const GameElement = require("./GameElement.js")
 // const Misc = require("./Misc.js")
 // const Point = Misc.Point
@@ -11,10 +39,10 @@ import {GameShape, GameElement, Point} from "./index.js";
 
 /**
  * Game class. It manages the game state and elements within it.
- * @property {Array<GameElement>} elements Array of GameElement objects
+ * @property {Array&lt;GameElement>} elements Array of GameElement objects
  * @property {GameElement} selectedElement Selected element when dragging
  * @property {Point} delta Distance from mouse to center of dragged element
- * @property {Array<string>} pressedKeys Array of currently pressed keys
+ * @property {Array&lt;string>} pressedKeys Array of currently pressed keys
  * @property {{mousePos:Point,tempContext:CanvasRenderingContext2D}} shared Last recorded mouse position and temporary context shared with elements
  * @property {HTMLCanvasElement} canvas HTML canvas on which the game is played
  * @property {CanvasRenderingContext2D} context Rendering context for the canvas
@@ -88,7 +116,7 @@ class Game {
     /**
      * Debugging listener function for checking if mouse is within an element. Draws red or green circles depending on whether the mouse is inside or not.
      * @param {MouseEvent} event Mouse event passed
-     * @returns {Promise<void>}
+     * @returns {Promise&lt;void>}
      */
     async drawInside(event) {
         const mousePos = this.getMousePos(event)
@@ -119,7 +147,7 @@ class Game {
     /**
      * Handler for mouse click. Passes the event to relevant elements.
      * @param {MouseEvent} event Mouse event passed
-     * @returns {Promise<void>}
+     * @returns {Promise&lt;void>}
      */
     async onClick(event) {
         const mousePos = this.getMousePos(event)
@@ -130,7 +158,7 @@ class Game {
             return
         }
 
-        if (!el.clickable && !el.draggable) {
+        if (!el.clickable &amp;&amp; !el.draggable) {
             console.error('clicked unresponsive element')
             return
         }
@@ -241,7 +269,7 @@ class Game {
             throw new Error("Incorrect element instance!")
         }
 
-        const nameIsUsed = this.elements.filter(c => c.name === element.name && element.name !== undefined).length > 0
+        const nameIsUsed = this.elements.filter(c => c.name === element.name &amp;&amp; element.name !== undefined).length > 0
         if (nameIsUsed) {
             throw new Error(`used name "${element.name}"`);
         }
@@ -280,7 +308,7 @@ class Game {
 
     /**
      * Calls the draw function of all elements
-     * @returns {Promise<void>}
+     * @returns {Promise&lt;void>}
      */
     async draw() {
         this.context.setTransform(1,0,0,1,0,0);
@@ -332,12 +360,12 @@ class Game {
     /**
      * Returns element on position or null
      * @param {Point} position Searched position
-     * @returns {Promise<null|GameElement>} Element at position or null
+     * @returns {Promise&lt;null|GameElement>} Element at position or null
      */
     async getElementAtPos(position) {
         for (const i in this.elements) {
             const el = this.elements.at(this.elements.length-1-i)
-            if (!el.clickable && !el.draggable) {
+            if (!el.clickable &amp;&amp; !el.draggable) {
                 // console.log("clicked unresponsive element")
                 continue
             }
@@ -359,7 +387,7 @@ class Game {
     /**
      * Returns an array of elements that collide with input element
      * @param {GameElement} element Element for which the collisions are checked
-     * @returns {Array<GameElement>}
+     * @returns {Array&lt;GameElement>}
      */
     checkCollisions(element) {
         const collisions = []
@@ -377,4 +405,26 @@ class Game {
 
 // module.exports = Game
 
-export { Game }
+export { Game }</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Game.html">Game</a></li><li><a href="GameButton.html">GameButton</a></li><li><a href="GameCanvas.html">GameCanvas</a></li><li><a href="GameDrawable.html">GameDrawable</a></li><li><a href="GameElement.html">GameElement</a></li><li><a href="GameGif.html">GameGif</a></li><li><a href="GameHitbox.html">GameHitbox</a></li><li><a href="GameImage.html">GameImage</a></li><li><a href="GameShape.html">GameShape</a></li><li><a href="GameText.html">GameText</a></li><li><a href="GameTextInput.html">GameTextInput</a></li><li><a href="Point.html">Point</a></li></ul><h3>Global</h3><ul><li><a href="global.html#loadImage">loadImage</a></li><li><a href="global.html#randomColor">randomColor</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Sun Mar 06 2022 21:02:36 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
