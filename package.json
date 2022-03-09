@@ -2,10 +2,8 @@
   "name": "easy-educational-games",
   "version": "1.0.11",
   "description": "javascript library for easy educational game development",
-  "main": "server.mjs",
+  "main": "index.js",
   "scripts": {
-    "start": "node server",
-    "dev": "nodemon server",
     "doc": "jsdoc -c jsdoc.json"
   },
   "repository": {
@@ -23,7 +21,6 @@
     "socket.io": "^4.4.1"
   },
   "devDependencies": {
-    "jsdoc": "^3.6.10",
-    "nodemon": "^2.0.15"
+    "jsdoc": "^3.6.10"
   }
 }

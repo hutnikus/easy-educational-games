@@ -1,7 +1,7 @@
-import {Point} from "./Misc.js";
-import {GameDrawable} from "./drawables/GameDrawable.js";
-import {GameHitbox} from "./GameHitbox.js";
-import {GameGif} from "./drawables/GameGif.js";
+import {Point} from "../Misc.js";
+import {GameDrawable} from "../drawables/GameDrawable.js";
+import {GameHitbox} from "../GameHitbox.js";
+import {GameGif} from "../drawables/GameGif.js";
 
 /**
  * @typedef callbackValue

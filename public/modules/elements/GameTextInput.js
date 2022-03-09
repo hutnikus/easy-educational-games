@@ -1,7 +1,7 @@
 import {GameElement} from "./GameElement.js";
-import {Point, randomColor} from "./Misc.js";
-import {GameShape} from "./drawables/GameShape.js";
-import {GameText} from "./drawables/GameText.js";
+import {Point, randomColor} from "../Misc.js";
+import {GameShape} from "../drawables/GameShape.js";
+import {GameText} from "../drawables/GameText.js";
 
 /**
  * Text Input class
