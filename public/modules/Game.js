@@ -50,8 +50,11 @@ class Game {
         // canvas.addEventListener('click',(event) => this.onClick(event))
 
         canvas.addEventListener('mousedown',(async ev => await this.onClick(ev)))
+        canvas.addEventListener('touchstart',(async ev => await this.onClick(ev)))
         canvas.addEventListener('mousemove',(ev => this.onDrag(ev)))
+        canvas.addEventListener('touchmove',(ev => this.onDrag(ev)))
         canvas.addEventListener('mouseup',(ev => this.onFinishDragging(ev)))
+        canvas.addEventListener('touchend',(ev => this.onFinishDragging(ev)))
         document.addEventListener('keydown',(ev => this.onKeyDown(ev)))
         document.addEventListener('keyup',(ev => this.onKeyUp(ev)))
 
@@ -118,10 +121,13 @@ class Game {
 
     /**
      * Handler for mouse click. Passes the event to relevant elements.
-     * @param {MouseEvent} event Mouse event passed
+     * @param {MouseEvent|TouchEvent} event Mouse event passed
      * @returns {Promise<void>}
      */
     async onClick(event) {
+        if (!(event instanceof MouseEvent)) {
+            event.preventDefault()
+        }
         const mousePos = this.getMousePos(event)
 
         //get topmost element
@@ -148,9 +154,12 @@ class Game {
 
     /**
      * Handler for dragging. Triggers every time the mouse is dragged and will pass the event to the selected element (if one exists)
-     * @param {MouseEvent} event Mouse event passed
+     * @param {MouseEvent|TouchEvent} event Mouse event passed
      */
     onDrag(event) {
+        if (!(event instanceof MouseEvent)) {
+            event.preventDefault()
+        }
         if (this.selectedElement === undefined) {
             return
         }
@@ -161,9 +170,12 @@ class Game {
 
     /**
      * Handler for finishing dragging. Triggers on mouseup and will pass the event to the selected element (if one exists)
-     * @param {MouseEvent} event Mouse event passed
+     * @param {MouseEvent|TouchEvent} event Mouse event passed
      */
     onFinishDragging(event) {
+        if (!(event instanceof MouseEvent)) {
+            event.preventDefault()
+        }
         if (this.selectedElement === undefined) {
             return
         }
@@ -317,12 +329,21 @@ class Game {
 
     /**
      * Sets current mouse position in the shared object and returns it
-     * @param {MouseEvent} event Mouse event passed
+     * @param {MouseEvent|TouchEvent} event Mouse event passed
      * @returns {Point} Current mouse position
      */
     getMousePos(event) {
         const rect = this.canvas.getBoundingClientRect();
-        const pos = new Point(event.clientX - rect.left, event.clientY - rect.top);
+        let pos;
+        if (event instanceof MouseEvent) {
+            pos = new Point(event.clientX - rect.left, event.clientY - rect.top);
+        } else if (event instanceof TouchEvent) {
+            const touch = event.touches.item(0)
+            if (touch === null) {
+                return undefined
+            }
+            pos = new Point(touch.clientX - rect.left, touch.clientY - rect.top);
+        }
 
         this.shared.mousePos = pos.copy()
 
