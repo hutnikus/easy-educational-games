@@ -108,9 +108,4 @@ function randomColor() {
     return "#"+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)
 }
 
-// module.exports = {
-//     Point,
-//     Pixel
-// }
-
 export { Point, randomColor }

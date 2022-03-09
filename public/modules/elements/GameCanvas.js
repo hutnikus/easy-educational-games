@@ -1,6 +1,6 @@
 import {GameElement} from "./GameElement.js";
-import {Point} from "./Misc.js";
-import {GameShape} from "./drawables/GameShape.js";
+import {Point} from "../Misc.js";
+import {GameShape} from "../drawables/GameShape.js";
 
 /**
  * GameCanvas class. Handles canvas and drawing on it

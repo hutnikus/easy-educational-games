@@ -1,8 +1,8 @@
 import {GameElement} from "./GameElement.js";
-import {Point} from "./Misc.js";
-import {GameShape} from "./drawables/GameShape.js";
-import {GameText} from "./drawables/GameText.js";
-import {GameDrawable} from "./drawables/GameDrawable.js";
+import {Point} from "../Misc.js";
+import {GameShape} from "../drawables/GameShape.js";
+import {GameText} from "../drawables/GameText.js";
+import {GameDrawable} from "../drawables/GameDrawable.js";
 
 /**
  * GameButton class. Handles drawing and clicking for the button.

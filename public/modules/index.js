@@ -6,25 +6,27 @@
 // const GameText = require("./public/modules/drawables/GameText.js")
 
 import {Game} from "./Game.js";
-import {GameElement} from "./GameElement.js";
+import {GameElement} from "./elements/GameElement.js";
 import {GameGif} from "./drawables/GameGif.js";
 import {GameImage} from "./drawables/GameImage.js";
 import {GameText} from "./drawables/GameText.js";
 import {GameShape} from "./drawables/GameShape.js";
 import {Point} from "./Misc.js";
-import {GameCanvas} from "./GameCanvas.js";
-import {GameButton} from "./GameButton.js";
+import {GameCanvas} from "./elements/GameCanvas.js";
+import {GameButton} from "./elements/GameButton.js";
 import {GameHitbox} from "./GameHitbox.js";
-import {GameTextInput} from "./GameTextInput.js";
+import {GameTextInput} from "./elements/GameTextInput.js";
 
-
-// module.exports = {
-//     Game,
-//     GameElement,
-//     GameGif,
-//     GameImage,
-//     GameShape,
-//     GameText,
-// }
-
-export {Game, GameText, GameGif, GameShape, GameElement, GameImage, Point, GameCanvas, GameButton, GameHitbox,GameTextInput}
+export {
+    Game,
+    GameText,
+    GameGif,
+    GameShape,
+    GameElement,
+    GameImage,
+    Point,
+    GameCanvas,
+    GameButton,
+    GameHitbox,
+    GameTextInput
+}

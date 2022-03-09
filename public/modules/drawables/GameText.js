@@ -1,7 +1,5 @@
 import {GameDrawable} from "./GameDrawable.js";
 
-//todo add rotation and isinside
-
 /**
  * Text drawable class.
  * @extends GameDrawable
