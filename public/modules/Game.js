@@ -50,11 +50,11 @@ class Game {
         // canvas.addEventListener('click',(event) => this.onClick(event))
 
         canvas.addEventListener('mousedown',(async ev => await this.onClick(ev)))
-        canvas.addEventListener('touchstart',(async ev => await this.onClick(ev)))
+        canvas.addEventListener('touchstart',(async ev => await this.onClick(ev)),false)
         canvas.addEventListener('mousemove',(ev => this.onDrag(ev)))
-        canvas.addEventListener('touchmove',(ev => this.onDrag(ev)))
+        canvas.addEventListener('touchmove',(ev => this.onDrag(ev)),false)
         canvas.addEventListener('mouseup',(ev => this.onFinishDragging(ev)))
-        canvas.addEventListener('touchend',(ev => this.onFinishDragging(ev)))
+        canvas.addEventListener('touchend',(ev => this.onFinishDragging(ev)),false)
         document.addEventListener('keydown',(ev => this.onKeyDown(ev)))
         document.addEventListener('keyup',(ev => this.onKeyUp(ev)))
 
@@ -129,6 +129,7 @@ class Game {
             event.preventDefault()
         }
         const mousePos = this.getMousePos(event)
+        // console.log("here")
 
         //get topmost element
         const el = await this.getElementAtPos(mousePos)
@@ -357,13 +358,11 @@ class Game {
      */
     async getElementAtPos(position) {
         for (const i in this.elements) {
-            const el = this.elements.at(this.elements.length-1-i)
+            const el = this.elements[this.elements.length-1-i]
             if (!el.clickable && !el.draggable) {
-                // console.log("clicked unresponsive element")
                 continue
             }
             if (await el.isInside(position, this.tempContext)) {
-                // console.log(el)
                 return el
             }
         }
