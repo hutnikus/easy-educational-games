@@ -43,6 +43,14 @@ class GameHitbox {
         ctx.lineWidth = 2
         ctx.stroke()
     }
+
+    /**
+     * Creates new instance with identical attributes
+     * @returns {GameHitbox} Copy of this instance
+     */
+    copy() {
+        return new GameHitbox(this.r,this.delta.x,this.delta.y)
+    }
 }
 
 export {GameHitbox}

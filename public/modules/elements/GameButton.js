@@ -8,15 +8,27 @@ import {GameDrawable} from "../drawables/GameDrawable.js";
  * GameButton class. Handles drawing and clicking for the button.
  * @extends GameElement
  *
- * @property {number} width Width of the button todo maxwidth of text inside
+ * @property {number} width Width of the button
  * @property {number} height Height of the button
  * @property {string} color CSS color string. Color of the button
  * @property {string} text Text displayed on the button
- * @property {boolean} selected Is true while holding the button todo remove or make it do something
  * @property {Array<callbackValue>} onPress Array of callbacks and their passed attributes to be triggered on button press
  * @property {GameDrawable} highlight Rectangle that highlights the button while pressed
  */
 class GameButton extends GameElement {
+    #widthValue = undefined
+    set width(newW) {
+        if (newW === undefined) {
+            this.#widthValue = 100
+        } else {
+            this.#widthValue = newW
+        }
+        this.textDrawable.maxWidth = this.#widthValue
+    }
+    get width() {
+        return this.#widthValue
+    }
+
     /**
      * Constructor for GameButton
      * @param {Point} center Center point of the element
@@ -24,13 +36,16 @@ class GameButton extends GameElement {
      */
     constructor(center,attrs={}) {
         super(center,[],attrs)
-        this.selected = false
         this.onPress = []
 
-        this.width = (attrs.width === undefined) ? 100 : attrs.width
+        this.text = attrs.text;
+
+        this.textDrawable = new GameText(this.text,{level:0,})
+        this.addChild(this.textDrawable)
+
+        this.width = attrs.width
         this.height = (attrs.height === undefined) ? 50 : attrs.height
         this.color = (attrs.color === undefined) ? 'lightgrey' : attrs.color;
-        this.text = attrs.text;
 
         const rectangle = new GameShape('rectangle',{
                 width:this.width,
@@ -42,9 +57,6 @@ class GameButton extends GameElement {
             }
         )
         this.addChild(rectangle)
-
-        const text = new GameText(this.text,{level:0,})
-        this.addChild(text)
 
         this.highlight =  new GameShape('rectangle',{
                 width:this.width+4,
@@ -75,6 +87,14 @@ class GameButton extends GameElement {
     }
 
     /**
+     * Removes listener for the onButtonPress event
+     * @param {function} callback function you want to remove
+     */
+    removeOnButtonPressListener(callback) {
+        this.onPress = this.onPress.filter(item=>item[0]!==callback)
+    }
+
+    /**
      * Highlights the button on click
      * @param {GameButton} self Instance of the button passed on construction
      * @static
@@ -82,7 +102,6 @@ class GameButton extends GameElement {
      */
     static #selectButton(self) {
         self.highlight.visible = true
-        self.selected = true
     }
 
     /**
@@ -102,6 +121,42 @@ class GameButton extends GameElement {
                 onPressElement[0](onPressElement[1])
             }
         }
+    }
+
+    /**
+     * Returns object of attributes of current instance.
+     * @returns {Object} Attribute object.
+     */
+    getAttrs() {
+        return Object.assign({
+            width: this.width,
+            height: this.height,
+            color: this.color,
+            text: this.text,
+            onPress: this.onPress.map((evt)=>[...evt]),
+        },super.getAttrs())
+    }
+
+    /**
+     * Returns copy of current instance.
+     * @param {string} newName Name of the newly created instance. Names have to be unique.
+     * @returns {GameButton} New instance with the same attributes.
+     */
+    copy(newName) {
+        const attrs = this.getAttrs()
+        if (newName === undefined) {
+            attrs.name = (attrs.name === undefined) ? undefined : attrs.name + "_copy"
+        } else {
+            attrs.name = newName
+        }
+        const retButton = new GameButton(attrs.center,attrs)
+        // remove selecting of this instance
+        retButton.removeOnClickListener(GameButton.#selectButton)
+        retButton.removeOnFinishDraggingListener(GameButton.#deselectButton)
+        // add selecting for new instance
+        retButton.addOnClickListener(GameButton.#selectButton,retButton)
+        retButton.addOnFinishDraggingListener(GameButton.#deselectButton,retButton)
+        return retButton
     }
 }
 

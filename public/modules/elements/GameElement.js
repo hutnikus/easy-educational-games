@@ -41,11 +41,11 @@ class GameElement {
         this.name = attrs.name;
         this.center = center;
         this.children = []
-        this.onClick = []
-        this.onDrag = []
-        this.onFinishDragging = []
-        this.onKeyPress = {}
-        this.onKeyHold = {}
+        this.onClick = (attrs.onClick === undefined) ? [] : attrs.onClick
+        this.onDrag = (attrs.onDrag === undefined) ? [] : attrs.onDrag
+        this.onFinishDragging = (attrs.onFinishDragging === undefined) ? [] : attrs.onFinishDragging
+        this.onKeyPress = (attrs.onKeyPress === undefined) ? {} : attrs.onKeyPress
+        this.onKeyHold = (attrs.onKeyHold === undefined) ? {} : attrs.onKeyHold
         this.hitboxes = []
 
         for (const child of children) {
@@ -99,6 +99,17 @@ class GameElement {
             throw `There are multiple children with name:${name} in ${this}`
         }
         return child[0]
+    }
+
+    /**
+     * Removes element from elements array and returns it, or throws an error
+     * @param {string} name Name of element to be removed
+     * @returns {GameElement} Removed element
+     */
+    popChildByName(name) {
+        const el = this.getChildByName(name)
+        this.children = this.children.filter(e => e.name !== name)
+        return el[0]
     }
 
     /**
@@ -174,6 +185,14 @@ class GameElement {
     }
 
     /**
+     * Removes listener for the onClick event
+     * @param {function} callback function you want to remove
+     */
+    removeOnClickListener(callback) {
+        this.onClick = this.onClick.filter(item=>item[0]!==callback)
+    }
+
+    /**
      * Adds a listener to the array of listeners for onDrag
      * @param {function} callback function to be called
      * @param {Object} attrs Attribute object passed to the callback
@@ -183,12 +202,28 @@ class GameElement {
     }
 
     /**
+     * Removes listener for the onDrag event
+     * @param {function} callback function you want to remove
+     */
+    removeOnDragListener(callback) {
+        this.onDrag = this.onDrag.filter(item=>item[0]!==callback)
+    }
+
+    /**
      * Adds a listener to the array of listeners for onFinishDragging
      * @param {function} callback function to be called
      * @param {Object} attrs Attribute object passed to the callback
      */
     addOnFinishDraggingListener(callback,attrs) {
         this.onFinishDragging.push([callback,attrs])
+    }
+
+    /**
+     * Removes listener for the onFinishDragging event
+     * @param {function} callback function you want to remove
+     */
+    removeOnFinishDraggingListener(callback) {
+        this.onFinishDragging = this.onFinishDragging.filter(item=>item[0]!==callback)
     }
 
     /**
@@ -205,6 +240,17 @@ class GameElement {
     }
 
     /**
+     * Removes listener for the onKeyPress event
+     * @param {string} key Key from which the listener is removed from
+     * @param {function} callback function you want to remove
+     */
+    removeOnKeyPressListener(key,callback) {
+        if (this.onKeyPress[key] !== undefined) {
+            this.onKeyPress[key] = this.onKeyPress[key].filter(item=>item[0]!==callback)
+        }
+    }
+
+    /**
      * Adds a listener to the array of listeners for onKeyHold
      * @param {string} key Key the callback will be called for
      * @param {function} callback function to be called
@@ -215,6 +261,17 @@ class GameElement {
             this.onKeyHold[key] = []
         }
         this.onKeyHold[key].push([callback,attrs])
+    }
+
+    /**
+     * Removes listener for the onKeyHold event
+     * @param {string} key Key from which the listener is removed from
+     * @param {function} callback function you want to remove
+     */
+    removeOnKeyHoldListener(key,callback) {
+        if (this.onKeyHold[key] !== undefined) {
+            this.onKeyHold[key] = this.onKeyHold[key].filter(item=>item[0]!==callback)
+        }
     }
 
     /**
@@ -284,17 +341,6 @@ class GameElement {
     }
 
     /**
-     * Returns a copy of the current instance todo attributes and child copies
-     * @returns {GameElement} Copy of current instance
-     */
-    copy() {
-        return new GameElement(
-            this.center.x,this.center.y,
-            this.children
-        )
-    }
-
-    /**
      * Returns true on collision with the other element
      * @param {GameElement} other Element with which the collision is checked
      * @returns {boolean} True on colision else false
@@ -327,6 +373,58 @@ class GameElement {
     move(delta) {
         this.center = this.center.add(delta)
     }
+
+    /**
+     * Returns an object of attributes (used for copying)
+     * @returns {Object} Attribute object
+     */
+    getAttrs() {
+        return {
+            name: this.name,
+            level: this.level,
+            center: this.center.copy(),
+            children: this.children.map((child=>child.copy())),
+            clickable: this.clickable,
+            draggable: this.draggable,
+            stationary: this.stationary,
+            onClick: this.onClick.map((evt)=>[...evt]),
+            onDrag: this.onDrag.map((evt)=>[...evt]),
+            onFinishDragging: this.onFinishDragging.map((evt)=>[...evt]),
+            onKeyPress: copyKeyObject(this.onKeyPress),
+            onKeyHold: copyKeyObject(this.onKeyHold),
+            shared: this.shared,
+            hitboxes: this.hitboxes.map((hb=>hb.copy())),
+            hitboxVisible: this.hitboxVisible,
+            rotation: this.rotation
+        }
+    }
+
+    /**
+     * Returns a new copy of this instance (with unlinked children)
+     * @param {string} newName Name of the newly created instance. Names have to be unique.
+     * @returns {GameElement} Copy of this instance
+     */
+    copy(newName) {
+        const attrs = this.getAttrs()
+        if (newName === undefined) {
+            attrs.name = (attrs.name === undefined) ? undefined : attrs.name + "_copy"
+        } else {
+            attrs.name = newName
+        }
+        return new GameElement(
+            attrs.center,
+            attrs.children,
+            attrs
+        )
+    }
+}
+
+function copyKeyObject(obj) {
+    const retObj = {}
+    for (const key of Object.keys(obj)) {
+        retObj[key] = obj[key].map((evt)=>[...evt])
+    }
+    return retObj
 }
 
 // module.exports = GameElement

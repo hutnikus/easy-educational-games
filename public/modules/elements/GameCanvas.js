@@ -115,6 +115,41 @@ class GameCanvas extends GameElement {
         self.current = undefined;
         clearInterval(self.interval)
     }
+
+    /**
+     * Returns object of attributes of current instance.
+     * @returns {Object} Attribute object.
+     */
+    getAttrs() {
+        return Object.assign({
+            width: this.width,
+            height: this.height,
+            fill: this.fill,
+            stroke: this.stroke,
+        },super.getAttrs())
+    }
+
+    /**
+     * Returns copy of current instance.
+     * @param {string} newName Name of the newly created instance. Names have to be unique.
+     * @returns {GameCanvas} New instance with the same attributes.
+     */
+    copy(newName) {
+        const attrs = this.getAttrs()
+        if (newName === undefined) {
+            attrs.name = (attrs.name === undefined) ? undefined : attrs.name + "_copy"
+        } else {
+            attrs.name = newName
+        }
+        const retCanvas = new GameCanvas(attrs.center,attrs)
+        // remove drawing of this instance
+        retCanvas.removeOnClickListener(GameCanvas.#startDrawing)
+        retCanvas.removeOnFinishDraggingListener(GameCanvas.#finishDrawing)
+        // add drawing for new instance
+        retCanvas.addOnClickListener(GameCanvas.#startDrawing,retCanvas)
+        retCanvas.addOnFinishDraggingListener(GameCanvas.#finishDrawing,retCanvas)
+        return retCanvas
+    }
 }
 
 export {GameCanvas}

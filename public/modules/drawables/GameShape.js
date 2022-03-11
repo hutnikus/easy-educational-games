@@ -264,7 +264,7 @@ class GameShape extends GameDrawable {
             lineWidth : this.lineWidth,
             rX : this.rX,
             rY : this.rY,
-            coords : [...this.coords],
+            coords : (this.coords === undefined) ? undefined : [...this.coords],
         },super.getAttrs())
     }
 

@@ -140,6 +140,14 @@ class GameTextInput extends GameElement {
     }
 
     /**
+     * Removes listener for the onEnterText event
+     * @param {function} callback function you want to remove
+     */
+    removeOnEnterTextListener(callback) {
+        this.onEnter = this.onEnter.filter(item=>item[0]!==callback)
+    }
+
+    /**
      * Called when user clicks on the element. Shows a prompt in which the user enters text. After text is entered, the onEnter callbacks are called
      * @param {GameTextInput} self Instance of Text Input
      * @returns {Promise<void>}
@@ -161,6 +169,42 @@ class GameTextInput extends GameElement {
                 onEnter[0](onEnter[1])
             }
         }
+    }
+
+    /**
+     * Returns object of attributes of current instance.
+     * @returns {Object} Attribute object.
+     */
+    getAttrs() {
+        return Object.assign({
+            width: this.width,
+            height: this.height,
+            color: this.color,
+            text: this.text,
+            defaultText: this.defaultText,
+            message: this.message,
+            onEnter: this.onEnter.map((evt)=>[...evt]),
+        },super.getAttrs())
+    }
+
+    /**
+     * Returns copy of current instance.
+     * @param {string} newName Name of the newly created instance. Names have to be unique.
+     * @returns {GameTextInput} New instance with the same attributes.
+     */
+    copy(newName) {
+        const attrs = this.getAttrs()
+        if (newName === undefined) {
+            attrs.name = (attrs.name === undefined) ? undefined : attrs.name + "_copy"
+        } else {
+            attrs.name = newName
+        }
+        const retInput = new GameTextInput(attrs.center,attrs)
+        // remove drawing of this instance
+        retInput.removeOnClickListener(GameTextInput.#clickOnInput)
+        // add drawing for new instance
+        retInput.addOnClickListener(GameTextInput.#clickOnInput,retInput)
+        return retInput
     }
 }
 
