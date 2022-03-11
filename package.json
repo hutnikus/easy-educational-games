@@ -1,6 +1,6 @@
 {
   "name": "easy-educational-games",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "javascript library for easy educational game development",
   "main": "index.js",
   "scripts": {

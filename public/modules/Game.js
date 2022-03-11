@@ -20,7 +20,7 @@ import {GameShape, GameElement, Point} from "./index.js";
  * @property {CanvasRenderingContext2D} context Rendering context for the canvas
  * @property {HTMLCanvasElement} tempCanvas Canvas on which the isInside() methods are checked. It can be optionally passed on construction
  * @property {CanvasRenderingContext2D} tempContext Rendering context for the tempCanvas
- *
+ * @property {Array<function>} onClear What happens on clear() in addition to removing elements
  */
 class Game {
     /**
@@ -31,6 +31,7 @@ class Game {
     constructor(canvas,tempCanvas=undefined) {
         this.elements = []
         this.pressedKeys = []
+        this.onClear = []
         this.canvas = canvas;
         this.context = canvas.getContext('2d');
         this.shared = {
@@ -369,11 +370,23 @@ class Game {
         return null
     }
 
+
     /**
-     * Resets element array
+     * Additional functions to call on clear
+     * @param callback function to call on clear
+     */
+    addOnClearListener(callback) {
+        this.onClear.push(callback)
+    }
+
+    /**
+     * Resets game to initial state
      */
     clear() {
         this.elements = []
+        for (const callback of this.onClear) {
+            callback()
+        }
     }
 
     /**
