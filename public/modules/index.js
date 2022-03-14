@@ -16,6 +16,7 @@ import {GameCanvas} from "./elements/GameCanvas.js";
 import {GameButton} from "./elements/GameButton.js";
 import {GameHitbox} from "./GameHitbox.js";
 import {GameTextInput} from "./elements/GameTextInput.js";
+import {GameComposite} from "./elements/GameComposite.js";
 
 export {
     Game,
@@ -28,5 +29,6 @@ export {
     GameCanvas,
     GameButton,
     GameHitbox,
-    GameTextInput
+    GameTextInput,
+    GameComposite,
 }

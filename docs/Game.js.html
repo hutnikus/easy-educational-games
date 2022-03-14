@@ -35,12 +35,12 @@
 // import {Point} from "./Misc.js";
 // import {GameElement} from "./GameElement.js";
 
-import {GameShape, GameElement, Point} from "./index.js";
+import {GameShape, GameElement, Point, GameComposite} from "./index.js";
 
 /**
  * Game class. It manages the game state and elements within it.
- * @property {Array&lt;GameElement>} elements Array of GameElement objects
- * @property {GameElement} selectedElement Selected element when dragging
+ * @property {Array&lt;GameElement|GameComposite>} elements Array of GameElement objects
+ * @property {GameElement|GameComposite} selectedElement Selected element when dragging
  * @property {Point} delta Distance from mouse to center of dragged element
  * @property {Array&lt;string>} pressedKeys Array of currently pressed keys
  * @property {{mousePos:Point,tempContext:CanvasRenderingContext2D}} shared Last recorded mouse position and temporary context shared with elements
@@ -48,7 +48,7 @@ import {GameShape, GameElement, Point} from "./index.js";
  * @property {CanvasRenderingContext2D} context Rendering context for the canvas
  * @property {HTMLCanvasElement} tempCanvas Canvas on which the isInside() methods are checked. It can be optionally passed on construction
  * @property {CanvasRenderingContext2D} tempContext Rendering context for the tempCanvas
- *
+ * @property {Array&lt;function>} onClear What happens on clear() in addition to removing elements
  */
 class Game {
     /**
@@ -59,6 +59,7 @@ class Game {
     constructor(canvas,tempCanvas=undefined) {
         this.elements = []
         this.pressedKeys = []
+        this.onClear = []
         this.canvas = canvas;
         this.context = canvas.getContext('2d');
         this.shared = {
@@ -78,8 +79,11 @@ class Game {
         // canvas.addEventListener('click',(event) => this.onClick(event))
 
         canvas.addEventListener('mousedown',(async ev => await this.onClick(ev)))
+        canvas.addEventListener('touchstart',(async ev => await this.onClick(ev)),false)
         canvas.addEventListener('mousemove',(ev => this.onDrag(ev)))
+        canvas.addEventListener('touchmove',(ev => this.onDrag(ev)),false)
         canvas.addEventListener('mouseup',(ev => this.onFinishDragging(ev)))
+        canvas.addEventListener('touchend',(ev => this.onFinishDragging(ev)),false)
         document.addEventListener('keydown',(ev => this.onKeyDown(ev)))
         document.addEventListener('keyup',(ev => this.onKeyUp(ev)))
 
@@ -105,7 +109,7 @@ class Game {
 
     /**
      * Changes the level of element and sorts elements by level
-     * @param {GameElement} element Element with level to be changed
+     * @param {GameElement|GameComposite} element Element with level to be changed
      * @param {number} newLevel New level value of the element
      */
     changeLevelOfElement(element,newLevel) {
@@ -146,11 +150,15 @@ class Game {
 
     /**
      * Handler for mouse click. Passes the event to relevant elements.
-     * @param {MouseEvent} event Mouse event passed
+     * @param {MouseEvent|TouchEvent} event Mouse event passed
      * @returns {Promise&lt;void>}
      */
     async onClick(event) {
+        if (!(event instanceof MouseEvent)) {
+            event.preventDefault()
+        }
         const mousePos = this.getMousePos(event)
+        // console.log("here")
 
         //get topmost element
         const el = await this.getElementAtPos(mousePos)
@@ -176,9 +184,12 @@ class Game {
 
     /**
      * Handler for dragging. Triggers every time the mouse is dragged and will pass the event to the selected element (if one exists)
-     * @param {MouseEvent} event Mouse event passed
+     * @param {MouseEvent|TouchEvent} event Mouse event passed
      */
     onDrag(event) {
+        if (!(event instanceof MouseEvent)) {
+            event.preventDefault()
+        }
         if (this.selectedElement === undefined) {
             return
         }
@@ -189,9 +200,12 @@ class Game {
 
     /**
      * Handler for finishing dragging. Triggers on mouseup and will pass the event to the selected element (if one exists)
-     * @param {MouseEvent} event Mouse event passed
+     * @param {MouseEvent|TouchEvent} event Mouse event passed
      */
     onFinishDragging(event) {
+        if (!(event instanceof MouseEvent)) {
+            event.preventDefault()
+        }
         if (this.selectedElement === undefined) {
             return
         }
@@ -228,7 +242,6 @@ class Game {
      */
     onKeyDown(event) {
         const key = event.key
-        console.log(key)
         if (!this.pressedKeys.includes(key)) {
             //if not yet pressed - add to array
             this.pressedKeys.push(key)
@@ -261,11 +274,11 @@ class Game {
 
     /**
      * Adds element to the array of elements
-     * @param {GameElement} element Added element
+     * @param {GameElement|GameComposite} element Added element
      * @param {boolean} sort Passing false improves the speed of adding elements, but requires later sorting (by level) for correct display
      */
     addElement(element,sort=true) {
-        if (!(element instanceof GameElement)) {
+        if (!(element instanceof GameElement) &amp;&amp; !(element instanceof GameComposite)) {
             throw new Error("Incorrect element instance!")
         }
 
@@ -283,7 +296,7 @@ class Game {
     /**
      * Returns element with matching name or throws an error
      * @param {string} name Name of searched element
-     * @returns {GameElement} Found element
+     * @returns {GameElement|GameComposite} Found element
      */
     getElementByName(name) {
         let el = this.elements.filter(e => e.name === name)
@@ -298,12 +311,20 @@ class Game {
     /**
      * Removes element from elements array and returns it, or throws an error
      * @param {string} name Name of element to be removed
-     * @returns {GameElement} Removed element
+     * @returns {GameElement|GameComposite} Removed element
      */
     popElementByName(name) {
         const el = this.getElementByName(name)
         this.elements = this.elements.filter(e => e.name !== name)
         return el[0]
+    }
+
+    /**
+     * Removes element from elements array
+     * @param {GameElement|GameComposite} element Element instance
+     */
+    removeElement(element) {
+        this.elements = this.elements.filter(e => e !== element)
     }
 
     /**
@@ -345,12 +366,21 @@ class Game {
 
     /**
      * Sets current mouse position in the shared object and returns it
-     * @param {MouseEvent} event Mouse event passed
+     * @param {MouseEvent|TouchEvent} event Mouse event passed
      * @returns {Point} Current mouse position
      */
     getMousePos(event) {
         const rect = this.canvas.getBoundingClientRect();
-        const pos = new Point(event.clientX - rect.left, event.clientY - rect.top);
+        let pos;
+        if (event instanceof MouseEvent) {
+            pos = new Point(event.clientX - rect.left, event.clientY - rect.top);
+        } else if (event instanceof TouchEvent) {
+            const touch = event.touches.item(0)
+            if (touch === null) {
+                return undefined
+            }
+            pos = new Point(touch.clientX - rect.left, touch.clientY - rect.top);
+        }
 
         this.shared.mousePos = pos.copy()
 
@@ -364,24 +394,34 @@ class Game {
      */
     async getElementAtPos(position) {
         for (const i in this.elements) {
-            const el = this.elements.at(this.elements.length-1-i)
+            const el = this.elements[this.elements.length-1-i]
             if (!el.clickable &amp;&amp; !el.draggable) {
-                // console.log("clicked unresponsive element")
                 continue
             }
             if (await el.isInside(position, this.tempContext)) {
-                // console.log(el)
                 return el
             }
         }
         return null
     }
 
+
     /**
-     * Resets element array
+     * Additional functions to call on clear
+     * @param callback function to call on clear
+     */
+    addOnClearListener(callback) {
+        this.onClear.push(callback)
+    }
+
+    /**
+     * Resets game to initial state
      */
     clear() {
         this.elements = []
+        for (const callback of this.onClear) {
+            callback()
+        }
     }
 
     /**
@@ -415,13 +455,13 @@ export { Game }</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Game.html">Game</a></li><li><a href="GameButton.html">GameButton</a></li><li><a href="GameCanvas.html">GameCanvas</a></li><li><a href="GameDrawable.html">GameDrawable</a></li><li><a href="GameElement.html">GameElement</a></li><li><a href="GameGif.html">GameGif</a></li><li><a href="GameHitbox.html">GameHitbox</a></li><li><a href="GameImage.html">GameImage</a></li><li><a href="GameShape.html">GameShape</a></li><li><a href="GameText.html">GameText</a></li><li><a href="GameTextInput.html">GameTextInput</a></li><li><a href="Point.html">Point</a></li></ul><h3>Global</h3><ul><li><a href="global.html#loadImage">loadImage</a></li><li><a href="global.html#randomColor">randomColor</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Game.html">Game</a></li><li><a href="GameButton.html">GameButton</a></li><li><a href="GameCanvas.html">GameCanvas</a></li><li><a href="GameComposite.html">GameComposite</a></li><li><a href="GameDrawable.html">GameDrawable</a></li><li><a href="GameElement.html">GameElement</a></li><li><a href="GameGif.html">GameGif</a></li><li><a href="GameHitbox.html">GameHitbox</a></li><li><a href="GameImage.html">GameImage</a></li><li><a href="GameShape.html">GameShape</a></li><li><a href="GameText.html">GameText</a></li><li><a href="GameTextInput.html">GameTextInput</a></li><li><a href="Point.html">Point</a></li></ul><h3>Global</h3><ul><li><a href="global.html#loadImage">loadImage</a></li><li><a href="global.html#randomColor">randomColor</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Sun Mar 06 2022 21:02:36 GMT+0100 (Central European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Mar 14 2022 12:42:15 GMT+0100 (Central European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

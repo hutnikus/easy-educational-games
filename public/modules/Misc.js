@@ -98,6 +98,32 @@ class Point {
 
         return new Point(rx,ry)
     }
+
+    /**
+     * Checks if point is between 2 values on X axis
+     * @param {number} left Lower value
+     * @param {number} right Higher value
+     * @returns {boolean} Is within values
+     */
+    xWithin(left,right) {
+        if (left > right) {
+            throw new Error("Left value has to be lower than right value")
+        }
+        return left <= this.x && this.x <= right
+    }
+
+    /**
+     * Checks if point is between 2 values on Y axis
+     * @param {number} top Lower value
+     * @param {number} bottom Higher value
+     * @returns {boolean} Is within values
+     */
+    yWithin(top,bottom) {
+        if (top > bottom) {
+            throw new Error("Top value has to be lower than bottom value")
+        }
+        return top <= this.y && this.y <= bottom
+    }
 }
 
 /**

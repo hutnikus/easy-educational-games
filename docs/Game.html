@@ -162,7 +162,7 @@
             <td class="type">
             
                 
-<span class="param-type">Array.&lt;<a href="GameElement.html">GameElement</a>></span>
+<span class="param-type">Array.&lt;(<a href="GameElement.html">GameElement</a>|<a href="GameComposite.html">GameComposite</a>)></span>
 
 
             
@@ -186,6 +186,9 @@
             
                 
 <span class="param-type"><a href="GameElement.html">GameElement</a></span>
+|
+
+<span class="param-type"><a href="GameComposite.html">GameComposite</a></span>
 
 
             
@@ -360,6 +363,29 @@
         </tr>
 
     
+
+        <tr>
+            
+                <td class="name"><code>onClear</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;function()></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>What happens on clear() in addition to removing elements</p></td>
+        </tr>
+
+    
     </tbody>
 </table>
 
@@ -504,6 +530,9 @@
             
                 
 <span class="param-type"><a href="GameElement.html">GameElement</a></span>
+|
+
+<span class="param-type"><a href="GameComposite.html">GameComposite</a></span>
 
 
             
@@ -587,7 +616,139 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line239">line 239</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line252">line 252</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="addOnClearListener"><span class="type-signature"></span>addOnClearListener<span class="signature">(callback)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Additional functions to call on clear</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>function to call on clear</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line385">line 385</a>
     </li></ul></dd>
     
 
@@ -675,7 +836,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line297">line 297</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line318">line 318</a>
     </li></ul></dd>
     
 
@@ -762,6 +923,9 @@
             
                 
 <span class="param-type"><a href="GameElement.html">GameElement</a></span>
+|
+
+<span class="param-type"><a href="GameComposite.html">GameComposite</a></span>
 
 
             
@@ -835,7 +999,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line83">line 83</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line87">line 87</a>
     </li></ul></dd>
     
 
@@ -972,7 +1136,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line364">line 364</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line404">line 404</a>
     </li></ul></dd>
     
 
@@ -1034,7 +1198,7 @@
 
 
 <div class="description">
-    <p>Resets element array</p>
+    <p>Resets game to initial state</p>
 </div>
 
 
@@ -1078,7 +1242,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line355">line 355</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line392">line 392</a>
     </li></ul></dd>
     
 
@@ -1166,7 +1330,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line285">line 285</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line306">line 306</a>
     </li></ul></dd>
     
 
@@ -1321,7 +1485,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line93">line 93</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line97">line 97</a>
     </li></ul></dd>
     
 
@@ -1476,7 +1640,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line337">line 337</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line367">line 367</a>
     </li></ul></dd>
     
 
@@ -1534,7 +1698,7 @@
     
 
     
-    <h4 class="name" id="getElementByName"><span class="type-signature"></span>getElementByName<span class="signature">(name)</span><span class="type-signature"> &rarr; {<a href="GameElement.html">GameElement</a>}</span></h4>
+    <h4 class="name" id="getElementByName"><span class="type-signature"></span>getElementByName<span class="signature">(name)</span><span class="type-signature"> &rarr; {<a href="GameElement.html">GameElement</a>|<a href="GameComposite.html">GameComposite</a>}</span></h4>
     
 
     
@@ -1635,7 +1799,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line260">line 260</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line273">line 273</a>
     </li></ul></dd>
     
 
@@ -1676,6 +1840,9 @@
     <dd>
         
 <span class="param-type"><a href="GameElement.html">GameElement</a></span>
+|
+
+<span class="param-type"><a href="GameComposite.html">GameComposite</a></span>
 
 
     </dd>
@@ -1744,6 +1911,9 @@
             
                 
 <span class="param-type">MouseEvent</span>
+|
+
+<span class="param-type">TouchEvent</span>
 
 
             
@@ -1794,7 +1964,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line323">line 323</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line344">line 344</a>
     </li></ul></dd>
     
 
@@ -1904,7 +2074,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line74">line 74</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line78">line 78</a>
     </li></ul></dd>
     
 
@@ -2014,7 +2184,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line181">line 181</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line195">line 195</a>
     </li></ul></dd>
     
 
@@ -2101,6 +2271,9 @@
             
                 
 <span class="param-type">MouseEvent</span>
+|
+
+<span class="param-type">TouchEvent</span>
 
 
             
@@ -2151,7 +2324,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line124">line 124</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line128">line 128</a>
     </li></ul></dd>
     
 
@@ -2256,6 +2429,9 @@
             
                 
 <span class="param-type">MouseEvent</span>
+|
+
+<span class="param-type">TouchEvent</span>
 
 
             
@@ -2306,7 +2482,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line153">line 153</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line161">line 161</a>
     </li></ul></dd>
     
 
@@ -2393,6 +2569,9 @@
             
                 
 <span class="param-type">MouseEvent</span>
+|
+
+<span class="param-type">TouchEvent</span>
 
 
             
@@ -2443,7 +2622,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line166">line 166</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line177">line 177</a>
     </li></ul></dd>
     
 
@@ -2580,7 +2759,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line201">line 201</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line215">line 215</a>
     </li></ul></dd>
     
 
@@ -2717,7 +2896,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line224">line 224</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line237">line 237</a>
     </li></ul></dd>
     
 
@@ -2753,7 +2932,7 @@
     
 
     
-    <h4 class="name" id="popElementByName"><span class="type-signature"></span>popElementByName<span class="signature">(name)</span><span class="type-signature"> &rarr; {<a href="GameElement.html">GameElement</a>}</span></h4>
+    <h4 class="name" id="popElementByName"><span class="type-signature"></span>popElementByName<span class="signature">(name)</span><span class="type-signature"> &rarr; {<a href="GameElement.html">GameElement</a>|<a href="GameComposite.html">GameComposite</a>}</span></h4>
     
 
     
@@ -2854,7 +3033,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line275">line 275</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line288">line 288</a>
     </li></ul></dd>
     
 
@@ -2895,12 +3074,155 @@
     <dd>
         
 <span class="param-type"><a href="GameElement.html">GameElement</a></span>
+|
+
+<span class="param-type"><a href="GameComposite.html">GameComposite</a></span>
 
 
     </dd>
 </dl>
 
     
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="removeElement"><span class="type-signature"></span>removeElement<span class="signature">(element)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Removes element from elements array</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>element</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="GameElement.html">GameElement</a></span>
+|
+
+<span class="param-type"><a href="GameComposite.html">GameComposite</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Element instance</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line298">line 298</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2964,7 +3286,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line66">line 66</a>
+        <a href="Game.js.html">Game.js</a>, <a href="Game.js.html#line70">line 70</a>
     </li></ul></dd>
     
 
@@ -3010,13 +3332,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Game.html">Game</a></li><li><a href="GameButton.html">GameButton</a></li><li><a href="GameCanvas.html">GameCanvas</a></li><li><a href="GameDrawable.html">GameDrawable</a></li><li><a href="GameElement.html">GameElement</a></li><li><a href="GameGif.html">GameGif</a></li><li><a href="GameHitbox.html">GameHitbox</a></li><li><a href="GameImage.html">GameImage</a></li><li><a href="GameShape.html">GameShape</a></li><li><a href="GameText.html">GameText</a></li><li><a href="GameTextInput.html">GameTextInput</a></li><li><a href="Point.html">Point</a></li></ul><h3>Global</h3><ul><li><a href="global.html#loadImage">loadImage</a></li><li><a href="global.html#randomColor">randomColor</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Game.html">Game</a></li><li><a href="GameButton.html">GameButton</a></li><li><a href="GameCanvas.html">GameCanvas</a></li><li><a href="GameComposite.html">GameComposite</a></li><li><a href="GameDrawable.html">GameDrawable</a></li><li><a href="GameElement.html">GameElement</a></li><li><a href="GameGif.html">GameGif</a></li><li><a href="GameHitbox.html">GameHitbox</a></li><li><a href="GameImage.html">GameImage</a></li><li><a href="GameShape.html">GameShape</a></li><li><a href="GameText.html">GameText</a></li><li><a href="GameTextInput.html">GameTextInput</a></li><li><a href="Point.html">Point</a></li></ul><h3>Global</h3><ul><li><a href="global.html#loadImage">loadImage</a></li><li><a href="global.html#randomColor">randomColor</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Sun Mar 06 2022 21:02:36 GMT+0100 (Central European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Mar 14 2022 12:42:15 GMT+0100 (Central European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

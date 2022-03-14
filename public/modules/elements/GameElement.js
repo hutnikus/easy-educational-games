@@ -2,6 +2,7 @@ import {Point} from "../Misc.js";
 import {GameDrawable} from "../drawables/GameDrawable.js";
 import {GameHitbox} from "../GameHitbox.js";
 import {GameGif} from "../drawables/GameGif.js";
+import {GameComposite} from "./GameComposite.js";
 
 /**
  * @typedef callbackValue
@@ -23,8 +24,9 @@ import {GameGif} from "../drawables/GameGif.js";
  * @property {Array<callbackValue>} onClick Array of [callback,attribute_object] called on click
  * @property {Array<callbackValue>} onDrag Array of [callback,attribute_object] called on dragging/holding
  * @property {Array<callbackValue>} onFinishDragging Array of [callback,attribute_object] called when finished dragging/holding
- * @property {Object} onKeyPress Map of (keyboard) keys mapped to an array of [callback,attribute_object] called on key press todo transform to Map
+ * @property {Object} onKeyPress Map of (keyboard) keys mapped to an array of [callback,attribute_object] called on key press
  * @property {Object} onKeyHold Map of (keyboard) keys mapped to an array of [callback,attribute_object] called on key hold
+ * @property {Array<callbackValue>} onMove Array of [callback,attribute_object] called on move
  * @property {Object} shared Shared object passed from Game
  * @property {Array<GameHitbox>} hitboxes Array of hitboxes linked to the element
  * @property {boolean} hitboxVisible Hitboxes are drawn on true, else are hidden
@@ -46,6 +48,7 @@ class GameElement {
         this.onFinishDragging = (attrs.onFinishDragging === undefined) ? [] : attrs.onFinishDragging
         this.onKeyPress = (attrs.onKeyPress === undefined) ? {} : attrs.onKeyPress
         this.onKeyHold = (attrs.onKeyHold === undefined) ? {} : attrs.onKeyHold
+        this.onMove = (attrs.onMove === undefined) ? [] : attrs.onMove
         this.hitboxes = []
 
         for (const child of children) {
@@ -73,7 +76,7 @@ class GameElement {
      */
     addChild(child,sort=true) {
         if (!(child instanceof GameDrawable)) {
-            throw new Error("Incorrect instance of child!")
+            throw new Error("Incorrect instance of child! Should be GameDrawable")
         }
 
         const nameIsUsed = this.children.filter(c => c.name === child.name && child.name !== undefined).length > 0
@@ -275,6 +278,23 @@ class GameElement {
     }
 
     /**
+     * Adds a listener to the array of listeners for move
+     * @param {function} callback function to be called
+     * @param {Object} attrs Attribute object passed to the callback
+     */
+    addOnMoveListener(callback,attrs) {
+        this.onMove.push([callback,attrs])
+    }
+
+    /**
+     * Removes listener for the onClick event
+     * @param {function} callback function you want to remove
+     */
+    removeOnMoveListener(callback) {
+        this.onMove = this.onMove.filter(item=>item[0]!==callback)
+    }
+
+    /**
      * Calls the functions in the onClick array
      */
     click() {
@@ -294,6 +314,9 @@ class GameElement {
                 mousePos.x - delta.x,
                 mousePos.y - delta.y
             )
+            for (const event of this.onMove) {
+                event[0](event[1])
+            }
         }
 
         for (const onDragElement of this.onDrag) {
@@ -342,7 +365,7 @@ class GameElement {
 
     /**
      * Returns true on collision with the other element
-     * @param {GameElement} other Element with which the collision is checked
+     * @param {GameElement|GameComposite} other Element with which the collision is checked
      * @returns {boolean} True on colision else false
      */
     collidesWith(other) {
@@ -367,11 +390,15 @@ class GameElement {
     }
 
     /**
-     * Moves the element by vector delta
+     * Moves the element by vector delta and calls onMove callbacks
      * @param {Point} delta Vector by which the element is moved
      */
     move(delta) {
         this.center = this.center.add(delta)
+
+        for (const event of this.onMove) {
+            event[0](event[1])
+        }
     }
 
     /**
