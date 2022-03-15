@@ -15,6 +15,48 @@ import {GameShape} from "../drawables/GameShape.js";
  * @property {NodeJS.Timer} interval Value returned from setInterval() call. Used to stop drawing [clearInterval()]
  */
 class GameCanvas extends GameElement {
+    #startDrawing = (event) => {
+        const mouse = this.shared.mousePos
+        const position = new Point(mouse.x-this.center.x,mouse.y-this.center.y)
+            .rotateAround(new Point(0,0),-this.rotation)
+        this.current = new GameShape('line',{
+            level:0,
+            coords:[...position.asArray(),...position.asArray()],
+            stroke:this.stroke,
+            lineWidth:this.lineWidth,
+        })
+        this.addChild(this.current,false)
+
+        this.interval = setInterval(this.#continueDrawing,20)
+    }
+    #continueDrawing = async () => {
+        if (this.current === undefined) {
+            return;
+        }
+        const mouse = this.shared.mousePos
+        let position = new Point(mouse.x - this.center.x, mouse.y - this.center.y)
+        position = position.rotateAround(new Point(0, 0), -this.rotation)
+
+        if (!await this.isInside(mouse)) {
+            this.current = undefined
+            clearInterval(this.interval)
+            return
+        }
+
+        this.current.addPoint(position)
+    }
+    #finishDrawing = (event) => {
+        if (this.current === undefined) {
+            return;
+        }
+        const mouse = this.shared.mousePos
+        let position = new Point(mouse.x-this.center.x,mouse.y-this.center.y)
+        position = position.rotateAround(new Point(0,0),-this.rotation)
+        this.current.addPoint(position)
+        this.current = undefined;
+        clearInterval(this.interval)
+    }
+
     /**
      * Constructor for GameCanvas
      * @param {Point} center Center of the element
@@ -42,8 +84,10 @@ class GameCanvas extends GameElement {
         this.draggable = true
         this.stationary = true
 
-        this.addOnClickListener(GameCanvas.#startDrawing,this)
-        this.addOnFinishDraggingListener(GameCanvas.#finishDrawing,this)
+
+
+        this.addOnClickListener(this.#startDrawing)
+        this.addOnFinishDraggingListener(this.#finishDrawing)
     }
 
     /**
@@ -51,69 +95,6 @@ class GameCanvas extends GameElement {
      */
     clear() {
         this.children = [this.background]
-    }
-
-    /**
-     * Creates new current line drawable and starts the drawing interval
-     * @param {GameCanvas} self Instance of GameCanvas passed on construction
-     * @static
-     * @private
-     */
-    static #startDrawing(self) {
-        const mouse = self.shared.mousePos
-        const position = new Point(mouse.x-self.center.x,mouse.y-self.center.y)
-            .rotateAround(new Point(0,0),-self.rotation)
-        self.current = new GameShape('line',{
-            level:0,
-            coords:[...position.asArray(),...position.asArray()],
-            stroke:self.stroke,
-            lineWidth:self.lineWidth,
-        })
-        self.addChild(self.current,false)
-
-        self.interval = setInterval(()=>GameCanvas.#continueDrawing(self),20)
-    }
-
-    /**
-     * Appends points to current line drawable or stops drawing when mouse leaves the canvas element
-     * @param {GameCanvas} self Instance of GameCanvas passed on construction
-     * @returns {Promise<void>}
-     * @static
-     * @private
-     */
-    static async #continueDrawing(self) {
-        if (self.current === undefined) {
-            return;
-        }
-        const mouse = self.shared.mousePos
-        let position = new Point(mouse.x-self.center.x,mouse.y-self.center.y)
-        position = position.rotateAround(new Point(0,0),-self.rotation)
-
-        if (!await self.isInside(mouse)) {
-            self.current = undefined
-            clearInterval(self.interval)
-            return
-        }
-
-        self.current.addPoint(position)
-    }
-
-    /**
-     * Appends the last point to current line drawable and stops the drawing process
-     * @param {GameCanvas} self Instance of GameCanvas passed on construction
-     * @static
-     * @private
-     */
-    static #finishDrawing(self) {
-        if (self.current === undefined) {
-            return;
-        }
-        const mouse = self.shared.mousePos
-        let position = new Point(mouse.x-self.center.x,mouse.y-self.center.y)
-        position = position.rotateAround(new Point(0,0),-self.rotation)
-        self.current.addPoint(position)
-        self.current = undefined;
-        clearInterval(self.interval)
     }
 
     /**
@@ -143,11 +124,8 @@ class GameCanvas extends GameElement {
         }
         const retCanvas = new GameCanvas(attrs.center,attrs)
         // remove drawing of this instance
-        retCanvas.removeOnClickListener(GameCanvas.#startDrawing)
-        retCanvas.removeOnFinishDraggingListener(GameCanvas.#finishDrawing)
-        // add drawing for new instance
-        retCanvas.addOnClickListener(GameCanvas.#startDrawing,retCanvas)
-        retCanvas.addOnFinishDraggingListener(GameCanvas.#finishDrawing,retCanvas)
+        retCanvas.removeOnClickListener(this.#startDrawing)
+        retCanvas.removeOnFinishDraggingListener(this.#finishDrawing)
         return retCanvas
     }
 }

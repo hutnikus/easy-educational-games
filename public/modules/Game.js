@@ -29,6 +29,7 @@ class Game {
      * @param tempCanvas (optional) Hidden canvas where isInside() is calculated
      */
     constructor(canvas,tempCanvas=undefined) {
+        canvas.addEventListener("contextmenu",e=>e.preventDefault()) //prevent context menu
         this.elements = []
         this.pressedKeys = []
         this.onClear = []
@@ -92,6 +93,12 @@ class Game {
         const composite = new GameComposite([],attrs)
         this.addElement(composite)
         return composite
+    }
+
+    copyElement(element) {
+        const copy = element.copy()
+        this.addElement(copy)
+        return copy
     }
 
     /**
@@ -173,7 +180,7 @@ class Game {
             return
         }
         if (el.clickable) {
-            el.click()
+            el.click(event)
         }
         if (el.draggable) {
             this.selectedElement = el
@@ -197,7 +204,7 @@ class Game {
         }
         const mousePos = this.getMousePos(event)
 
-        this.selectedElement.drag(mousePos,this.delta)
+        this.selectedElement.drag(mousePos,this.delta,event)
     }
 
     /**
@@ -213,7 +220,7 @@ class Game {
         }
         const mousePos = this.getMousePos(event)
 
-        this.selectedElement.finishDragging()
+        this.selectedElement.finishDragging(event)
 
         this.selectedElement = undefined
         this.delta = undefined
@@ -255,7 +262,7 @@ class Game {
             })
 
             for (const el of listeners) {
-                el.keyPress(this.pressedKeys)
+                el.keyPress(this.pressedKeys,event)
             }
         }
     }
@@ -422,7 +429,8 @@ class Game {
     clear() {
         this.elements = []
         for (const callback of this.onClear) {
-            callback()
+            callback.call(this)
+            // callback()
         }
     }
 
