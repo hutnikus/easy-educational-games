@@ -78,7 +78,7 @@ class GameButton extends GameElement {
      */
     constructor(center,attrs={}) {
         super(center,[],attrs)
-        this.onPress = []
+        this.onPress = attrs.onPress || []
 
         this.text = attrs.text;
 
@@ -87,7 +87,7 @@ class GameButton extends GameElement {
 
         this.width = attrs.width
         this.height = (attrs.height === undefined) ? 50 : attrs.height
-        this.color = (attrs.color === undefined) ? 'lightgrey' : attrs.color;
+        this.color = attrs.color || 'lightgrey'
 
         this.rectangle = new GameShape('rectangle',{
                 width:this.width,

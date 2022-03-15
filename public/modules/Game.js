@@ -11,8 +11,8 @@ import {GameShape, GameElement, Point, GameComposite, GameButton, GameTextInput,
 
 /**
  * Game class. It manages the game state and elements within it.
- * @property {Array<GameElement|GameComposite>} elements Array of GameElement objects
- * @property {GameElement|GameComposite} selectedElement Selected element when dragging
+ * @property {Array<GameElement>} elements Array of GameElement objects
+ * @property {GameElement} selectedElement Selected element when dragging
  * @property {Point} delta Distance from mouse to center of dragged element
  * @property {Array<string>} pressedKeys Array of currently pressed keys
  * @property {{mousePos:Point,tempContext:CanvasRenderingContext2D}} shared Last recorded mouse position and temporary context shared with elements
@@ -98,6 +98,12 @@ class Game {
     copyElement(element) {
         const copy = element.copy()
         this.addElement(copy)
+
+        if (copy instanceof GameComposite) {
+            //also add its children elements
+            copy.addToGame(this)
+        }
+
         return copy
     }
 
@@ -118,7 +124,7 @@ class Game {
 
     /**
      * Changes the level of element and sorts elements by level
-     * @param {GameElement|GameComposite} element Element with level to be changed
+     * @param {GameElement} element Element with level to be changed
      * @param {number} newLevel New level value of the element
      */
     changeLevelOfElement(element,newLevel) {
@@ -283,12 +289,16 @@ class Game {
 
     /**
      * Adds element to the array of elements
-     * @param {GameElement|GameComposite} element Added element
+     * @param {GameElement} element Added element
      * @param {boolean} sort Passing false improves the speed of adding elements, but requires later sorting (by level) for correct display
      */
     addElement(element,sort=true) {
-        if (!(element instanceof GameElement) && !(element instanceof GameComposite)) {
+        if (!(element instanceof GameElement)) {
+            console.log(element)
             throw new Error("Incorrect element instance!")
+        }
+        if (this.elements.some(el=>el===element)) {
+            throw new Error("Trying to add already added object!")
         }
 
         const nameIsUsed = this.elements.filter(c => c.name === element.name && element.name !== undefined).length > 0
@@ -302,10 +312,17 @@ class Game {
         }
     }
 
+    addElements(...elements) {
+        for (const element of elements) {
+            this.addElement(element,false)
+        }
+        this.updateLevels()
+    }
+
     /**
      * Returns element with matching name or throws an error
      * @param {string} name Name of searched element
-     * @returns {GameElement|GameComposite} Found element
+     * @returns {GameElement} Found element
      */
     getElementByName(name) {
         let el = this.elements.filter(e => e.name === name)
@@ -320,7 +337,7 @@ class Game {
     /**
      * Removes element from elements array and returns it, or throws an error
      * @param {string} name Name of element to be removed
-     * @returns {GameElement|GameComposite} Removed element
+     * @returns {GameElement} Removed element
      */
     popElementByName(name) {
         const el = this.getElementByName(name)
@@ -330,7 +347,7 @@ class Game {
 
     /**
      * Removes element from elements array
-     * @param {GameElement|GameComposite} element Element instance
+     * @param {GameElement} element Element instance
      */
     removeElement(element) {
         this.elements = this.elements.filter(e => e !== element)

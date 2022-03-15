@@ -2,7 +2,6 @@ import {Point} from "../Misc.js";
 import {GameDrawable} from "../drawables/GameDrawable.js";
 import {GameHitbox} from "../GameHitbox.js";
 import {GameGif} from "../drawables/GameGif.js";
-import {GameComposite} from "./GameComposite.js";
 import {Game} from "../Game.js";
 
 /**
@@ -14,6 +13,7 @@ import {Game} from "../Game.js";
  * @property {Array<GameDrawable>} children Array of drawables linked to the element
  * @property {boolean} clickable Element will respond to click
  * @property {boolean} draggable Element will respond to holding
+ * @property {boolean} pressable Element will respond to key press
  * @property {boolean} stationary Element will respond to holding, but won't change its position
  * @property {Array<function>} onClick Array of callbacks called on click
  * @property {Array<function>} onDrag Array of callbacks called on dragging/holding
@@ -33,6 +33,16 @@ class GameElement {
     }
     set name(newName) {
         throw new Error("Use function setName() when setting names for elements!")
+    }
+    #centerValue
+    set center(newCenter) {
+        if (!(newCenter instanceof Point)) {
+            throw new Error("Incorrect center instance!")
+        }
+        this.#centerValue = newCenter
+    }
+    get center() {
+        return this.#centerValue
     }
 
     /**
@@ -276,6 +286,9 @@ class GameElement {
     removeOnKeyPressListener(key,callback) {
         if (this.onKeyPress[key] !== undefined) {
             this.onKeyPress[key] = this.onKeyPress[key].filter(item=>item!==callback)
+            if (this.onKeyPress[key].length === 0) {
+                delete this.onKeyPress[key]
+            }
         }
     }
 
@@ -299,6 +312,9 @@ class GameElement {
     removeOnKeyHoldListener(key,callback) {
         if (this.onKeyHold[key] !== undefined) {
             this.onKeyHold[key] = this.onKeyHold[key].filter(item=>item!==callback)
+            if (this.onKeyHold[key].length === 0) {
+                delete this.onKeyHold[key]
+            }
         }
     }
 
@@ -368,6 +384,9 @@ class GameElement {
      * @param {Event} event
      */
     keyPress(keyArray,event) {
+        if (!this.pressable) {
+            return
+        }
         for (const key of keyArray) {
             const events = this.onKeyPress[key]
             if (events !== undefined && events.length !== 0) {
@@ -384,6 +403,9 @@ class GameElement {
      * @param {Array<string>} keyArray Array of currently pressed keys
      */
     keyHold(keyArray) {
+        if (!this.pressable) {
+            return
+        }
         for (const key of keyArray) {
             const events = this.onKeyHold[key]
             if (events !== undefined && events.length !== 0) {
@@ -397,7 +419,7 @@ class GameElement {
 
     /**
      * Returns true on collision with the other element
-     * @param {GameElement|GameComposite} other Element with which the collision is checked
+     * @param {GameElement} other Element with which the collision is checked
      * @returns {boolean} True on colision else false
      */
     collidesWith(other) {
@@ -446,6 +468,7 @@ class GameElement {
             children: this.children.map((child=>child.copy())),
             clickable: this.clickable,
             draggable: this.draggable,
+            pressable: this.pressable,
             stationary: this.stationary,
             onClick: [...this.onClick],
             onDrag: [...this.onDrag],
