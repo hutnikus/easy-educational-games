@@ -141,11 +141,9 @@ class GameComposite {
     /**
      * Adds a listener to the array of listeners for onClick
      * @param {function} callback function to be called
-     * @param {Object} attrs Attribute object passed to the callback
      */
-    addOnClickListener(callback,attrs) {
-        this.onClick.push([callback,attrs])
-        // this.virtualElement.addOnClickListener(callback,attrs)
+    addOnClickListener(callback) {
+        this.onClick.push(callback)
     }
 
     /**
@@ -153,18 +151,15 @@ class GameComposite {
      * @param {function} callback function you want to remove
      */
     removeOnClickListener(callback) {
-        this.onClick = this.onClick.filter(item=>item[0]!==callback)
-        // this.virtualElement.removeOnClickListener(callback)
+        this.onClick = this.onClick.filter(item=>item!==callback)
     }
 
     /**
      * Adds a listener to the array of listeners for onDrag
      * @param {function} callback function to be called
-     * @param {Object} attrs Attribute object passed to the callback
      */
-    addOnDragListener(callback,attrs) {
-        this.onDrag.push([callback,attrs])
-        // this.virtualElement.addOnDragListener(callback,attrs)
+    addOnDragListener(callback) {
+        this.onDrag.push(callback)
     }
 
     /**
@@ -172,18 +167,15 @@ class GameComposite {
      * @param {function} callback function you want to remove
      */
     removeOnDragListener(callback) {
-        this.onDrag = this.onDrag.filter(item=>item[0]!==callback)
-        // this.virtualElement.removeOnDragListener(callback)
+        this.onDrag = this.onDrag.filter(item=>item!==callback)
     }
 
     /**
      * Adds a listener to the array of listeners for onFinishDragging
      * @param {function} callback function to be called
-     * @param {Object} attrs Attribute object passed to the callback
      */
-    addOnFinishDraggingListener(callback,attrs) {
-        this.onFinishDragging.push([callback,attrs])
-        // this.virtualElement.addOnFinishDraggingListener(callback,attrs)
+    addOnFinishDraggingListener(callback) {
+        this.onFinishDragging.push(callback)
     }
 
     /**
@@ -191,22 +183,19 @@ class GameComposite {
      * @param {function} callback function you want to remove
      */
     removeOnFinishDraggingListener(callback) {
-        this.onFinishDragging = this.onFinishDragging.filter(item=>item[0]!==callback)
-        // this.virtualElement.removeOnFinishDraggingListener(callback)
+        this.onFinishDragging = this.onFinishDragging.filter(item=>item!==callback)
     }
 
     /**
      * Adds a listener to the array of listeners for onKeyPress
      * @param {string} key Key the callback will be called for
      * @param {function} callback function to be called
-     * @param {Object} attrs Attribute object passed to the callback
      */
-    addOnKeyPressListener(key,callback,attrs) {
+    addOnKeyPressListener(key,callback) {
         if (!Array.isArray(this.onKeyPress[key])) {
             this.onKeyPress[key] = []
         }
-        this.onKeyPress[key].push([callback,attrs])
-        // this.virtualElement.addOnKeyPressListener(key,callback,attrs)
+        this.onKeyPress[key].push(callback)
     }
 
     /**
@@ -216,23 +205,21 @@ class GameComposite {
      */
     removeOnKeyPressListener(key,callback) {
         if (this.onKeyPress[key] !== undefined) {
-            this.onKeyPress[key] = this.onKeyPress[key].filter(item=>item[0]!==callback)
+            this.onKeyPress[key] = this.onKeyPress[key].filter(item=>item!==callback)
         }
-        // this.virtualElement.removeOnKeyPressListener(key,callback)
     }
+
 
     /**
      * Adds a listener to the array of listeners for onKeyHold
      * @param {string} key Key the callback will be called for
      * @param {function} callback function to be called
-     * @param {Object} attrs Attribute object passed to the callback
      */
-    addOnKeyHoldListener(key,callback,attrs) {
+    addOnKeyHoldListener(key,callback) {
         if (!Array.isArray(this.onKeyHold[key])) {
             this.onKeyHold[key] = []
         }
-        this.onKeyHold[key].push([callback,attrs])
-        // this.virtualElement.addOnKeyHoldListener(key,callback,attrs)
+        this.onKeyHold[key].push(callback)
     }
 
     /**
@@ -242,19 +229,16 @@ class GameComposite {
      */
     removeOnKeyHoldListener(key,callback) {
         if (this.onKeyHold[key] !== undefined) {
-            this.onKeyHold[key] = this.onKeyHold[key].filter(item=>item[0]!==callback)
+            this.onKeyHold[key] = this.onKeyHold[key].filter(item=>item!==callback)
         }
-        // this.virtualElement.removeOnKeyHoldListener(key,callback)
     }
 
     /**
      * Adds a listener to the array of listeners for move
      * @param {function} callback function to be called
-     * @param {Object} attrs Attribute object passed to the callback
      */
-    addOnMoveListener(callback,attrs) {
-        this.onMove.push([callback,attrs])
-        // this.virtualElement.addOnMoveListener(callback,attrs)
+    addOnMoveListener(callback) {
+        this.onMove.push(callback)
     }
 
     /**
@@ -262,66 +246,68 @@ class GameComposite {
      * @param {function} callback function you want to remove
      */
     removeOnMoveListener(callback) {
-        this.onMove = this.onMove.filter(item=>item[0]!==callback)
-        // this.virtualElement.removeOnMoveListener(callback)
+        this.onMove = this.onMove.filter(item=>item!==callback)
     }
 
     /**
      * Calls the functions in the onClick array
+     * @param {Object} event Event passed from listener
      */
-    click() {
-        for (const onClickElement of this.onClick) {
-            onClickElement[0](onClickElement[1])
+    click(event) {
+        for (const callback of this.onClick) {
+            // callback(event)
+            callback.call(this,event)
         }
-        // this.virtualElement.click()
     }
 
     /**
      * Calls the functions in the onDrag array
      * @param {Point} mousePos Mouse position
      * @param {Point} delta Deviation of the mouse position (when clicked) from the center
+     * @param {Event} event
      */
-    drag(mousePos,delta) {
+    drag(mousePos,delta,event) {
         if (!this.stationary) {
             this.center = new Point(
                 mousePos.x - delta.x,
                 mousePos.y - delta.y
             )
-            for (const event of this.onMove) {
-                event[0](event[1])
+            for (const callback of this.onMove) {
+                callback.call(this,event)
+                // callback(event)
             }
         }
-
-        for (const onDragElement of this.onDrag) {
-            onDragElement[0](onDragElement[1])
+        for (const callback of this.onDrag) {
+            callback.call(this,event)
+            // callback(event)
         }
-        // this.virtualElement.drag(mousePos,delta)
     }
 
     /**
      * Calls the functions in the onFinishDragging array
      */
-    finishDragging() {
-        for (const onFinishDraggingElement of this.onFinishDragging) {
-            onFinishDraggingElement[0](onFinishDraggingElement[1])
+    finishDragging(event) {
+        for (const callback of this.onFinishDragging) {
+            callback.call(this,event)
+            // callback(event)
         }
-        // this.virtualElement.finishDragging()
     }
 
     /**
      * Calls the functions in the onKeyPress object that are assigned to the passed keys
      * @param {Array<string>} keyArray Array of currently pressed keys
+     * @param {Event} event
      */
-    keyPress(keyArray) {
+    keyPress(keyArray,event) {
         for (const key of keyArray) {
             const events = this.onKeyPress[key]
             if (events !== undefined && events.length !== 0) {
-                for (const onPress of events) {
-                    onPress[0](onPress[1])
+                for (const callback of events) {
+                    callback.call(this,event)
+                    // callback(event)
                 }
             }
         }
-        // this.virtualElement.keyPress(keyArray)
     }
 
     /**
@@ -332,12 +318,12 @@ class GameComposite {
         for (const key of keyArray) {
             const events = this.onKeyHold[key]
             if (events !== undefined && events.length !== 0) {
-                for (const onHold of events) {
-                    onHold[0](onHold[1])
+                for (const callback of events) {
+                    // callback()
+                    callback.call(this)
                 }
             }
         }
-        // this.virtualElement.keyHold(keyArray)
     }
 
     /**
@@ -377,8 +363,9 @@ class GameComposite {
     move(delta) {
         this.center = this.center.add(delta)
 
-        for (const event of this.onMove) {
-            event[0](event[1])
+        for (const callback of this.onMove) {
+            callback.call(this)
+            // callback()
         }
     }
 

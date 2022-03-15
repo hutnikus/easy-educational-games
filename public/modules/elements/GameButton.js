@@ -12,7 +12,7 @@ import {GameDrawable} from "../drawables/GameDrawable.js";
  * @property {number} height Height of the button
  * @property {string} color CSS color string. Color of the button
  * @property {string} text Text displayed on the button
- * @property {Array<callbackValue>} onPress Array of callbacks and their passed attributes to be triggered on button press
+ * @property {Array<function>} onPress Array of callbacks to be triggered on button press
  * @property {GameDrawable} highlight Rectangle that highlights the button while pressed
  */
 class GameButton extends GameElement {
@@ -53,6 +53,22 @@ class GameButton extends GameElement {
     }
     get text() {
         return this.#text
+    }
+
+    #selectButton = () => {
+        this.highlight.visible = true
+    }
+    #deselectButton = async (event) => {
+        const mouse = this.shared.mousePos
+
+        this.highlight.visible = false
+
+        if (await this.isInside(mouse)) {
+            for (const callback of this.onPress) {
+                callback.call(this,event)
+                // callback(event)
+            }
+        }
     }
 
     /**
@@ -99,17 +115,16 @@ class GameButton extends GameElement {
         this.draggable = true
         this.stationary = true
 
-        this.addOnClickListener(GameButton.#selectButton,this)
-        this.addOnFinishDraggingListener(GameButton.#deselectButton,this)
+        this.addOnClickListener(this.#selectButton)
+        this.addOnFinishDraggingListener(this.#deselectButton)
     }
 
     /**
      * Adds a listener to be called on button press
      * @param {function} callback Function to be called
-     * @param {Object} attrs Attribute object that will get passed to the function
      */
-    addOnButtonPressListener(callback,attrs) {
-        this.onPress.push([callback,attrs])
+    addOnButtonPressListener(callback) {
+        this.onPress.push(callback)
     }
 
     /**
@@ -117,36 +132,7 @@ class GameButton extends GameElement {
      * @param {function} callback function you want to remove
      */
     removeOnButtonPressListener(callback) {
-        this.onPress = this.onPress.filter(item=>item[0]!==callback)
-    }
-
-    /**
-     * Highlights the button on click
-     * @param {GameButton} self Instance of the button passed on construction
-     * @static
-     * @private
-     */
-    static #selectButton(self) {
-        self.highlight.visible = true
-    }
-
-    /**
-     * Undos highlight of the button and calls the onPress listeners if mouse is inside
-     * @param {GameButton} self Instance of the button passed on construction
-     * @returns {Promise<void>}
-     * @static
-     * @private
-     */
-    static async #deselectButton(self) {
-        const mouse = self.shared.mousePos
-
-        self.highlight.visible = false
-
-        if (await self.isInside(mouse)) {
-            for (const onPressElement of self.onPress) {
-                onPressElement[0](onPressElement[1])
-            }
-        }
+        this.onPress = this.onPress.filter(item=>item!==callback)
     }
 
     /**
@@ -159,7 +145,7 @@ class GameButton extends GameElement {
             height: this.height,
             color: this.color,
             text: this.text,
-            onPress: this.onPress.map((evt)=>[...evt]),
+            onPress: [...this.onPress],
         },super.getAttrs())
     }
 
@@ -177,11 +163,8 @@ class GameButton extends GameElement {
         }
         const retButton = new GameButton(attrs.center,attrs)
         // remove selecting of this instance
-        retButton.removeOnClickListener(GameButton.#selectButton)
-        retButton.removeOnFinishDraggingListener(GameButton.#deselectButton)
-        // add selecting for new instance
-        retButton.addOnClickListener(GameButton.#selectButton,retButton)
-        retButton.addOnFinishDraggingListener(GameButton.#deselectButton,retButton)
+        retButton.removeOnClickListener(this.#selectButton)
+        retButton.removeOnFinishDraggingListener(this.#deselectButton)
         return retButton
     }
 }

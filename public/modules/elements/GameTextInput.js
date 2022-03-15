@@ -13,7 +13,7 @@ import {GameText} from "../drawables/GameText.js";
  * @property {string} text Text displayed/entered on the element
  * @property {string} defaultText Text that shows up already pre-filled in the popup todo merge with text?
  * @property {string} message Text displayed on the popup. Default 'Enter text'
- * @property {Array<callbackValue>} onEnter Array of [callback,attribute_object] called on enter text (on popup)
+ * @property {Array<function>} onEnter Array of [callback,attribute_object] called on enter text (on popup)
  *
  */
 class GameTextInput extends GameElement {
@@ -95,6 +95,24 @@ class GameTextInput extends GameElement {
         return this.#defaultTextValue
     }
 
+    #clickOnInput = async (event) => {
+        const entered = window.prompt(this.message, this.defaultText);
+        if (entered === null) {
+            return
+        }
+        this.text = entered
+        this.defaultText = this.text
+
+        const mouse = this.shared.mousePos
+
+        if (await this.isInside(mouse)) {
+            for (const callback of this.onEnter) {
+                // callback(event)
+                callback.call(this,event)
+            }
+        }
+    }
+
     /**
      * Constructor for Text Input element
      * @param {Point} center Center point of the element
@@ -103,7 +121,7 @@ class GameTextInput extends GameElement {
     constructor(center,attrs={}) {
         super(center,[],attrs)
         // init elements
-        this.onEnter = []
+        this.onEnter = (Array.isArray(attrs.onEnter)) ? attrs.onEnter : []
         const text = new GameText("",{level:0,name:"text"})
         this.addChild(text)
         const rectangle = new GameShape('rectangle',{
@@ -127,16 +145,15 @@ class GameTextInput extends GameElement {
 
         this.clickable = true
 
-        this.addOnClickListener(GameTextInput.#clickOnInput,this)
+        this.addOnClickListener(this.#clickOnInput)
     }
 
     /**
      * Adds a listener to the array of listeners for onEnter
      * @param {function} callback function to be called
-     * @param {Object} attrs Attribute object passed to the callback
      */
-    addOnEnterTextListener(callback,attrs) {
-        this.onEnter.push([callback,attrs])
+    addOnEnterTextListener(callback) {
+        this.onEnter.push(callback)
     }
 
     /**
@@ -144,31 +161,7 @@ class GameTextInput extends GameElement {
      * @param {function} callback function you want to remove
      */
     removeOnEnterTextListener(callback) {
-        this.onEnter = this.onEnter.filter(item=>item[0]!==callback)
-    }
-
-    /**
-     * Called when user clicks on the element. Shows a prompt in which the user enters text. After text is entered, the onEnter callbacks are called
-     * @param {GameTextInput} self Instance of Text Input
-     * @returns {Promise<void>}
-     * @static
-     * @private
-     */
-    static async #clickOnInput(self) {
-        const entered = window.prompt(self.message, self.defaultText);
-        if (entered === null) {
-            return
-        }
-        self.text = entered
-        self.defaultText = self.text
-
-        const mouse = self.shared.mousePos
-
-        if (await self.isInside(mouse)) {
-            for (const onEnter of self.onEnter) {
-                onEnter[0](onEnter[1])
-            }
-        }
+        this.onEnter = this.onEnter.filter(item=>item!==callback)
     }
 
     /**
@@ -183,7 +176,7 @@ class GameTextInput extends GameElement {
             text: this.text,
             defaultText: this.defaultText,
             message: this.message,
-            onEnter: this.onEnter.map((evt)=>[...evt]),
+            onEnter: [...this.onEnter],
         },super.getAttrs())
     }
 
@@ -201,9 +194,7 @@ class GameTextInput extends GameElement {
         }
         const retInput = new GameTextInput(attrs.center,attrs)
         // remove drawing of this instance
-        retInput.removeOnClickListener(GameTextInput.#clickOnInput)
-        // add drawing for new instance
-        retInput.addOnClickListener(GameTextInput.#clickOnInput,retInput)
+        retInput.removeOnClickListener(this.#clickOnInput)
         return retInput
     }
 }
