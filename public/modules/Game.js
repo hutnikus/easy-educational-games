@@ -7,7 +7,7 @@
 // import {Point} from "./Misc.js";
 // import {GameElement} from "./GameElement.js";
 
-import {GameShape, GameElement, Point, GameComposite} from "./index.js";
+import {GameShape, GameElement, Point, GameComposite, GameButton, GameTextInput, GameCanvas} from "./index.js";
 
 /**
  * Game class. It manages the game state and elements within it.
@@ -62,6 +62,36 @@ class Game {
         setInterval(()=>this.keyHoldLoop(),20)
 
         this.animate()
+    }
+
+    createElement(attrs) {
+        const el = new GameElement(new Point(0,0),[],attrs)
+        this.addElement(el)
+        return el
+    }
+
+    createButton(attrs) {
+        const button = new GameButton(new Point(0,0),attrs)
+        this.addElement(button)
+        return button
+    }
+
+    createTextInput(attrs) {
+        const input = new GameTextInput(new Point(0,0),attrs)
+        this.addElement(input)
+        return input
+    }
+
+    createCanvas(attrs) {
+        const canvas = new GameCanvas(new Point(0,0),attrs)
+        this.addElement(canvas)
+        return canvas
+    }
+
+    createComposite(attrs) {
+        const composite = new GameComposite([],attrs)
+        this.addElement(composite)
+        return composite
     }
 
     /**

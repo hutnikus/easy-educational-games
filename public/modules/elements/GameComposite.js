@@ -21,6 +21,29 @@ class GameComposite {
         return this.#centerValue
     }
     elements = []
+    #name = undefined
+    get name() {
+        return this.#name
+    }
+    set name(newName) {
+        throw new Error("Use function setName() when setting names for elements!")
+    }
+
+    /**
+     * Checks if name is unique within the context and sets it
+     * @param {Game} game Game instance
+     * @param {string} newName New name
+     */
+    setName(game,newName) {
+        if (!(game instanceof Game)) {
+            throw new Error("Incorrect instance of Game!")
+        }
+        const gameHasName = game.elements.filter(el=>el.name===newName).length > 0
+        if (gameHasName) {
+            throw new Error(`Name "${newName}" is not unique!`)
+        }
+        this.#name = newName
+    }
 
     /**
      * @link GameElement constructor
@@ -31,6 +54,8 @@ class GameComposite {
         for (const element of elements) {
             this.addElement(element)
         }
+
+        this.#name = attrs.name;
 
         this.onClick = (attrs.onClick === undefined) ? [] : attrs.onClick
         this.onDrag = (attrs.onDrag === undefined) ? [] : attrs.onDrag
@@ -391,6 +416,14 @@ class GameComposite {
                 element.rotation += angle
             }
         }
+    }
+
+    /**
+     * Returns true when it has elements
+     * @returns {boolean} value
+     */
+    hasElements() {
+        return this.elements.length > 0
     }
 
 }

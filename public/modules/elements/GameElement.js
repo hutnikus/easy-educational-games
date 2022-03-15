@@ -3,6 +3,7 @@ import {GameDrawable} from "../drawables/GameDrawable.js";
 import {GameHitbox} from "../GameHitbox.js";
 import {GameGif} from "../drawables/GameGif.js";
 import {GameComposite} from "./GameComposite.js";
+import {Game} from "../Game.js";
 
 /**
  * @typedef callbackValue
@@ -33,6 +34,29 @@ import {GameComposite} from "./GameComposite.js";
  * @property {number} rotation Rotation of element in radians
  */
 class GameElement {
+    #name = undefined
+    get name() {
+        return this.#name
+    }
+    set name(newName) {
+        throw new Error("Use function setName() when setting names for elements!")
+    }
+
+    /**
+     * Checks if name is unique within the context and sets it
+     * @param {Game} game Game instance
+     * @param {string} newName New name
+     */
+    setName(game,newName) {
+        if (!(game instanceof Game)) {
+            throw new Error("Incorrect instance of Game!")
+        }
+        const gameHasName = game.elements.filter(el=>el.name===newName).length > 0
+        if (gameHasName) {
+            throw new Error(`Name "${newName}" is not unique!`)
+        }
+        this.#name = newName
+    }
     /**
      * Constructor of the GameElement class
      * @param {Point} center Absolute position of the element
@@ -40,7 +64,7 @@ class GameElement {
      * @param {Object} attrs Attribute object
      */
     constructor(center,children,attrs={}) {
-        this.name = attrs.name;
+        this.#name = attrs.name;
         this.center = center;
         this.children = []
         this.onClick = (attrs.onClick === undefined) ? [] : attrs.onClick
@@ -67,6 +91,19 @@ class GameElement {
         this.level = (attrs.level === undefined) ? 0 : Number(attrs.level);
 
         this.rotation = (attrs.rotation === undefined) ? 0 : Number(attrs.rotation);
+    }
+
+    setPosition(x,y) {
+        if (!Number.isNaN(x)) {
+            this.center.x = x
+        }
+        if (!Number.isNaN(y)) {
+            this.center.y = y
+        }
+    }
+
+    addHitbox(radius,dx,dy) {
+        this.hitboxes.push(new GameHitbox(radius,dx,dy))
     }
 
     /**
