@@ -4,6 +4,10 @@ import {Point,randomColor} from "../Misc.js"
 // const Misc = require("../Misc.js")
 // const Point = Misc.Point
 
+/**
+ * @typedef {"rectangle" | "oval" | "polygon" | "line"} TYPE
+ */
+
 const shapes = ["rectangle","oval","polygon","line"]
 
 /**
@@ -67,24 +71,12 @@ class GameShape extends GameDrawable {
     }
 
     initRectangle() {
-        if (this.width === undefined) {
-            throw new Error("Rectangle needs a defined width!")
-        }
-        if (this.height === undefined) {
-            throw new Error("Rectangle needs a defined height!")
-        }
+        this.width = this.width || 100
+        this.height = this.height || 100
     }
     initOval(rx,ry) {
-        if (rx === undefined) {
-            throw new Error("Oval needs a defined rX!")
-        } else {
-            this.rX = Number(rx);
-        }
-        if (ry === undefined) {
-            throw new Error("Oval needs a defined rY!")
-        } else {
-            this.rY = Number(ry);
-        }
+        this.rX = rx || ry || 50
+        this.rY = ry || rx || 50
     }
     initPolygon(coords) {
         if (!Array.isArray(coords)) {
@@ -119,7 +111,7 @@ class GameShape extends GameDrawable {
 
     /**
      * Constructor of Shape drawable
-     * @param {string} type Type of shape: rectangle, oval, polygon, line
+     * @param {TYPE} type Type of shape: rectangle, oval, polygon, line
      * @param {Object} attrs Attribute object
      */
     constructor(type='rectangle',attrs={}) {
@@ -153,6 +145,14 @@ class GameShape extends GameDrawable {
         }
         else if (type === 'line') {
             this.initLine(attrs.coords)
+        }
+
+        if (!this.fill && !this.stroke) {
+            if (this.type === "line") {
+                this.stroke = "red"
+            } else {
+                this.fill = 'red'
+            }
         }
     }
 
@@ -213,7 +213,7 @@ class GameShape extends GameDrawable {
                 ctx.closePath()
             }
         }
-        if (this.fill !== undefined) {
+        if (this.type !== "line" && this.fill !== undefined) {
             ctx.fillStyle = this.fill;
             ctx.fill();
         }

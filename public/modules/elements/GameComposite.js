@@ -6,16 +6,31 @@ import {Point} from "../Misc.js";
 /**
  * GameComposite class. Its children are elements.
  * Is used to manage multiple elements at once
+ * @extends GameElement
  *
  * @property {Object} shared Shared object passed from Game
- * @property {Array<GameElement>} elements Elements instances + their original method calls
+ * @property {Array<{
+ *             element: GameElement,
+ *             clickable: boolean,
+ *             draggable: boolean,
+ *             pressable: boolean
+ *         }>} elements Elements instances + their original settings
  */
 class GameComposite extends GameElement {
 
     elements = []
 
+    set center(newCenter) {
+        this.subtractPosition()
+        super.center = newCenter
+        this.addPosition()
+    }
+    get center() {
+        return super.center
+    }
+
     /**
-     *
+     * GameComposite constructor
      * @param {Array<GameElement>} elements
      * @param {Object} attrs
      */
@@ -48,18 +63,6 @@ class GameComposite extends GameElement {
         throw new Error('Incorrect method call in GameComposite "popChildByName"!')
     }
 
-    set center(newCenter) {
-        this.subtractPosition()
-        super.center = newCenter
-        this.addPosition()
-    }
-    get center() {
-        return super.center
-    }
-
-    getElementInstances() {
-        return this.elements.map(obj=>obj.element)
-    }
 
     /**
      * Adds element to composite, silences some of its functions
@@ -82,7 +85,7 @@ class GameComposite extends GameElement {
     }
 
     /**
-     *
+     * Adds multiple elements to composite, some of its functions are turned off
      * @param {GameElement} elements
      */
     addElements(...elements) {
@@ -128,6 +131,11 @@ class GameComposite extends GameElement {
         }
     }
 
+    /**
+     * Sets position of composite.
+     * @param x
+     * @param y
+     */
     setPosition(x, y) {
         this.subtractPosition()
         super.setPosition(x, y);
@@ -220,6 +228,10 @@ class GameComposite extends GameElement {
         return this.elements.length > 0
     }
 
+    /**
+     * Returns attribute object with copies of elements
+     * @returns {{elements: *[]} & {shared: *, onClick, hitboxVisible: boolean, level: number|number, center: *, clickable: boolean, onKeyPress: {}, rotation: number|number, onDrag, onFinishDragging, draggable: boolean, children: *, stationary: boolean, hitboxes: *, pressable: *, name: *, onKeyHold: {}}}
+     */
     getAttrs() {
         const attrs = Object.assign({
             elements: this.#copyOfIntactElements()
@@ -233,17 +245,31 @@ class GameComposite extends GameElement {
         return attrs
     }
 
+    /**
+     * Creates a new copy of composite with all its elements. They aren't added to game.
+     * Use game.copyElement() instead
+     * @param {string} newName
+     * @returns {GameComposite} New instance
+     */
     copy(newName) {
         const attrs = this.getAttrs()
         const newInstance = new GameComposite([...attrs.elements],attrs)
         return newInstance
     }
 
+    /**
+     * Adds all elements to game
+     * @param {Game} game
+     */
     addToGame(game) {
         const elements = this.elements.map(el=>el.element)
         game.addElements(...elements)
     }
 
+    /**
+     * Returns array of copies of elements in composite
+     * @returns {*[]} Array of copied elements (that work)
+     */
     #copyOfIntactElements() {
         const arr = []
         for (const el of this.elements) {
@@ -254,6 +280,10 @@ class GameComposite extends GameElement {
             element.pressable = el.pressable
 
             arr.push(element.copy())
+
+            element.clickable = false
+            element.draggable = false
+            element.pressable = false
         }
         return arr
     }

@@ -55,9 +55,21 @@ class GameButton extends GameElement {
         return this.#text
     }
 
+    set textColor(newColor) {
+        this.textDrawable.color = newColor
+    }
+
+    /**
+     * Highlights the button on press
+     */
     #selectButton = () => {
         this.highlight.visible = true
     }
+    /**
+     * Disables highlight and executes onPress callbacks when mouse is lifted on button
+     * @param {Event} event
+     * @returns {Promise<void>}
+     */
     #deselectButton = async (event) => {
         const mouse = this.shared.mousePos
 
@@ -84,6 +96,8 @@ class GameButton extends GameElement {
 
         this.textDrawable = new GameText(this.text,{level:0,})
         this.addChild(this.textDrawable)
+
+        this.textColor = attrs.textColor
 
         this.width = attrs.width
         this.height = (attrs.height === undefined) ? 50 : attrs.height

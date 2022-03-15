@@ -65,36 +65,66 @@ class Game {
         this.animate()
     }
 
+    /**
+     * Creates, adds and returns a blank element at (0,0)
+     * @param {Object} attrs Element attributes
+     * @returns {GameElement} New instance
+     */
     createElement(attrs) {
         const el = new GameElement(new Point(0,0),[],attrs)
         this.addElement(el)
         return el
     }
 
+    /**
+     * Creates, adds and returns a button element at (0,0)
+     * @param {Object} attrs Element attributes
+     * @returns {GameButton} New instance
+     */
     createButton(attrs) {
         const button = new GameButton(new Point(0,0),attrs)
         this.addElement(button)
         return button
     }
 
+    /**
+     * Creates, adds and returns a text input element at (0,0)
+     * @param {Object} attrs Element attributes
+     * @returns {GameTextInput} New instance
+     */
     createTextInput(attrs) {
         const input = new GameTextInput(new Point(0,0),attrs)
         this.addElement(input)
         return input
     }
 
+    /**
+     * Creates, adds and returns a canvas element at (0,0)
+     * @param {Object} attrs Element attributes
+     * @returns {GameCanvas} New instance
+     */
     createCanvas(attrs) {
         const canvas = new GameCanvas(new Point(0,0),attrs)
         this.addElement(canvas)
         return canvas
     }
 
+    /**
+     * Creates, adds and returns a blank composite object at (0,0)
+     * @param {Object} attrs Element attributes
+     * @returns {GameComposite} New instance
+     */
     createComposite(attrs) {
         const composite = new GameComposite([],attrs)
         this.addElement(composite)
         return composite
     }
 
+    /**
+     * Calls the copy function of element and adds it to game
+     * @param {GameElement|GameCanvas|GameButton|GameComposite|GameTextInput} element Element to copy
+     * @returns {GameElement|GameCanvas|GameButton|GameComposite|GameTextInput} New instance
+     */
     copyElement(element) {
         const copy = element.copy()
         this.addElement(copy)
@@ -312,6 +342,10 @@ class Game {
         }
     }
 
+    /**
+     * Adds multiple elements to game
+     * @param {GameElement} elements
+     */
     addElements(...elements) {
         for (const element of elements) {
             this.addElement(element,false)

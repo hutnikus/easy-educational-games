@@ -3,6 +3,9 @@ import {GameDrawable} from "../drawables/GameDrawable.js";
 import {GameHitbox} from "../GameHitbox.js";
 import {GameGif} from "../drawables/GameGif.js";
 import {Game} from "../Game.js";
+import {GameImage} from "../drawables/GameImage.js";
+import {GameShape} from "../drawables/GameShape.js";
+import {GameText} from "../drawables/GameText.js";
 
 /**
  * GameElement class. Handles shared actions and properties of game elements
@@ -30,9 +33,6 @@ class GameElement {
     #name = undefined
     get name() {
         return this.#name
-    }
-    set name(newName) {
-        throw new Error("Use function setName() when setting names for elements!")
     }
     #centerValue
     set center(newCenter) {
@@ -96,6 +96,59 @@ class GameElement {
         this.rotation = (attrs.rotation === undefined) ? 0 : Number(attrs.rotation);
     }
 
+    /**
+     * Creates, adds and returns a new instance of GameGif
+     * @param {string} gifName Name of gif without extension
+     * @param {Object} attrs Attributes
+     * @returns {GameGif} Newly created instance
+     */
+    createGif(gifName,attrs) {
+        const gif = new GameGif(gifName,attrs)
+        this.addChild(gif)
+        return gif
+    }
+
+    /**
+     * Creates, adds and returns a new instance of GameImage
+     * @param {string} imageName Name of image WITH extension
+     * @param {Object} attrs Attributes
+     * @returns {GameImage} Newly created instance
+     */
+    createImage(imageName,attrs) {
+        const img = new GameImage(imageName,attrs)
+        this.addChild(img)
+        return img
+    }
+
+    /**
+     * Creates, adds and returns a new instance of GameShape
+     * @param {TYPE} type Type of shape (rectangle,oval,line,polygon)
+     * @param {Object} attrs Attributes, line and polygon require coords attribute
+     * @returns {GameShape} Newly created instance
+     */
+    createShape(type,attrs) {
+        const shape = new GameShape(type,attrs)
+        this.addChild(shape)
+        return shape
+    }
+
+    /**
+     * Creates, adds and returns a new instance of GameText
+     * @param {string} text Text to be displayed
+     * @param {Object} attrs Attributes
+     * @returns {GameText} Newly created instance
+     */
+    createText(text,attrs) {
+        const textElement = new GameText(text,attrs)
+        this.addChild(textElement)
+        return textElement
+    }
+
+    /**
+     * Changes the position of element to values
+     * @param {number} x X coordinate
+     * @param {number} y Y coordinate
+     */
     setPosition(x,y) {
         if (!Number.isNaN(x)) {
             this.center.x = x
@@ -105,6 +158,12 @@ class GameElement {
         }
     }
 
+    /**
+     * Creates and adds a new hitbox
+     * @param {number} radius Radius of hitbox
+     * @param {number} dx Deviation on X axis
+     * @param {number} dy Deviation on Y axis
+     */
     addHitbox(radius,dx,dy) {
         this.hitboxes.push(new GameHitbox(radius,dx,dy))
     }
