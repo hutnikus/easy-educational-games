@@ -1,5 +1,5 @@
 import {GameElement} from "./GameElement.js";
-import {Point} from "../Misc.js";
+import {Point, randomColor} from "../Misc.js";
 import {GameShape} from "../drawables/GameShape.js";
 import {GameText} from "../drawables/GameText.js";
 import {GameDrawable} from "../drawables/GameDrawable.js";
@@ -16,17 +16,43 @@ import {GameDrawable} from "../drawables/GameDrawable.js";
  * @property {GameDrawable} highlight Rectangle that highlights the button while pressed
  */
 class GameButton extends GameElement {
-    #widthValue = undefined
+    #width = undefined
     set width(newW) {
         if (newW === undefined) {
-            this.#widthValue = 100
+            this.#width = 100
         } else {
-            this.#widthValue = newW
+            this.#width = newW
         }
-        this.textDrawable.maxWidth = this.#widthValue
+        if (this.textDrawable) this.textDrawable.maxWidth = this.#width - 10
+        if (this.highlight) this.highlight.width = this.#width
+        if (this.rectangle) this.rectangle.width = this.#width
     }
     get width() {
-        return this.#widthValue
+        return this.#width
+    }
+    #color = undefined
+    set color(newColor) {
+        if (newColor === "random") {
+            this.#color = randomColor()
+        } else {
+            this.#color = newColor
+        }
+        if (this.rectangle) {
+            this.rectangle.fill = this.#color
+        }
+    }
+    get color() {
+        return this.#color
+    }
+    #text = undefined
+    set text(newText) {
+        this.#text = newText
+        if (this.textDrawable) {
+            this.textDrawable.text = this.#text
+        }
+    }
+    get text() {
+        return this.#text
     }
 
     /**
@@ -47,7 +73,7 @@ class GameButton extends GameElement {
         this.height = (attrs.height === undefined) ? 50 : attrs.height
         this.color = (attrs.color === undefined) ? 'lightgrey' : attrs.color;
 
-        const rectangle = new GameShape('rectangle',{
+        this.rectangle = new GameShape('rectangle',{
                 width:this.width,
                 height:this.height,
                 fill:this.color,
@@ -56,7 +82,7 @@ class GameButton extends GameElement {
                 lineWidth: 5
             }
         )
-        this.addChild(rectangle)
+        this.addChild(this.rectangle)
 
         this.highlight =  new GameShape('rectangle',{
                 width:this.width+4,
