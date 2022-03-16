@@ -17,6 +17,7 @@ import {GameButton} from "./elements/GameButton.js";
 import {GameHitbox} from "./GameHitbox.js";
 import {GameTextInput} from "./elements/GameTextInput.js";
 import {GameComposite} from "./elements/GameComposite.js";
+import {GameGrid} from "./GameGrid.js";
 
 export {
     Game,
@@ -31,4 +32,5 @@ export {
     GameHitbox,
     GameTextInput,
     GameComposite,
+    GameGrid
 }

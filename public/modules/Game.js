@@ -7,10 +7,20 @@
 // import {Point} from "./Misc.js";
 // import {GameElement} from "./GameElement.js";
 
-import {GameShape, GameElement, Point, GameComposite, GameButton, GameTextInput, GameCanvas} from "./index.js";
+import {
+    GameShape,
+    GameElement,
+    Point,
+    GameComposite,
+    GameButton,
+    GameTextInput,
+    GameCanvas,
+    GameGrid
+} from "./index.js";
 
 /**
  * Game class. It manages the game state and elements within it.
+ * @property {number} animationInterval Loop for drawing
  * @property {Array<GameElement>} elements Array of GameElement objects
  * @property {GameElement} selectedElement Selected element when dragging
  * @property {Point} delta Distance from mouse to center of dragged element
@@ -21,8 +31,10 @@ import {GameShape, GameElement, Point, GameComposite, GameButton, GameTextInput,
  * @property {HTMLCanvasElement} tempCanvas Canvas on which the isInside() methods are checked. It can be optionally passed on construction
  * @property {CanvasRenderingContext2D} tempContext Rendering context for the tempCanvas
  * @property {Array<function>} onClear What happens on clear() in addition to removing elements
+ * @property {Array<GameGrid>} grids Array of grids
  */
 class Game {
+    animationInterval
     /**
      * Constructor of the Game class
      * @param canvas Canvas on which the game is played
@@ -31,6 +43,7 @@ class Game {
     constructor(canvas,tempCanvas=undefined) {
         canvas.addEventListener("contextmenu",e=>e.preventDefault()) //prevent context menu
         this.elements = []
+        this.grids = []
         this.pressedKeys = []
         this.onClear = []
         this.canvas = canvas;
@@ -60,7 +73,7 @@ class Game {
         document.addEventListener('keydown',(ev => this.onKeyDown(ev)))
         document.addEventListener('keyup',(ev => this.onKeyUp(ev)))
 
-        setInterval(()=>this.keyHoldLoop(),20)
+        setInterval(()=>this.keyHoldLoop(),30)
 
         this.animate()
     }
@@ -138,6 +151,22 @@ class Game {
     }
 
     /**
+     * Creates,adds and returns a new grid instance
+     * @param {number} dx Deviation from right
+     * @param {number} dy Deviation from top
+     * @param {number} width Width of the grid
+     * @param {number} height Height of the grid
+     * @param {number} cols Number of columns
+     * @param {number} rows Number of rows
+     * @returns {GameGrid} New instance
+     */
+    createGrid(dx=0,dy=0,width,height,cols,rows) {
+        const grid = new GameGrid(new Point(dx,dy),width,height,cols,rows)
+        this.grids.push(grid)
+        return grid
+    }
+
+    /**
      * Sorts array of elements by level
      */
     updateLevels() {
@@ -175,7 +204,6 @@ class Game {
             const insideElement = await el.isInside(mousePos,this.tempContext)
             if (insideElement) {
                 wasInside = true
-                // console.log(el)
             }
         }
 
@@ -199,11 +227,14 @@ class Game {
      * @returns {Promise<void>}
      */
     async onClick(event) {
-        if (!(event instanceof MouseEvent)) {
+        if (this.selectedElement) {
+            return
+        }
+
+        if (!(event instanceof MouseEvent)) { //prevent scrolling on touch
             event.preventDefault()
         }
         const mousePos = this.getMousePos(event)
-        // console.log("here")
 
         //get topmost element
         const el = await this.getElementAtPos(mousePos)
@@ -269,15 +300,11 @@ class Game {
         if (this.pressedKeys.length === 0) {
             return
         }
-        // console.log("pressed:",this.pressedKeys)
-
-        const listeners = this.elements.filter((el) => {
-            const keys = Object.keys(el.onKeyHold)
-            return keys.filter(value => this.pressedKeys.includes(value))
-        })
-
-        for (const el of listeners) {
-            el.keyHold(this.pressedKeys)
+        for (const key of this.pressedKeys) {
+            const objects = this.elements.filter((el) => Object.keys(el.onKeyHold).includes(key))
+            for (const element of objects) {
+                element.keyHold(key)
+            }
         }
     }
 
@@ -294,11 +321,11 @@ class Game {
             //first press
             const listeners = this.elements.filter((el) => {
                 const keys = Object.keys(el.onKeyPress)
-                return keys.filter(value => this.pressedKeys.includes(value))
+                return keys.filter(value => key === value)
             })
 
             for (const el of listeners) {
-                el.keyPress(this.pressedKeys,event)
+                el.keyPress(key,event)
             }
         }
     }
@@ -313,7 +340,9 @@ class Game {
         if (indexInArray !== -1) {
             //if pressed
             this.pressedKeys.splice(indexInArray,1)
-            // console.log(this.pressedKeys)
+        }
+        for (const element of this.elements.filter(el=>el.pressable)) {
+            element.keyUp(event)
         }
     }
 
@@ -395,6 +424,10 @@ class Game {
         this.context.setTransform(1,0,0,1,0,0);
         this.context.clearRect(0,0,this.canvas.width,this.canvas.width)
 
+        for (const grid of this.grids) {
+            grid.draw(this.context)
+        }
+
         for (const obj of this.elements) {
             await obj.draw(this.context)
         }
@@ -404,7 +437,7 @@ class Game {
      * Starts the animation loop
      */
     animate() {
-        setInterval(()=>this.#animationLoop(this),30)
+        this.animationInterval = setInterval(()=>this.#animationLoop(this),30)
     }
 
     /**
@@ -478,7 +511,9 @@ class Game {
      * Resets game to initial state
      */
     clear() {
+        this.grids = []
         this.elements = []
+        this.pressedKeys = []
         for (const callback of this.onClear) {
             callback.call(this)
             // callback()

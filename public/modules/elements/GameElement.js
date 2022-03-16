@@ -23,11 +23,13 @@ import {GameText} from "../drawables/GameText.js";
  * @property {Array<function>} onFinishDragging Array of callbacks called when finished dragging/holding
  * @property {Object} onKeyPress Map of (keyboard) keys mapped to an array of callbacks called on key press
  * @property {Object} onKeyHold Map of (keyboard) keys mapped to an array of callbacks called on key hold
+ * @property {Array<function>} onKeyUp Array of callbacks called when all keys are lifted
  * @property {Array<function>} onMove Array of callbacks called on move
  * @property {Object} shared Shared object passed from Game
  * @property {Array<GameHitbox>} hitboxes Array of hitboxes linked to the element
  * @property {boolean} hitboxVisible Hitboxes are drawn on true, else are hidden
  * @property {number} rotation Rotation of element in radians
+ * @property {GameGrid} grid Reference to grid (if it belongs)
  */
 class GameElement {
     #name = undefined
@@ -75,6 +77,7 @@ class GameElement {
         this.onFinishDragging = (attrs.onFinishDragging === undefined) ? [] : attrs.onFinishDragging
         this.onKeyPress = (attrs.onKeyPress === undefined) ? {} : attrs.onKeyPress
         this.onKeyHold = (attrs.onKeyHold === undefined) ? {} : attrs.onKeyHold
+        this.onKeyUp = attrs.onKeyUp || []
         this.onMove = (attrs.onMove === undefined) ? [] : attrs.onMove
         this.hitboxes = []
 
@@ -91,9 +94,11 @@ class GameElement {
         this.clickable = (attrs.clickable === undefined) ? false : attrs.clickable;
         this.draggable = (attrs.draggable === undefined) ? false : attrs.draggable;
         this.stationary = (attrs.stationary === undefined) ? false : attrs.stationary;
+        this.pressable = attrs.pressable || false;
         this.level = (attrs.level === undefined) ? 0 : Number(attrs.level);
 
         this.rotation = (attrs.rotation === undefined) ? 0 : Number(attrs.rotation);
+        this.grid = undefined
     }
 
     /**
@@ -378,6 +383,22 @@ class GameElement {
     }
 
     /**
+     * Adds a listener to the array of listeners for onKeyUp
+     * @param {function} callback function to be called
+     */
+    addOnKeyUpListener(callback) {
+        this.onKeyUp.push(callback)
+    }
+
+    /**
+     * Removes listener for the onKeyUp event
+     * @param {function} callback function you want to remove
+     */
+    removeOnKeyUpListener(callback) {
+        this.onKeyUp = this.onKeyUp.filter(item=>item!==callback)
+    }
+
+    /**
      * Adds a listener to the array of listeners for move
      * @param {function} callback function to be called
      */
@@ -439,40 +460,44 @@ class GameElement {
 
     /**
      * Calls the functions in the onKeyPress object that are assigned to the passed keys
-     * @param {Array<string>} keyArray Array of currently pressed keys
+     * @param {string} key Array of currently pressed keys
      * @param {Event} event
      */
-    keyPress(keyArray,event) {
+    keyPress(key,event) {
         if (!this.pressable) {
             return
         }
-        for (const key of keyArray) {
-            const events = this.onKeyPress[key]
-            if (events !== undefined && events.length !== 0) {
-                for (const callback of events) {
-                    callback.call(this,event)
-                    // callback(event)
-                }
+        const events = this.onKeyPress[key]
+        if (events !== undefined && events.length !== 0) {
+            for (const callback of events) {
+                callback.call(this,event)
+                // callback(event)
             }
         }
     }
 
     /**
      * Calls the functions in the onKeyHold object that are assigned to the passed keys
-     * @param {Array<string>} keyArray Array of currently pressed keys
+     * @param {string} key Array of currently pressed keys
      */
-    keyHold(keyArray) {
+    keyHold(key) {
         if (!this.pressable) {
             return
         }
-        for (const key of keyArray) {
-            const events = this.onKeyHold[key]
-            if (events !== undefined && events.length !== 0) {
-                for (const callback of events) {
-                    // callback()
-                    callback.call(this)
-                }
+        const events = this.onKeyHold[key]
+        if (events !== undefined && events.length !== 0) {
+            for (const callback of events) {
+                callback.call(this)
             }
+        }
+    }
+
+    /**
+     * Calls the functions in the onKeyUp array
+     */
+    keyUp(event) {
+        for (const callback of this.onKeyUp) {
+            callback.call(this,event)
         }
     }
 
@@ -507,11 +532,29 @@ class GameElement {
      * @param {Point} delta Vector by which the element is moved
      */
     move(delta) {
-        this.center = this.center.add(delta)
-
+        if (!this.grid) {
+            this.center = this.center.add(delta)
+        }
+        else {
+            //move on grid
+            const pos = this.grid.getElementPosition(this)
+            if (delta.x) { //not zero
+                pos.x += (delta.x > 0) ? 1 : -1
+            }
+            if (delta.y) { //not zero
+                pos.y += (delta.y > 0) ? 1 : -1
+            }
+            try {
+                this.grid.moveElement(pos.x,pos.y,this)
+            } catch (e) {
+                //don't move outside range but throw otherwise
+                if (!(e instanceof RangeError)) {
+                    throw e
+                }
+            }
+        }
         for (const callback of this.onMove) {
             callback.call(this)
-            // callback()
         }
     }
 

@@ -14,6 +14,7 @@ import {GameDrawable} from "../drawables/GameDrawable.js";
  * @property {string} text Text displayed on the button
  * @property {Array<function>} onPress Array of callbacks to be triggered on button press
  * @property {GameDrawable} highlight Rectangle that highlights the button while pressed
+ * @property {GameDrawable} rectangle Button body
  */
 class GameButton extends GameElement {
     #width = undefined
