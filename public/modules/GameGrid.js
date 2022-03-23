@@ -373,6 +373,23 @@ class GameGrid {
         throw new FullError("Grid appears to be full!")
     }
 
+    /**
+     * Moves or adds element to a position on this grid
+     * @param {number} col
+     * @param {number} row
+     * @param {GameElement} element
+     */
+    placeElement(col,row,element) {
+        if (element.grid === this) {
+            this.moveElement(col,row,element)
+            return
+        }
+        if (element.grid) {
+            element.grid.removeElement(element)
+        }
+        this.addElement(col,row,element)
+    }
+
 
 }
 
