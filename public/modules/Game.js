@@ -78,13 +78,20 @@ class Game {
         this.animate()
     }
 
+    getCenter() {
+        return new Point(
+            this.canvas.width/2,
+            this.canvas.height/2
+        )
+    }
+
     /**
      * Creates, adds and returns a blank element at (0,0)
      * @param {Object} attrs Element attributes
      * @returns {GameElement} New instance
      */
     createElement(attrs) {
-        const el = new GameElement(new Point(0,0),[],attrs)
+        const el = new GameElement(this.getCenter(),[],attrs)
         this.addElement(el)
         return el
     }
@@ -95,7 +102,7 @@ class Game {
      * @returns {GameButton} New instance
      */
     createButton(attrs) {
-        const button = new GameButton(new Point(0,0),attrs)
+        const button = new GameButton(this.getCenter(),attrs)
         this.addElement(button)
         return button
     }
@@ -106,7 +113,7 @@ class Game {
      * @returns {GameTextInput} New instance
      */
     createTextInput(attrs) {
-        const input = new GameTextInput(new Point(0,0),attrs)
+        const input = new GameTextInput(this.getCenter(),attrs)
         this.addElement(input)
         return input
     }
@@ -117,7 +124,7 @@ class Game {
      * @returns {GameCanvas} New instance
      */
     createCanvas(attrs) {
-        const canvas = new GameCanvas(new Point(0,0),attrs)
+        const canvas = new GameCanvas(this.getCenter(),attrs)
         this.addElement(canvas)
         return canvas
     }
@@ -227,34 +234,39 @@ class Game {
      * @returns {Promise<void>}
      */
     async onClick(event) {
+        // one click at a time
         if (this.selectedElement) {
             return
         }
-
-        if (!(event instanceof MouseEvent)) { //prevent scrolling on touch
+        // prevent scrolling on touch
+        if (!(event instanceof MouseEvent)) {
             event.preventDefault()
         }
-        const mousePos = this.getMousePos(event)
-
         //get topmost element
+        const mousePos = this.getMousePos(event)
         const el = await this.getElementAtPos(mousePos)
         if (el === null) {
             return
         }
 
-        if (!el.clickable && !el.draggable) {
-            console.error('clicked unresponsive element')
-            return
-        }
+        // if (!el.clickable && !el.draggable) {
+        //     console.error('clicked unresponsive element')
+        //     return
+        // }
         if (el.clickable) {
             el.click(event)
         }
-        if (el.draggable) {
+        if (el.draggable || el.holdable) {
             this.selectedElement = el
-            this.delta = new Point(
-                mousePos.x - el.center.x,
-                mousePos.y - el.center.y
-            )
+            if (el.draggable) {
+                this.delta = new Point(
+                    mousePos.x - el.center.x,
+                    mousePos.y - el.center.y
+                )
+            }
+            if (el.holdable) {
+                el.startMouseHold(event)
+            }
         }
     }
 
@@ -266,7 +278,7 @@ class Game {
         if (!(event instanceof MouseEvent)) {
             event.preventDefault()
         }
-        if (this.selectedElement === undefined) {
+        if (this.selectedElement === undefined || !this.selectedElement.draggable) {
             return
         }
         const mousePos = this.getMousePos(event)
@@ -288,6 +300,7 @@ class Game {
         const mousePos = this.getMousePos(event)
 
         this.selectedElement.finishDragging(event)
+        this.selectedElement.finishMouseHold(event)
 
         this.selectedElement = undefined
         this.delta = undefined
@@ -488,7 +501,7 @@ class Game {
     async getElementAtPos(position) {
         for (const i in this.elements) {
             const el = this.elements[this.elements.length-1-i]
-            if (!el.clickable && !el.draggable) {
+            if (!el.clickable && !el.draggable && !el.holdable) {
                 continue
             }
             if (await el.isInside(position, this.tempContext)) {

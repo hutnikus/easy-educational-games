@@ -127,11 +127,10 @@ class GameButton extends GameElement {
         this.addChild(this.highlight)
 
         this.clickable = true
-        this.draggable = true
-        this.stationary = true
+        this.holdable = true
 
         this.addOnClickListener(this.#selectButton)
-        this.addOnFinishDraggingListener(this.#deselectButton)
+        this.addOnFinishMouseHoldListener(this.#deselectButton)
     }
 
     /**
@@ -179,7 +178,7 @@ class GameButton extends GameElement {
         const retButton = new GameButton(attrs.center,attrs)
         // remove selecting of this instance
         retButton.removeOnClickListener(this.#selectButton)
-        retButton.removeOnFinishDraggingListener(this.#deselectButton)
+        retButton.removeOnFinishMouseHoldListener(this.#deselectButton)
         return retButton
     }
 }

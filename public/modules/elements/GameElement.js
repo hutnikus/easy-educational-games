@@ -18,13 +18,16 @@ import {GameText} from "../drawables/GameText.js";
  * @property {boolean} draggable Element will respond to holding
  * @property {boolean} pressable Element will respond to key press
  * @property {boolean} stationary Element will respond to holding, but won't change its position
+ * @property {boolean} holdable Element will respond to holding
  * @property {Array<function>} onClick Array of callbacks called on click
  * @property {Array<function>} onDrag Array of callbacks called on dragging/holding
  * @property {Array<function>} onFinishDragging Array of callbacks called when finished dragging/holding
+ * @property {Array<function>} onFinishMouseHold Array of callbacks called when finished mouseHold
  * @property {Object} onKeyPress Map of (keyboard) keys mapped to an array of callbacks called on key press
  * @property {Object} onKeyHold Map of (keyboard) keys mapped to an array of callbacks called on key hold
  * @property {Array<function>} onKeyUp Array of callbacks called when all keys are lifted
  * @property {Array<function>} onMove Array of callbacks called on move
+ * @property {Array<Object>} onMouseHold Array of callbacks called on mouse hold
  * @property {Object} shared Shared object passed from Game
  * @property {Array<GameHitbox>} hitboxes Array of hitboxes linked to the element
  * @property {boolean} hitboxVisible Hitboxes are drawn on true, else are hidden
@@ -78,6 +81,8 @@ class GameElement {
         this.onKeyPress = (attrs.onKeyPress === undefined) ? {} : attrs.onKeyPress
         this.onKeyHold = (attrs.onKeyHold === undefined) ? {} : attrs.onKeyHold
         this.onKeyUp = attrs.onKeyUp || []
+        this.onMouseHold = attrs.onMouseHold || []
+        this.onFinishMouseHold = attrs.onFinishMouseHold || []
         this.onMove = (attrs.onMove === undefined) ? [] : attrs.onMove
         this.hitboxes = []
 
@@ -95,6 +100,7 @@ class GameElement {
         this.draggable = (attrs.draggable === undefined) ? false : attrs.draggable;
         this.stationary = (attrs.stationary === undefined) ? false : attrs.stationary;
         this.pressable = attrs.pressable || false;
+        this.holdable = attrs.holdable || false;
         this.level = (attrs.level === undefined) ? 0 : Number(attrs.level);
 
         this.rotation = (attrs.rotation === undefined) ? 0 : Number(attrs.rotation);
@@ -331,6 +337,22 @@ class GameElement {
     }
 
     /**
+     * Adds a listener to the array of listeners for onFinishMouseHold
+     * @param {function} callback function to be called
+     */
+    addOnFinishMouseHoldListener(callback) {
+        this.onFinishMouseHold.push(callback)
+    }
+
+    /**
+     * Removes listener for the onFinishDragging event
+     * @param {function} callback function you want to remove
+     */
+    removeOnFinishMouseHoldListener(callback) {
+        this.onFinishMouseHold = this.onFinishMouseHold.filter(item=>item!==callback)
+    }
+
+    /**
      * Adds a listener to the array of listeners for onKeyPress
      * @param {string} key Key the callback will be called for
      * @param {function} callback function to be called
@@ -360,12 +382,13 @@ class GameElement {
      * Adds a listener to the array of listeners for onKeyHold
      * @param {string} key Key the callback will be called for
      * @param {function} callback function to be called
+     * @param {number} stagger Skips this many calls
      */
-    addOnKeyHoldListener(key,callback) {
+    addOnKeyHoldListener(key,callback,stagger=0) {
         if (!Array.isArray(this.onKeyHold[key])) {
             this.onKeyHold[key] = []
         }
-        this.onKeyHold[key].push(callback)
+        this.onKeyHold[key].push({callback,stagger,stg:0})
     }
 
     /**
@@ -375,7 +398,7 @@ class GameElement {
      */
     removeOnKeyHoldListener(key,callback) {
         if (this.onKeyHold[key] !== undefined) {
-            this.onKeyHold[key] = this.onKeyHold[key].filter(item=>item!==callback)
+            this.onKeyHold[key] = this.onKeyHold[key].filter(item=>item.callback!==callback)
             if (this.onKeyHold[key].length === 0) {
                 delete this.onKeyHold[key]
             }
@@ -412,6 +435,14 @@ class GameElement {
      */
     removeOnMoveListener(callback) {
         this.onMove = this.onMove.filter(item=>item!==callback)
+    }
+
+    addOnMouseHoldListener(callback,stagger=0) {
+        this.onMouseHold.push({callback,stagger,stg:0})
+    }
+
+    removeOnMouseHoldListener(callback) {
+        this.onMouseHold = this.onMouseHold.filter(item=>item.callback!==callback)
     }
 
     /**
@@ -486,17 +517,69 @@ class GameElement {
         }
         const events = this.onKeyHold[key]
         if (events !== undefined && events.length !== 0) {
-            for (const callback of events) {
-                callback.call(this)
+            for (const obj of events) {
+                if (obj.stg === 0) {
+                    obj.callback.call(this)
+                    obj.stg = obj.stagger
+                } else {
+                    obj.stg--
+                }
             }
         }
     }
 
     /**
-     * Calls the functions in the onKeyUp array
+     * Calls the functions in the onKeyUp array and resets stagger values for onKeyHold
      */
     keyUp(event) {
         for (const callback of this.onKeyUp) {
+            callback.call(this,event)
+        }
+
+        const events = this.onKeyHold[event.key]
+        if (events !== undefined && events.length !== 0) {
+            for (const obj of events) {
+                obj.stg = 0
+            }
+        }
+    }
+
+    /**
+     * Creates mouse hold interval
+     * @param event
+     */
+    startMouseHold(event) {
+        if (this.holdInterval) {
+            return
+        }
+        function holdFunction() {
+            for (const obj of this.onMouseHold) {
+                if (obj.stg === 0) {
+                    obj.callback.call(this, event)
+                    obj.stg = obj.stagger
+                } else {
+                    obj.stg--
+                }
+            }
+        }
+
+        holdFunction.call(this)
+        this.holdInterval = setInterval(holdFunction.bind(this),30)
+    }
+
+    /**
+     * Stops and resets mouse hold interval
+     * @param event
+     */
+    finishMouseHold(event) {
+        clearInterval(this.holdInterval)
+        this.holdInterval = undefined
+
+        for (const obj of this.onMouseHold) {
+            obj.stg = 0
+        }
+
+        for (const callback of this.onFinishMouseHold) {
             callback.call(this,event)
         }
     }

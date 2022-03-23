@@ -84,8 +84,6 @@ class GameCanvas extends GameElement {
         this.draggable = true
         this.stationary = true
 
-
-
         this.addOnClickListener(this.#startDrawing)
         this.addOnFinishDraggingListener(this.#finishDrawing)
     }
