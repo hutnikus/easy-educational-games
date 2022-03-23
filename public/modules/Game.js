@@ -15,7 +15,8 @@ import {
     GameButton,
     GameTextInput,
     GameCanvas,
-    GameGrid
+    GameGrid,
+    GameRangeSlider
 } from "./index.js";
 
 /**
@@ -86,7 +87,7 @@ class Game {
     }
 
     /**
-     * Creates, adds and returns a blank element at (0,0)
+     * Creates, adds and returns a blank element
      * @param {Object} attrs Element attributes
      * @returns {GameElement} New instance
      */
@@ -97,7 +98,7 @@ class Game {
     }
 
     /**
-     * Creates, adds and returns a button element at (0,0)
+     * Creates, adds and returns a button element
      * @param {Object} attrs Element attributes
      * @returns {GameButton} New instance
      */
@@ -108,7 +109,7 @@ class Game {
     }
 
     /**
-     * Creates, adds and returns a text input element at (0,0)
+     * Creates, adds and returns a text input element
      * @param {Object} attrs Element attributes
      * @returns {GameTextInput} New instance
      */
@@ -119,7 +120,7 @@ class Game {
     }
 
     /**
-     * Creates, adds and returns a canvas element at (0,0)
+     * Creates, adds and returns a canvas element
      * @param {Object} attrs Element attributes
      * @returns {GameCanvas} New instance
      */
@@ -127,6 +128,17 @@ class Game {
         const canvas = new GameCanvas(this.getCenter(),attrs)
         this.addElement(canvas)
         return canvas
+    }
+
+    /**
+     * Creates, adds and returns a range slider element
+     * @param {Object} attrs Element attributes
+     * @returns {GameCanvas} New instance
+     */
+    createRangeSlider(attrs) {
+        const slider = new GameRangeSlider(this.getCenter(),attrs)
+        this.addElement(slider)
+        return slider
     }
 
     /**

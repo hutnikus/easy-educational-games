@@ -18,6 +18,7 @@ import {GameHitbox} from "./GameHitbox.js";
 import {GameTextInput} from "./elements/GameTextInput.js";
 import {GameComposite} from "./elements/GameComposite.js";
 import {GameGrid} from "./GameGrid.js";
+import {GameRangeSlider} from "./elements/GameRangeSlider.js";
 
 export {
     Game,
@@ -32,5 +33,6 @@ export {
     GameHitbox,
     GameTextInput,
     GameComposite,
-    GameGrid
+    GameGrid,
+    GameRangeSlider
 }

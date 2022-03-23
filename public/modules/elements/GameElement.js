@@ -32,6 +32,7 @@ import {GameText} from "../drawables/GameText.js";
  * @property {Array<GameHitbox>} hitboxes Array of hitboxes linked to the element
  * @property {boolean} hitboxVisible Hitboxes are drawn on true, else are hidden
  * @property {number} rotation Rotation of element in radians
+ * @property {boolean} visible Element is visible
  * @property {GameGrid} grid Reference to grid (if it belongs)
  */
 class GameElement {
@@ -104,6 +105,7 @@ class GameElement {
         this.level = (attrs.level === undefined) ? 0 : Number(attrs.level);
 
         this.rotation = (attrs.rotation === undefined) ? 0 : Number(attrs.rotation);
+        this.visible = (attrs.visible === undefined) ? true : attrs.visible
         this.grid = undefined
     }
 
@@ -231,6 +233,11 @@ class GameElement {
      * @returns {Promise<void>}
      */
     async draw(ctx) {
+        if (!this.visible) {
+            //skip drawing
+            return
+        }
+
         //wait for loading all images
         for (const e of this.children) {
             e.img = await e.img
@@ -272,6 +279,11 @@ class GameElement {
      * @returns {Promise<boolean>} True when inside
      */
     async isInside(mouse) {
+        if (!this.visible) {
+            // only clickable when visible
+            return false
+        }
+
         this.shared.tempContext.setTransform(1,0,0,1,this.center.x,this.center.y);
         this.shared.tempContext.rotate(this.rotation)
 
@@ -645,7 +657,7 @@ class GameElement {
      * Returns an object of attributes (used for copying)
      * @returns {Object} Attribute object
      */
-    getAttrs() {
+    getAttrs() { //todo pridat mousemove
         return {
             name: this.name,
             level: this.level,
@@ -663,7 +675,8 @@ class GameElement {
             shared: this.shared,
             hitboxes: this.hitboxes.map((hb=>hb.copy())),
             hitboxVisible: this.hitboxVisible,
-            rotation: this.rotation
+            rotation: this.rotation,
+            visible: this.visible
         }
     }
 
