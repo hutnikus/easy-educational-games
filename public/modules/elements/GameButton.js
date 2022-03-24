@@ -159,7 +159,6 @@ class GameButton extends GameElement {
             height: this.height,
             color: this.color,
             text: this.text,
-            onPress: [...this.onPress],
         },super.getAttrs())
     }
 
@@ -175,11 +174,7 @@ class GameButton extends GameElement {
         } else {
             attrs.name = newName
         }
-        const retButton = new GameButton(attrs.center,attrs)
-        // remove selecting of this instance
-        retButton.removeOnClickListener(this.#selectButton)
-        retButton.removeOnFinishMouseHoldListener(this.#deselectButton)
-        return retButton
+        return new GameButton(attrs.center,attrs)
     }
 }
 

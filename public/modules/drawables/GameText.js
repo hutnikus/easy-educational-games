@@ -7,7 +7,7 @@ import {GameDrawable} from "./GameDrawable.js";
  * @property {string} color Color of text. Can be CSS color.
  * @property {string} text Text to display. Can be only 1 line
  * @property {string} font Font (and size) of the text. Default "20px arial"
- * @property {number} maxWidth Shrink text width to this size todo use super.width
+ * @property {number} maxWidth Shrink text width to this size
  */
 class GameText extends GameDrawable {
     color = undefined;

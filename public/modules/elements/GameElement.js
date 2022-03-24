@@ -657,7 +657,7 @@ class GameElement {
      * Returns an object of attributes (used for copying)
      * @returns {Object} Attribute object
      */
-    getAttrs() { //todo pridat mousemove
+    getAttrs() {
         return {
             name: this.name,
             level: this.level,
@@ -667,11 +667,6 @@ class GameElement {
             draggable: this.draggable,
             pressable: this.pressable,
             stationary: this.stationary,
-            onClick: [...this.onClick],
-            onDrag: [...this.onDrag],
-            onFinishDragging: [...this.onFinishDragging],
-            onKeyPress: copyKeyObject(this.onKeyPress),
-            onKeyHold: copyKeyObject(this.onKeyHold),
             shared: this.shared,
             hitboxes: this.hitboxes.map((hb=>hb.copy())),
             hitboxVisible: this.hitboxVisible,
@@ -681,7 +676,7 @@ class GameElement {
     }
 
     /**
-     * Returns a new copy of this instance (with unlinked children)
+     * Returns a new copy of this instance without methods
      * @param {string} newName Name of the newly created instance. Names have to be unique.
      * @returns {GameElement} Copy of this instance
      */
@@ -698,14 +693,6 @@ class GameElement {
             attrs
         )
     }
-}
-
-function copyKeyObject(obj) {
-    const retObj = {}
-    for (const key of Object.keys(obj)) {
-        retObj[key] = [...obj[key]]
-    }
-    return retObj
 }
 
 // module.exports = GameElement

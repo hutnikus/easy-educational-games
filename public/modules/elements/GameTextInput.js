@@ -11,97 +11,84 @@ import {GameText} from "../drawables/GameText.js";
  * @property {number} height Height of the text input element
  * @property {string} color Background color of the element (default 'aliceblue')
  * @property {string} text Text displayed/entered on the element
- * @property {string} defaultText Text that shows up already pre-filled in the popup todo merge with text?
  * @property {string} message Text displayed on the popup. Default 'Enter text'
  * @property {Array<function>} onEnter Array of [callback,attribute_object] called on enter text (on popup)
  *
  */
 class GameTextInput extends GameElement {
-    #widthValue = undefined
+    #width = undefined
     set width(newWidth) {
         if (newWidth === undefined) {
-            this.#widthValue = 150
+            this.#width = 150
         }
         else if (isNaN(newWidth)) {
             throw new Error("Entered width value is not a number!")
         } else {
-            this.#widthValue = newWidth
+            this.#width = newWidth
         }
         //set text width
         const text = this.getChildByName("text")
-        text.maxWidth = this.#widthValue
+        text.maxWidth = this.#width
         //set rect width
         const rect = this.getChildByName("rect")
-        rect.width = this.#widthValue
+        rect.width = this.#width
     }
     get width() {
-        return this.#widthValue
+        return this.#width
     }
-
-    #heightValue = undefined
+    #height = undefined
     set height(newHeight) {
         if (newHeight === undefined) {
-            this.#heightValue = 30
+            this.#height = 30
         }
         else if (isNaN(newHeight)) {
             throw new Error("Entered height value is not a number!")
         }
         else {
-            this.#heightValue = newHeight
+            this.#height = newHeight
         }
         //set rect height
         const rect = this.getChildByName("rect")
-        rect.height = this.#heightValue
+        rect.height = this.#height
     }
     get height() {
-        return this.#heightValue
+        return this.#height
     }
-
-    #colorValue = undefined
+    #color = undefined
     set color(newColor) {
         if (newColor === undefined) {
-            this.#colorValue = 'aliceblue'
+            this.#color = 'aliceblue'
         }
         else if (newColor === "random") {
-            this.#colorValue = randomColor()
+            this.#color = randomColor()
         }
         else {
-            this.#colorValue = newColor
+            this.#color = newColor
         }
         //set rect color
         const rect = this.getChildByName("rect")
-        rect.fill = this.#colorValue
+        rect.fill = this.#color
     }
     get color() {
-        return this.#colorValue
+        return this.#color
     }
-
-    #textValue = undefined
+    #text = undefined
     set text(newText) {
-        this.#textValue = (newText === undefined) ? this.defaultText : newText;
+        this.#text = (newText === undefined) ? "" : newText;
         //pass text to element
         const text = this.getChildByName("text")
-        text.text = this.#textValue
+        text.text = this.#text
     }
     get text() {
-        return this.#textValue
-    }
-
-    #defaultTextValue = undefined       // text that shows up in the popup
-    set defaultText(newDefaultText) {
-        this.#defaultTextValue = (newDefaultText === undefined) ? "Enter text" : newDefaultText;
-    }
-    get defaultText() {
-        return this.#defaultTextValue
+        return this.#text
     }
 
     #clickOnInput = async (event) => {
-        const entered = window.prompt(this.message, this.defaultText);
+        const entered = window.prompt(this.message, this.text);
         if (entered === null) {
             return
         }
         this.text = entered
-        this.defaultText = this.text
 
         const mouse = this.shared.mousePos
 
@@ -136,8 +123,7 @@ class GameTextInput extends GameElement {
         this.addChild(rectangle)
 
         //init attributes
-        this.defaultText = attrs.defaultText
-        this.text = attrs.text;
+        this.text = attrs.text
         this.width = attrs.width
         this.height = attrs.height
         this.color = attrs.color;
@@ -174,9 +160,7 @@ class GameTextInput extends GameElement {
             height: this.height,
             color: this.color,
             text: this.text,
-            defaultText: this.defaultText,
             message: this.message,
-            onEnter: [...this.onEnter],
         },super.getAttrs())
     }
 
@@ -192,10 +176,7 @@ class GameTextInput extends GameElement {
         } else {
             attrs.name = newName
         }
-        const retInput = new GameTextInput(attrs.center,attrs)
-        // remove drawing of this instance
-        retInput.removeOnClickListener(this.#clickOnInput)
-        return retInput
+        return new GameTextInput(attrs.center,attrs)
     }
 }
 

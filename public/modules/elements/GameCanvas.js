@@ -120,11 +120,7 @@ class GameCanvas extends GameElement {
         } else {
             attrs.name = newName
         }
-        const retCanvas = new GameCanvas(attrs.center,attrs)
-        // remove drawing of this instance
-        retCanvas.removeOnClickListener(this.#startDrawing)
-        retCanvas.removeOnFinishDraggingListener(this.#finishDrawing)
-        return retCanvas
+        return new GameCanvas(attrs.center,attrs)
     }
 }
 

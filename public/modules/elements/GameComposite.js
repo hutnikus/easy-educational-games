@@ -253,8 +253,7 @@ class GameComposite extends GameElement {
      */
     copy(newName) {
         const attrs = this.getAttrs()
-        const newInstance = new GameComposite([...attrs.elements],attrs)
-        return newInstance
+        return new GameComposite([...attrs.elements],attrs)
     }
 
     /**
