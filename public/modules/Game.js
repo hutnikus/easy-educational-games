@@ -133,7 +133,7 @@ class Game {
     /**
      * Creates, adds and returns a range slider element
      * @param {Object} attrs Element attributes
-     * @returns {GameCanvas} New instance
+     * @returns {GameRangeSlider} New instance
      */
     createRangeSlider(attrs) {
         const slider = new GameRangeSlider(this.getCenter(),attrs)

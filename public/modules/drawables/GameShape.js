@@ -29,7 +29,7 @@ class GameShape extends GameDrawable {
     #lineWidthValue;
     set type(newType) {
         if (!shapes.includes(newType)) {
-            throw new Error(`Incorrect type name. Should be of "${shapes}", is ${type}`)
+            throw new Error(`Incorrect type name. Should be of "${shapes}", is ${newType}`)
         }
         this.#typeValue = newType
     }

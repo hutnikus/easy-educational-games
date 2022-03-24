@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: GameTextInput</title>
+    <title>JSDoc: Class: GameRangeSlider</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: GameTextInput</h1>
+    <h1 class="page-title">Class: GameRangeSlider</h1>
 
     
 
@@ -28,9 +28,9 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>GameTextInput<span class="signature">(center, attrs)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>GameRangeSlider<span class="signature">()</span><span class="type-signature"></span></h2>
         
-            <div class="class-description"><p>Text Input class</p></div>
+            <div class="class-description"><p>Range slider class</p></div>
         
     
 </header>
@@ -45,95 +45,19 @@
     
 
     
-    <h4 class="name" id="GameTextInput"><span class="type-signature"></span>new GameTextInput<span class="signature">(center, attrs)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="GameRangeSlider"><span class="type-signature"></span>new GameRangeSlider<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
 
 
 
-<div class="description">
-    <p>Constructor for Text Input element</p>
-</div>
 
 
 
 
 
 
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>center</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Point.html">Point</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Center point of the element</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>attrs</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Attribute object</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -182,7 +106,7 @@
 
             
 
-            <td class="description last"><p>Width of the text input element</p></td>
+            <td class="description last"><p>Width of slider in pixels</p></td>
         </tr>
 
     
@@ -205,7 +129,7 @@
 
             
 
-            <td class="description last"><p>Height of the text input element</p></td>
+            <td class="description last"><p>Height of slider in pixels</p></td>
         </tr>
 
     
@@ -228,60 +152,14 @@
 
             
 
-            <td class="description last"><p>Background color of the element (default 'aliceblue')</p></td>
+            <td class="description last"><p>Color of the whole slider</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>text</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Text displayed/entered on the element</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>message</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Text displayed on the popup. Default 'Enter text'</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>onEnter</code></td>
+                <td class="name"><code>onChange</code></td>
             
 
             <td class="type">
@@ -297,7 +175,53 @@
 
             
 
-            <td class="description last"><p>Array of [callback,attribute_object] called on enter text (on popup)</p></td>
+            <td class="description last"><p>Events to be trigerred on change of slider value</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>scale</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="GameShape.html">GameShape</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Line that represents slider scale</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>handle</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="GameShape.html">GameShape</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Rectangle that represents slider handle</p></td>
         </tr>
 
     
@@ -336,7 +260,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="elements_GameTextInput.js.html">elements/GameTextInput.js</a>, <a href="elements_GameTextInput.js.html#line18">line 18</a>
+        <a href="elements_GameRangeSlider.js.html">elements/GameRangeSlider.js</a>, <a href="elements_GameRangeSlider.js.html#line16">line 16</a>
     </li></ul></dd>
     
 
@@ -768,6 +692,143 @@
     
 
     
+    <h4 class="name" id="addOnChangeListener"><span class="type-signature"></span>addOnChangeListener<span class="signature">(callback)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Adds a listener to the array of listeners for OnChange</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>function to be called</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="elements_GameRangeSlider.js.html">elements/GameRangeSlider.js</a>, <a href="elements_GameRangeSlider.js.html#line105">line 105</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="addOnClickListener"><span class="type-signature"></span>addOnClickListener<span class="signature">(callback)</span><span class="type-signature"></span></h4>
     
 
@@ -1017,143 +1078,6 @@
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="elements_GameElement.js.html">elements/GameElement.js</a>, <a href="elements_GameElement.js.html#line323">line 323</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="addOnEnterTextListener"><span class="type-signature"></span>addOnEnterTextListener<span class="signature">(callback)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Adds a listener to the array of listeners for onEnter</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>function to be called</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="elements_GameTextInput.js.html">elements/GameTextInput.js</a>, <a href="elements_GameTextInput.js.html#line141">line 141</a>
     </li></ul></dd>
     
 
@@ -2543,7 +2467,7 @@
     
 
     
-    <h4 class="name" id="copy"><span class="type-signature"></span>copy<span class="signature">(newName)</span><span class="type-signature"> &rarr; {<a href="GameTextInput.html">GameTextInput</a>}</span></h4>
+    <h4 class="name" id="copy"><span class="type-signature"></span>copy<span class="signature">(newName)</span><span class="type-signature"> &rarr; {<a href="GameRangeSlider.html">GameRangeSlider</a>}</span></h4>
     
 
     
@@ -2649,7 +2573,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="elements_GameTextInput.js.html">elements/GameTextInput.js</a>, <a href="elements_GameTextInput.js.html#line172">line 172</a>
+        <a href="elements_GameRangeSlider.js.html">elements/GameRangeSlider.js</a>, <a href="elements_GameRangeSlider.js.html#line130">line 130</a>
     </li></ul></dd>
     
 
@@ -2689,7 +2613,7 @@
     </dt>
     <dd>
         
-<span class="param-type"><a href="GameTextInput.html">GameTextInput</a></span>
+<span class="param-type"><a href="GameRangeSlider.html">GameRangeSlider</a></span>
 
 
     </dd>
@@ -4041,7 +3965,7 @@
 
 
 <div class="description">
-    <p>Returns object of attributes of current instance.</p>
+    <p>Returns an object of attributes (used for copying)</p>
 </div>
 
 
@@ -4090,7 +4014,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="elements_GameTextInput.js.html">elements/GameTextInput.js</a>, <a href="elements_GameTextInput.js.html#line157">line 157</a>
+        <a href="elements_GameElement.js.html">elements/GameElement.js</a>, <a href="elements_GameElement.js.html#line660">line 660</a>
     </li></ul></dd>
     
 
@@ -4119,7 +4043,7 @@
 
         
 <div class="param-desc">
-    <p>Attribute object.</p>
+    <p>Attribute object</p>
 </div>
 
 
@@ -4295,6 +4219,112 @@
     <dd>
         
 <span class="param-type"><a href="GameDrawable.html">GameDrawable</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="getValue"><span class="type-signature"></span>getValue<span class="signature">()</span><span class="type-signature"> &rarr; {number}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Returns % value of slider state</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="elements_GameRangeSlider.js.html">elements/GameRangeSlider.js</a>, <a href="elements_GameRangeSlider.js.html#line83">line 83</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">number</span>
 
 
     </dd>
@@ -5182,6 +5212,143 @@
     
 
     
+    <h4 class="name" id="removeOnChangeListener"><span class="type-signature"></span>removeOnChangeListener<span class="signature">(callback)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Removes listener for the OnChange event</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>function you want to remove</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="elements_GameRangeSlider.js.html">elements/GameRangeSlider.js</a>, <a href="elements_GameRangeSlider.js.html#line113">line 113</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="removeOnClickListener"><span class="type-signature"></span>removeOnClickListener<span class="signature">(callback)</span><span class="type-signature"></span></h4>
     
 
@@ -5431,143 +5598,6 @@
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="elements_GameElement.js.html">elements/GameElement.js</a>, <a href="elements_GameElement.js.html#line331">line 331</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="removeOnEnterTextListener"><span class="type-signature"></span>removeOnEnterTextListener<span class="signature">(callback)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Removes listener for the onEnterText event</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>function you want to remove</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="elements_GameTextInput.js.html">elements/GameTextInput.js</a>, <a href="elements_GameTextInput.js.html#line149">line 149</a>
     </li></ul></dd>
     
 
