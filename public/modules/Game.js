@@ -256,6 +256,9 @@ class Game {
         }
         //get topmost element
         const mousePos = this.getMousePos(event)
+        if (!this.mouseInBounds(mousePos)) {
+            return
+        }
         const el = await this.getElementAtPos(mousePos)
         if (el === null) {
             return
@@ -309,7 +312,6 @@ class Game {
         if (this.selectedElement === undefined) {
             return
         }
-        const mousePos = this.getMousePos(event)
 
         this.selectedElement.finishDragging(event)
         this.selectedElement.finishMouseHold(event)
@@ -503,6 +505,10 @@ class Game {
         this.shared.mousePos = pos.copy()
 
         return pos
+    }
+
+    mouseInBounds(mousePos) {
+        return mousePos.xWithin(0,this.canvas.width) && mousePos.yWithin(0,this.canvas.height)
     }
 
     /**
