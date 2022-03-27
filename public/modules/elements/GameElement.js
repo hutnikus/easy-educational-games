@@ -697,7 +697,7 @@ class GameElement {
                 }
             }
         }
-        animate() //todo more than one animation
+        animate()
     }
 
     /**
