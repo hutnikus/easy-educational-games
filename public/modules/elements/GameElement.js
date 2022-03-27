@@ -34,6 +34,8 @@ import {GameText} from "../drawables/GameText.js";
  * @property {number} rotation Rotation of element in radians
  * @property {boolean} visible Element is visible
  * @property {GameGrid} grid Reference to grid (if it belongs)
+ * @property {Array<[Point,number]>} animationQueue Animations in the future
+ * @property {boolean} isAnimating Flag
  */
 class GameElement {
     #name = undefined
@@ -107,6 +109,9 @@ class GameElement {
         this.rotation = (attrs.rotation === undefined) ? 0 : Number(attrs.rotation);
         this.visible = (attrs.visible === undefined) ? true : attrs.visible
         this.grid = undefined
+
+        this.isAnimating = false
+        this.animationQueue = []
     }
 
     /**
@@ -625,8 +630,9 @@ class GameElement {
     /**
      * Moves the element by vector delta and calls onMove callbacks
      * @param {Point} delta Vector by which the element is moved
+     * @param {boolean} triggerOnMove Calls the onMove callbacks on true
      */
-    move(delta) {
+    move(delta,triggerOnMove=true) {
         if (!this.grid) {
             this.center = this.center.add(delta)
         }
@@ -648,9 +654,50 @@ class GameElement {
                 }
             }
         }
-        for (const callback of this.onMove) {
-            callback.call(this)
+        if (triggerOnMove) {
+            for (const callback of this.onMove) {
+                callback.call(this)
+            }
         }
+    }
+
+    /**
+     * Animates movement of the element to the point
+     * @param {Point} point Point to animate to
+     * @param {number} steps How many steps in animation. Lower = faster
+     */
+    animateTo(point, steps=10) {
+        this.animationQueue.push([point,steps])
+        if (!this.isAnimating) {
+            this.#animateMovement()
+        }
+    }
+
+    #animateMovement() {
+        this.isAnimating = true
+
+        const animation = this.animationQueue.shift()
+        const point = animation[0]
+        const steps = animation[1]
+
+        const path = point.subtract(this.center)
+        const delta = new Point(
+            path.x/steps,
+            path.y/steps
+        )
+        const animate = () => {
+            this.move(delta)
+            if (this.center.distanceTo(point) > 1) {
+                window.requestAnimationFrame(animate)
+            } else {
+                if (this.animationQueue.length > 0) {
+                    this.#animateMovement()
+                } else {
+                    this.isAnimating = false
+                }
+            }
+        }
+        animate() //todo more than one animation
     }
 
     /**

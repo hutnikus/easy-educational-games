@@ -131,6 +131,10 @@ class GameButton extends GameElement {
 
         this.addOnClickListener(this.#selectButton)
         this.addOnFinishMouseHoldListener(this.#deselectButton)
+
+        if (attrs.action) {
+            this.addOnButtonPressListener(attrs.action)
+        }
     }
 
     /**
