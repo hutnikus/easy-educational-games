@@ -34,7 +34,7 @@ import {GameText} from "../drawables/GameText.js";
  * @property {number} rotation Rotation of element in radians
  * @property {boolean} visible Element is visible
  * @property {GameGrid} grid Reference to grid (if it belongs)
- * @property {Array<[Point,number]>} animationQueue Animations in the future
+ * @property {Array<Array<Point|number>>} animationQueue Animations in the future
  * @property {boolean} isAnimating Flag
  */
 class GameElement {

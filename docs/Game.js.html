@@ -61,6 +61,9 @@ import {
  * @property {CanvasRenderingContext2D} tempContext Rendering context for the tempCanvas
  * @property {Array&lt;function>} onClear What happens on clear() in addition to removing elements
  * @property {Array&lt;GameGrid>} grids Array of grids
+ * @property {Array&lt;function>} onClickCallbacks Array of functions triggered on click
+ * @property {Array&lt;function>} onDragCallbacks Array of functions triggered on drag
+ * @property {Array&lt;function>} onFinishDraggingCallbacks Array of functions triggered on finish dragging
  */
 class Game {
     animationInterval
@@ -75,6 +78,9 @@ class Game {
         this.grids = []
         this.pressedKeys = []
         this.onClear = []
+        this.onClickCallbacks = []
+        this.onDragCallbacks = []
+        this.onFinishDraggingCallbacks = []
         this.canvas = canvas;
         this.context = canvas.getContext('2d');
         this.shared = {
@@ -93,8 +99,8 @@ class Game {
 
         // canvas.addEventListener('click',(event) => this.onClick(event))
 
-        canvas.addEventListener('mousedown',(async ev => await this.onClick(ev)))
-        canvas.addEventListener('touchstart',(async ev => await this.onClick(ev)),false)
+        canvas.addEventListener('mousedown',(ev => this.onClick(ev)))
+        canvas.addEventListener('touchstart',(ev => this.onClick(ev)),false)
         canvas.addEventListener('mousemove',(ev => this.onDrag(ev)))
         canvas.addEventListener('touchmove',(ev => this.onDrag(ev)),false)
         canvas.addEventListener('mouseup',(ev => this.onFinishDragging(ev)))
@@ -241,14 +247,13 @@ class Game {
     /**
      * Debugging listener function for checking if mouse is within an element. Draws red or green circles depending on whether the mouse is inside or not.
      * @param {MouseEvent} event Mouse event passed
-     * @returns {Promise&lt;void>}
      */
-    async drawInside(event) {
+    drawInside(event) {
         const mousePos = this.getMousePos(event)
 
         let wasInside = false
         for (const el of this.elements.filter((e)=>e.name!=="drawInside")) {
-            const insideElement = await el.isInside(mousePos,this.tempContext)
+            const insideElement = el.isInside(mousePos,this.tempContext)
             if (insideElement) {
                 wasInside = true
             }
@@ -269,11 +274,26 @@ class Game {
     }
 
     /**
+     * Adds a listener to the array onClickCallbacks
+     * @param {function} callback function to be called
+     */
+    addOnMouseDownListener(callback) {
+        this.onClickCallbacks.push(callback)
+    }
+
+    /**
+     * Removes listener for the onClick event
+     * @param {function} callback function you want to remove
+     */
+    removeOnMouseDownListener(callback) {
+        this.onClickCallbacks = this.onClickCallbacks.filter(item=>item!==callback)
+    }
+
+    /**
      * Handler for mouse click. Passes the event to relevant elements.
      * @param {MouseEvent|TouchEvent} event Mouse event passed
-     * @returns {Promise&lt;void>}
      */
-    async onClick(event) {
+    onClick(event) {
         // one click at a time
         if (this.selectedElement) {
             return
@@ -284,15 +304,18 @@ class Game {
         }
         //get topmost element
         const mousePos = this.getMousePos(event)
-        const el = await this.getElementAtPos(mousePos)
+        if (!this.mouseInBounds(mousePos)) {
+            return
+        }
+        //call functions in onClickCallbacks
+        for (const callback of this.onClickCallbacks) {
+            callback.call(this,event)
+        }
+
+        const el = this.getElementAtPos(mousePos)
         if (el === null) {
             return
         }
-
-        // if (!el.clickable &amp;&amp; !el.draggable) {
-        //     console.error('clicked unresponsive element')
-        //     return
-        // }
         if (el.clickable) {
             el.click(event)
         }
@@ -311,6 +334,22 @@ class Game {
     }
 
     /**
+     * Adds a listener to the array of listeners for onDrag
+     * @param {function} callback function to be called
+     */
+    addOnMouseMoveListener(callback) {
+        this.onDragCallbacks.push(callback)
+    }
+
+    /**
+     * Removes listener for the onDrag event
+     * @param {function} callback function you want to remove
+     */
+    removeOnMouseMoveListener(callback) {
+        this.onDragCallbacks = this.onDragCallbacks.filter(item=>item!==callback)
+    }
+
+    /**
      * Handler for dragging. Triggers every time the mouse is dragged and will pass the event to the selected element (if one exists)
      * @param {MouseEvent|TouchEvent} event Mouse event passed
      */
@@ -318,12 +357,32 @@ class Game {
         if (!(event instanceof MouseEvent)) {
             event.preventDefault()
         }
+        for (const callback of this.onDragCallbacks) {
+            callback.call(this,event)
+        }
+
         if (this.selectedElement === undefined || !this.selectedElement.draggable) {
             return
         }
         const mousePos = this.getMousePos(event)
 
         this.selectedElement.drag(mousePos,this.delta,event)
+    }
+
+    /**
+     * Adds a listener to the array of listeners for onFinishDragging
+     * @param {function} callback function to be called
+     */
+    addOnMouseUpListener(callback) {
+        this.onFinishDraggingCallbacks.push(callback)
+    }
+
+    /**
+     * Removes listener for the onFinishDragging event
+     * @param {function} callback function you want to remove
+     */
+    removeOnMouseUpListener(callback) {
+        this.onFinishDraggingCallbacks = this.onFinishDraggingCallbacks.filter(item=>item!==callback)
     }
 
     /**
@@ -334,10 +393,14 @@ class Game {
         if (!(event instanceof MouseEvent)) {
             event.preventDefault()
         }
+
+        for (const callback of this.onFinishDraggingCallbacks) {
+            callback.call(this,event)
+        }
+
         if (this.selectedElement === undefined) {
             return
         }
-        const mousePos = this.getMousePos(event)
 
         this.selectedElement.finishDragging(event)
         this.selectedElement.finishMouseHold(event)
@@ -471,9 +534,8 @@ class Game {
 
     /**
      * Calls the draw function of all elements
-     * @returns {Promise&lt;void>}
      */
-    async draw() {
+    draw() {
         this.context.setTransform(1,0,0,1,0,0);
         this.context.clearRect(0,0,this.canvas.width,this.canvas.width)
 
@@ -482,7 +544,7 @@ class Game {
         }
 
         for (const obj of this.elements) {
-            await obj.draw(this.context)
+            obj.draw(this.context)
         }
     }
 
@@ -497,9 +559,9 @@ class Game {
      * Calls this.draw() on next animation frame, also calls animate() on Gif drawables
      * @param {Game} game instance of the Game object
      */
-    async #animationLoop(game) {
-        const animation = async function () {
-            await game.draw()
+    #animationLoop(game) {
+        const animation = function () {
+            game.draw()
 
             game.elements
                 .forEach(obj => {
@@ -507,7 +569,7 @@ class Game {
                 })
         }
 
-        window.requestAnimationFrame(await animation)
+        window.requestAnimationFrame(animation)
     }
 
     /**
@@ -533,18 +595,22 @@ class Game {
         return pos
     }
 
+    mouseInBounds(mousePos) {
+        return mousePos.xWithin(0,this.canvas.width) &amp;&amp; mousePos.yWithin(0,this.canvas.height)
+    }
+
     /**
      * Returns element on position or null
      * @param {Point} position Searched position
-     * @returns {Promise&lt;null|GameElement>} Element at position or null
+     * @returns {null|GameElement} Element at position or null
      */
-    async getElementAtPos(position) {
+    getElementAtPos(position) {
         for (const i in this.elements) {
             const el = this.elements[this.elements.length-1-i]
             if (!el.clickable &amp;&amp; !el.draggable &amp;&amp; !el.holdable) {
                 continue
             }
-            if (await el.isInside(position, this.tempContext)) {
+            if (el.isInside(position, this.tempContext)) {
                 return el
             }
         }
@@ -610,7 +676,7 @@ export { Game }</code></pre>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Thu Mar 24 2022 11:21:36 GMT+0100 (Central European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Thu Mar 31 2022 16:12:10 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>
