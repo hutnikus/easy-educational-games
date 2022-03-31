@@ -109,7 +109,7 @@ class GameButton extends GameElement {
                 fill:this.color,
                 level:-1,
                 stroke: 'black',
-                lineWidth: 5
+                lineWidth: 3
             }
         )
         this.addChild(this.rectangle)
@@ -119,7 +119,7 @@ class GameButton extends GameElement {
                 height:this.height+4,
                 level:-1,
                 stroke: 'lightblue',
-                lineWidth: 5,
+                lineWidth: 3,
                 visible:false
             }
         )

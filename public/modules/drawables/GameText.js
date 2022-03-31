@@ -99,7 +99,7 @@ class GameText extends GameDrawable {
     /**
      * Returns measures of the drawable
      * @param {CanvasRenderingContext2D} ctx Rendering context upon which the calculations are made
-     * @returns {TextMetrics}
+     * @returns {TextMetrics} text metrics
      */
     measureText(ctx) {
         ctx.font = this.font;
