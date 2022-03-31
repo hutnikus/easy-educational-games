@@ -667,6 +667,9 @@ class GameElement {
      * @param {number} steps How many steps in animation. Lower = faster
      */
     animateTo(point, steps=10) {
+        if (steps < 1) {
+            throw new RangeError("Minimum number of steps is 1!")
+        }
         this.animationQueue.push([point,steps])
         if (!this.isAnimating) {
             this.#animateMovement()

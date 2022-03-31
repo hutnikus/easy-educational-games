@@ -33,6 +33,9 @@ import {
  * @property {CanvasRenderingContext2D} tempContext Rendering context for the tempCanvas
  * @property {Array<function>} onClear What happens on clear() in addition to removing elements
  * @property {Array<GameGrid>} grids Array of grids
+ * @property {Array<function>} onClickCallbacks Array of functions triggered on click
+ * @property {Array<function>} onDragCallbacks Array of functions triggered on drag
+ * @property {Array<function>} onFinishDraggingCallbacks Array of functions triggered on finish dragging
  */
 class Game {
     animationInterval
@@ -47,6 +50,9 @@ class Game {
         this.grids = []
         this.pressedKeys = []
         this.onClear = []
+        this.onClickCallbacks = []
+        this.onDragCallbacks = []
+        this.onFinishDraggingCallbacks = []
         this.canvas = canvas;
         this.context = canvas.getContext('2d');
         this.shared = {
@@ -241,6 +247,22 @@ class Game {
     }
 
     /**
+     * Adds a listener to the array onClickCallbacks
+     * @param {function} callback function to be called
+     */
+    addOnMouseDownListener(callback) {
+        this.onClickCallbacks.push(callback)
+    }
+
+    /**
+     * Removes listener for the onClick event
+     * @param {function} callback function you want to remove
+     */
+    removeOnMouseDownListener(callback) {
+        this.onClickCallbacks = this.onClickCallbacks.filter(item=>item!==callback)
+    }
+
+    /**
      * Handler for mouse click. Passes the event to relevant elements.
      * @param {MouseEvent|TouchEvent} event Mouse event passed
      * @returns {Promise<void>}
@@ -259,15 +281,15 @@ class Game {
         if (!this.mouseInBounds(mousePos)) {
             return
         }
+        //call functions in onClickCallbacks
+        for (const callback of this.onClickCallbacks) {
+            callback.call(this,event)
+        }
+
         const el = await this.getElementAtPos(mousePos)
         if (el === null) {
             return
         }
-
-        // if (!el.clickable && !el.draggable) {
-        //     console.error('clicked unresponsive element')
-        //     return
-        // }
         if (el.clickable) {
             el.click(event)
         }
@@ -286,6 +308,22 @@ class Game {
     }
 
     /**
+     * Adds a listener to the array of listeners for onDrag
+     * @param {function} callback function to be called
+     */
+    addOnMouseMoveListener(callback) {
+        this.onDragCallbacks.push(callback)
+    }
+
+    /**
+     * Removes listener for the onDrag event
+     * @param {function} callback function you want to remove
+     */
+    removeOnMouseMoveListener(callback) {
+        this.onDragCallbacks = this.onDragCallbacks.filter(item=>item!==callback)
+    }
+
+    /**
      * Handler for dragging. Triggers every time the mouse is dragged and will pass the event to the selected element (if one exists)
      * @param {MouseEvent|TouchEvent} event Mouse event passed
      */
@@ -293,12 +331,32 @@ class Game {
         if (!(event instanceof MouseEvent)) {
             event.preventDefault()
         }
+        for (const callback of this.onDragCallbacks) {
+            callback.call(this,event)
+        }
+
         if (this.selectedElement === undefined || !this.selectedElement.draggable) {
             return
         }
         const mousePos = this.getMousePos(event)
 
         this.selectedElement.drag(mousePos,this.delta,event)
+    }
+
+    /**
+     * Adds a listener to the array of listeners for onFinishDragging
+     * @param {function} callback function to be called
+     */
+    addOnMouseUpListener(callback) {
+        this.onFinishDraggingCallbacks.push(callback)
+    }
+
+    /**
+     * Removes listener for the onFinishDragging event
+     * @param {function} callback function you want to remove
+     */
+    removeOnMouseUpListener(callback) {
+        this.onFinishDraggingCallbacks = this.onFinishDraggingCallbacks.filter(item=>item!==callback)
     }
 
     /**
@@ -309,6 +367,11 @@ class Game {
         if (!(event instanceof MouseEvent)) {
             event.preventDefault()
         }
+
+        for (const callback of this.onFinishDraggingCallbacks) {
+            callback.call(this,event)
+        }
+
         if (this.selectedElement === undefined) {
             return
         }
