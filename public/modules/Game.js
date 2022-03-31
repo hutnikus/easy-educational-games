@@ -71,8 +71,8 @@ class Game {
 
         // canvas.addEventListener('click',(event) => this.onClick(event))
 
-        canvas.addEventListener('mousedown',(async ev => await this.onClick(ev)))
-        canvas.addEventListener('touchstart',(async ev => await this.onClick(ev)),false)
+        canvas.addEventListener('mousedown',(ev => this.onClick(ev)))
+        canvas.addEventListener('touchstart',(ev => this.onClick(ev)),false)
         canvas.addEventListener('mousemove',(ev => this.onDrag(ev)))
         canvas.addEventListener('touchmove',(ev => this.onDrag(ev)),false)
         canvas.addEventListener('mouseup',(ev => this.onFinishDragging(ev)))
@@ -219,14 +219,13 @@ class Game {
     /**
      * Debugging listener function for checking if mouse is within an element. Draws red or green circles depending on whether the mouse is inside or not.
      * @param {MouseEvent} event Mouse event passed
-     * @returns {Promise<void>}
      */
-    async drawInside(event) {
+    drawInside(event) {
         const mousePos = this.getMousePos(event)
 
         let wasInside = false
         for (const el of this.elements.filter((e)=>e.name!=="drawInside")) {
-            const insideElement = await el.isInside(mousePos,this.tempContext)
+            const insideElement = el.isInside(mousePos,this.tempContext)
             if (insideElement) {
                 wasInside = true
             }
@@ -265,9 +264,8 @@ class Game {
     /**
      * Handler for mouse click. Passes the event to relevant elements.
      * @param {MouseEvent|TouchEvent} event Mouse event passed
-     * @returns {Promise<void>}
      */
-    async onClick(event) {
+    onClick(event) {
         // one click at a time
         if (this.selectedElement) {
             return
@@ -286,7 +284,7 @@ class Game {
             callback.call(this,event)
         }
 
-        const el = await this.getElementAtPos(mousePos)
+        const el = this.getElementAtPos(mousePos)
         if (el === null) {
             return
         }
@@ -508,9 +506,8 @@ class Game {
 
     /**
      * Calls the draw function of all elements
-     * @returns {Promise<void>}
      */
-    async draw() {
+    draw() {
         this.context.setTransform(1,0,0,1,0,0);
         this.context.clearRect(0,0,this.canvas.width,this.canvas.width)
 
@@ -519,7 +516,7 @@ class Game {
         }
 
         for (const obj of this.elements) {
-            await obj.draw(this.context)
+            obj.draw(this.context)
         }
     }
 
@@ -534,9 +531,9 @@ class Game {
      * Calls this.draw() on next animation frame, also calls animate() on Gif drawables
      * @param {Game} game instance of the Game object
      */
-    async #animationLoop(game) {
-        const animation = async function () {
-            await game.draw()
+    #animationLoop(game) {
+        const animation = function () {
+            game.draw()
 
             game.elements
                 .forEach(obj => {
@@ -544,7 +541,7 @@ class Game {
                 })
         }
 
-        window.requestAnimationFrame(await animation)
+        window.requestAnimationFrame(animation)
     }
 
     /**
@@ -577,15 +574,15 @@ class Game {
     /**
      * Returns element on position or null
      * @param {Point} position Searched position
-     * @returns {Promise<null|GameElement>} Element at position or null
+     * @returns {null|GameElement} Element at position or null
      */
-    async getElementAtPos(position) {
+    getElementAtPos(position) {
         for (const i in this.elements) {
             const el = this.elements[this.elements.length-1-i]
             if (!el.clickable && !el.draggable && !el.holdable) {
                 continue
             }
-            if (await el.isInside(position, this.tempContext)) {
+            if (el.isInside(position, this.tempContext)) {
                 return el
             }
         }

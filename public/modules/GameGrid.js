@@ -340,7 +340,6 @@ class GameGrid {
     /**
      * Draws generated image or generates a new one and draws
      * @param {CanvasRenderingContext2D} ctx
-     * @returns {Promise<void>}
      */
     draw(ctx) {
         if (this.img === undefined) {

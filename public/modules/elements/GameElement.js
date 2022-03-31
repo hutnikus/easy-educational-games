@@ -235,18 +235,11 @@ class GameElement {
     /**
      * Transforms the canvas context and calls draw function of every visible child
      * @param {CanvasRenderingContext2D} ctx Rendering context of the canvas
-     * @returns {Promise<void>}
      */
-    async draw(ctx) {
+    draw(ctx) {
         if (!this.visible) {
             //skip drawing
             return
-        }
-
-        //wait for loading all images
-        for (const e of this.children) {
-            e.img = await e.img
-            e.imgData = await e.imgData
         }
 
         ctx.save()
@@ -256,7 +249,7 @@ class GameElement {
 
         for (const drawable of this.children) {
             if (drawable.visible) {
-                await drawable.draw(ctx, this.center);
+                drawable.draw(ctx, this.center);
             }
         }
         if (this.hitboxVisible) {
@@ -270,9 +263,8 @@ class GameElement {
 
     /**
      * Updates the animation on every child of type GameGif
-     * @returns {Promise<void>}
      */
-    async animate() {
+    animate() {
         this.children
             .filter(obj => obj instanceof GameGif)
             .forEach(obj=>obj.updateAnimation())
@@ -281,9 +273,9 @@ class GameElement {
     /**
      * Checks if mouse is inside any of the instance's child
      * @param {Point} mouse Mouse position
-     * @returns {Promise<boolean>} True when inside
+     * @returns {boolean} True when inside
      */
-    async isInside(mouse) {
+    isInside(mouse) {
         if (!this.visible) {
             // only clickable when visible
             return false
@@ -294,7 +286,7 @@ class GameElement {
 
         for (const child of this.children) {
             this.shared.tempContext.save()
-            const insideChild = await child.isInside(mouse, this.shared.tempContext, this.center)
+            const insideChild = child.isInside(mouse, this.shared.tempContext, this.center)
             this.shared.tempContext.restore()
             // console.log('inside child',insideChild, child)
             if (insideChild) {

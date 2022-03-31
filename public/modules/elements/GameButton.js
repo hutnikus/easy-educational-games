@@ -69,14 +69,13 @@ class GameButton extends GameElement {
     /**
      * Disables highlight and executes onPress callbacks when mouse is lifted on button
      * @param {Event} event
-     * @returns {Promise<void>}
      */
-    #deselectButton = async (event) => {
+    #deselectButton = (event) => {
         const mouse = this.shared.mousePos
 
         this.highlight.visible = false
 
-        if (await this.isInside(mouse)) {
+        if (this.isInside(mouse)) {
             for (const callback of this.onPress) {
                 callback.call(this,event)
                 // callback(event)

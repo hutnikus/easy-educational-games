@@ -7,7 +7,7 @@ import {GameDrawable, loadImage} from "./GameDrawable.js";
  * Image drawable class
  * @extends GameDrawable
  *
- * @property {Image|Promise<Image>} img Image to be drawn.
+ * @property {Image} img Image to be drawn.
  */
 class GameImage extends GameDrawable {
     /**
@@ -24,17 +24,23 @@ class GameImage extends GameDrawable {
         }
 
         const url = `resources/${imageName}`
-        this.img = loadImage(url)
+        // this.img = loadImage(url)
+
+        loadImage(url).then(value => {
+            this.img = value
+        })
     }
 
     /**
      * Called when drawing
      * @param {CanvasRenderingContext2D} ctx Rendering context on which the method draws
-     * @returns {Promise<void>}
      */
-    async drawFunction(ctx) {
+    drawFunction(ctx) {
+        if (!this.img) {
+            return
+        }
         ctx.drawImage(
-            await this.img,
+            this.img,
             -(this.width / 2), -(this.height / 2),this.width,this.height
         );
     }
@@ -43,15 +49,17 @@ class GameImage extends GameDrawable {
      * Checks parameters and calls parent draw() method
      * @param {CanvasRenderingContext2D} ctx Rendering context on which the method draws
      * @param {Point} center Center Point of parent Element
-     * @returns {Promise<void>}
      */
-    async draw(ctx,center) {
+    draw(ctx,center) {
         if (this.width !== undefined && this.height !== undefined) {
-            await super.draw(ctx,center,this)
+            super.draw(ctx,center,this)
         } else {
+            if (!this.img) {
+                return
+            }
             this.width = this.img.width
             this.height = this.img.height
-            await this.draw(ctx, center)
+            this.draw(ctx, center)
         }
     }
 
@@ -60,17 +68,17 @@ class GameImage extends GameDrawable {
      * @param {Point} mouse Mouse position on canvas.
      * @param {CanvasRenderingContext2D} tempContext Hidden rendering context to check pixel state.
      * @param {Point} center Center Point of parent Element
-     * @returns {Promise<boolean>} True when mouse is inside drawable, false otherwise.
+     * @returns {boolean} True when mouse is inside drawable, false otherwise.
      */
-    async isInside(mouse, tempContext, center) {
-        const drawFunction = async function (ctx, attrs) {
-            await attrs.obj.draw(ctx,attrs.center.x,attrs.center.y)
+    isInside(mouse, tempContext, center) {
+        const drawFunction = function (ctx, attrs) {
+            attrs.obj.draw(ctx,attrs.center.x,attrs.center.y)
         }
         const drawAttrs = {
             obj: this,
             center: center.copy()
         }
-        return await super.isInside(mouse, tempContext, drawFunction, drawAttrs)
+        return super.isInside(mouse, tempContext, drawFunction, drawAttrs)
     }
 
     /**

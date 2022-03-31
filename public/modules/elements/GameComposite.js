@@ -159,11 +159,11 @@ class GameComposite extends GameElement {
     /**
      * Checks if mouse is inside any of the instance's child
      * @param {Point} mouse Mouse position
-     * @returns {Promise<boolean>} True when inside
+     * @returns {boolean} True when inside
      */
-    async isInside(mouse) {
+    isInside(mouse) {
         for (const element of this.elements.map(e=>e.element)) {
-            const inside = await element.isInside(mouse)
+            const inside = element.isInside(mouse)
             // console.log(inside)
             if (inside) {
                 return true

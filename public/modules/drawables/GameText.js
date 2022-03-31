@@ -31,7 +31,6 @@ class GameText extends GameDrawable {
     /**
      * Called when drawing
      * @param {CanvasRenderingContext2D} ctx Rendering context on which the method draws
-     * @returns {Promise<void>}
      */
     drawFunction(ctx) {
         ctx.font = this.font;
@@ -46,10 +45,9 @@ class GameText extends GameDrawable {
      * Calls parent draw function
      * @param {CanvasRenderingContext2D} ctx Rendering context on which the method draws
      * @param {Point} center Center Point of parent Element
-     * @returns {Promise<void>}
      */
-    async draw(ctx,center) {
-        await super.draw(ctx,center,this)
+    draw(ctx,center) {
+        super.draw(ctx,center,this)
     }
 
     /**
@@ -57,17 +55,17 @@ class GameText extends GameDrawable {
      * @param {Point} mouse Mouse position on canvas.
      * @param {CanvasRenderingContext2D} tempContext Hidden rendering context to check pixel state.
      * @param {Point} center Center Point of parent Element
-     * @returns {Promise<boolean>} True when mouse is inside drawable, false otherwise.
+     * @returns {boolean} True when mouse is inside drawable, false otherwise.
      */
-    async isInside(mouse, tempContext, center) {
-        const drawFunction = async function (ctx, attrs) {
-            await attrs.obj.draw(ctx,attrs.center)
+    isInside(mouse, tempContext, center) {
+        const drawFunction = function (ctx, attrs) {
+            attrs.obj.draw(ctx,attrs.center)
         }
         const drawAttrs = {
             obj: this,
             center: center
         }
-        return await super.isInside(mouse, tempContext, drawFunction, drawAttrs)
+        return super.isInside(mouse, tempContext, drawFunction, drawAttrs)
     }
 
     /**

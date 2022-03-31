@@ -5,9 +5,9 @@ import {Point} from "../Misc.js";
  * Gif drawable class
  * @extends GameDrawable
  *
- * @property {Image|Promise<Image>} img Image to be drawn. File generated from python script (NAME_sheet.png)
+ * @property {Image} img Image to be drawn. File generated from python script (NAME_sheet.png)
  * @property {number} currentFrame Current frame of animation
- * @property {{frame_count:number,frame_width:number,frame_hight:number}|Promise<Object>} imgData Data from resources/GIFNAME_data.json
+ * @property {{frame_count:number,frame_width:number,frame_hight:number}} imgData Data from resources/GIFNAME_data.json
  * @property {number} stagger Number of frames skipped while animating. Higher number = slower animation
  * @property {number} stg Counter of skipped frames.
  */
@@ -32,18 +32,24 @@ class GameGif extends GameDrawable {
         const url = `resources/${gifName}_sheet.png`
 
         //load data from ${gifName}_data.json
-        this.imgData = fetch(`resources/${gifName}_data.json`).then(response => {
-            return response.json()
-        }) //.then(jsondata => console.log(jsondata))
+        fetch(`resources/${gifName}_data.json`).then(response => {
+            response.json().then(value => {
+                this.imgData = value
+            })
+        })
 
-        this.img = loadImage(url)
+        loadImage(url).then(value => {
+            this.img = value
+        })
     }
 
     /**
      * Updates counter of skipped frames or updates the current image
-     * @returns {Promise<void>}
      */
-    async updateAnimation() {
+    updateAnimation() {
+        if (!this.imgData) {
+            return
+        }
         if (this.stg === this.stagger) {
             this.currentFrame += 1;
             if (this.currentFrame >= this.imgData.frame_count) {
@@ -58,13 +64,15 @@ class GameGif extends GameDrawable {
     /**
      * Called when drawing
      * @param {CanvasRenderingContext2D} ctx Rendering context on which the method draws
-     * @returns {Promise<void>}
      */
-    async drawFunction(ctx) {
+    drawFunction(ctx) {
+        if (!this.img) {
+            return
+        }
         let fw = this.imgData.frame_width
         let fh = this.imgData.frame_height
         ctx.drawImage(
-            await this.img,
+            this.img,
             this.currentFrame * fw, 0, fw, fh,
             -(this.width / 2), -(this.height / 2),this.width,this.height
         );
@@ -74,13 +82,15 @@ class GameGif extends GameDrawable {
      * Checks parameters and calls parent draw() method
      * @param {CanvasRenderingContext2D} ctx Rendering context on which the method draws
      * @param {Point} center Center Point of parent Element
-     * @returns {Promise<void>}
      */
-    async draw(ctx,center) {
+    draw(ctx,center) {
+        if (!this.imgData) {
+            return
+        }
         let fw = this.imgData.frame_width
         let fh = this.imgData.frame_height
         if (this.width !== undefined && this.height !== undefined) {
-            await super.draw(ctx,center,this)
+            super.draw(ctx,center,this)
         } else {
             if (this.width === undefined) {
                 this.width = fw
@@ -88,7 +98,7 @@ class GameGif extends GameDrawable {
             if (this.height === undefined) {
                 this.height = fh
             }
-            await this.draw(ctx, center)
+            this.draw(ctx, center)
         }
     }
 
@@ -97,17 +107,17 @@ class GameGif extends GameDrawable {
      * @param {Point} mouse Mouse position on canvas.
      * @param {CanvasRenderingContext2D} tempContext Hidden rendering context to check pixel state.
      * @param {Point} center Center Point of parent Element
-     * @returns {Promise<boolean>} True when mouse is inside drawable, false otherwise.
+     * @returns {boolean} True when mouse is inside drawable, false otherwise.
      */
-    async isInside(mouse, tempContext, center) {
-        const drawFunction = async function (ctx, attrs) {
-            await attrs.obj.draw(ctx,attrs.center)
+    isInside(mouse, tempContext, center) {
+        const drawFunction = function (ctx, attrs) {
+            attrs.obj.draw(ctx,attrs.center)
         }
         const drawAttrs = {
             obj: this,
             center: center
         }
-        return await super.isInside(mouse, tempContext, drawFunction, drawAttrs)
+        return super.isInside(mouse, tempContext, drawFunction, drawAttrs)
     }
 
     /**

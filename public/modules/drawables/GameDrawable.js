@@ -44,9 +44,8 @@ class GameDrawable {
      * @param {CanvasRenderingContext2D} ctx Rendering context.
      * @param {Point} center Center Point of parent Element.
      * @param {GameDrawable} drawable Child drawable to be drawn.
-     * @returns {Promise<void>}
      */
-    async draw(ctx,center,drawable) {
+    draw(ctx,center,drawable) {
         ctx.save()
         // let t = getTransform(ctx);
         // let rad = Math.atan2(t.b, t.a);
@@ -55,7 +54,7 @@ class GameDrawable {
         // ctx.rotate(rad)
         ctx.rotate(this.rotation)
 
-        await drawable.drawFunction(ctx)
+        drawable.drawFunction(ctx)
 
         ctx.restore()
     }
@@ -66,9 +65,9 @@ class GameDrawable {
      * @param {CanvasRenderingContext2D} tempContext Hidden rendering context to check pixel state.
      * @param {function(CanvasRenderingContext2D,Object)} drawFunction Drawing function of child drawable.
      * @param {Object} drawAttrs Attributes to pass to drawFunction.
-     * @returns {Promise<boolean>} True when mouse is inside drawable, false otherwise.
+     * @returns {boolean} True when mouse is inside drawable, false otherwise.
      */
-    async isInside(mouse, tempContext, drawFunction, drawAttrs) {
+    isInside(mouse, tempContext, drawFunction, drawAttrs) {
         tempContext.save()
         tempContext.setTransform(1,0,0,1,0,0);
         //clear the temp context
@@ -76,7 +75,7 @@ class GameDrawable {
         tempContext.restore()
 
         // call the draw function
-        await drawFunction(tempContext,drawAttrs)
+        drawFunction(tempContext,drawAttrs)
 
         // get the pixel array
         const imageData = tempContext.getImageData(0, 0,tempContext.canvas.width,tempContext.canvas.height);

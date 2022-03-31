@@ -83,7 +83,7 @@ class GameTextInput extends GameElement {
         return this.#text
     }
 
-    #clickOnInput = async (event) => {
+    #clickOnInput = (event) => {
         const entered = window.prompt(this.message, this.text);
         if (entered === null) {
             return
@@ -92,7 +92,7 @@ class GameTextInput extends GameElement {
 
         const mouse = this.shared.mousePos
 
-        if (await this.isInside(mouse)) {
+        if (this.isInside(mouse)) {
             for (const callback of this.onEnter) {
                 // callback(event)
                 callback.call(this,event)

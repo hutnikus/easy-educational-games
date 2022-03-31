@@ -29,7 +29,7 @@ class GameCanvas extends GameElement {
 
         this.interval = setInterval(this.#continueDrawing,20)
     }
-    #continueDrawing = async () => {
+    #continueDrawing = () => {
         if (this.current === undefined) {
             return;
         }
@@ -37,7 +37,7 @@ class GameCanvas extends GameElement {
         let position = new Point(mouse.x - this.center.x, mouse.y - this.center.y)
         position = position.rotateAround(new Point(0, 0), -this.rotation)
 
-        if (!await this.isInside(mouse)) {
+        if (!this.isInside(mouse)) {
             this.current = undefined
             clearInterval(this.interval)
             return
