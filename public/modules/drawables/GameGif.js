@@ -6,12 +6,19 @@ import {Point} from "../Misc.js";
  * @extends GameDrawable
  *
  * @property {Image} img Image to be drawn. File generated from python script (NAME_sheet.png)
- * @property {number} currentFrame Current frame of animation
- * @property {{frame_count:number,frame_width:number,frame_hight:number}} imgData Data from resources/GIFNAME_data.json
- * @property {number} stagger Number of frames skipped while animating. Higher number = slower animation
- * @property {number} stg Counter of skipped frames.
+ * @property {{frame_count:number,frame_width:number,frame_height:number}} imgData Data from resources/GIFNAME_data.json
+ * @property {number} currentFrame Current frame of image
  */
 class GameGif extends GameDrawable {
+    #img = undefined
+    get img() {return this.#img}
+    #currentFrame = 0
+    get currentFrame() {return this.#currentFrame}
+    #stg = 0
+    #imgData = undefined
+    get imgData() {return this.#imgData}
+
+
     /**
      * Constructor of Gif drawable
      * @param {string} gifName Name of the gif (without "_sheet.png")
@@ -19,13 +26,11 @@ class GameGif extends GameDrawable {
      */
     constructor(gifName,attrs={}) {
         super(attrs)
-        this.currentFrame = 0
-        this.stg = 0
         this.stagger = (attrs.stagger === undefined) ? 0 : Number(attrs.stagger);
 
         if (gifName === undefined) {
-            this.imgData = attrs.imgData
-            this.img = attrs.img
+            this.#imgData = attrs.imgData
+            this.#img = attrs.img
             return
         }
 
@@ -34,12 +39,12 @@ class GameGif extends GameDrawable {
         //load data from ${gifName}_data.json
         fetch(`resources/${gifName}_data.json`).then(response => {
             response.json().then(value => {
-                this.imgData = value
+                this.#imgData = value
             })
         })
 
         loadImage(url).then(value => {
-            this.img = value
+            this.#img = value
         })
     }
 
@@ -50,14 +55,14 @@ class GameGif extends GameDrawable {
         if (!this.imgData) {
             return
         }
-        if (this.stg === this.stagger) {
-            this.currentFrame += 1;
-            if (this.currentFrame >= this.imgData.frame_count) {
-                this.currentFrame = 0;
+        if (this.#stg === this.stagger) {
+            this.#currentFrame += 1;
+            if (this.#currentFrame >= this.imgData.frame_count) {
+                this.#currentFrame = 0;
             }
-            this.stg = 0;
+            this.#stg = 0;
         } else {
-            this.stg += 1;
+            this.#stg += 1;
         }
     }
 
@@ -73,7 +78,7 @@ class GameGif extends GameDrawable {
         let fh = this.imgData.frame_height
         ctx.drawImage(
             this.img,
-            this.currentFrame * fw, 0, fw, fh,
+            this.#currentFrame * fw, 0, fw, fh,
             -(this.width / 2), -(this.height / 2),this.width,this.height
         );
     }

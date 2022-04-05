@@ -15,20 +15,137 @@ import {Point} from "../Misc.js";
  * @property {number} vScale Scale of drawable on vertical axis. 1 is default, -1 is mirrored.
  */
 class GameDrawable {
+    #name = undefined
+    get name() {
+        return this.#name
+    }
+    #level = 0
+    set level(newLevel) {
+        if (newLevel === undefined) {
+            this.#level = 0
+            return
+        }
+        if (isNaN(newLevel)) {
+            throw new TypeError("Incorrect type of level, it has to be a number!")
+        }
+        this.#level = Number(newLevel)
+    }
+    get level() {
+        return this.#level
+    }
+    #dx = 0
+    set dx(newDX) {
+        if (newDX === undefined) {
+            this.#dx = 0
+            return
+        }
+        if (isNaN(newDX)) {
+            throw new TypeError("Incorrect type of dx, it has to be a number!")
+        }
+        this.#dx = Number(newDX)
+    }
+    get dx() {
+        return this.#dx
+    }
+    #dy = 0
+    set dy(newDY) {
+        if (newDY === undefined) {
+            this.#dy = 0
+            return
+        }
+        if (isNaN(newDY)) {
+            throw new TypeError("Incorrect type of dy, it has to be a number!")
+        }
+        this.#dx = Number(newDY)
+    }
+    get dy() {return this.#dy}
+    #width = undefined
+    set width(newWidth) {
+        if (newWidth === undefined) {
+            this.#width = undefined
+            return
+        }
+        if (isNaN(newWidth)) {
+            throw new TypeError("Incorrect type of width, it has to be a number!")
+        }
+        this.#width = Number(newWidth)
+    }
+    get width() {return this.#width}
+    #height = undefined
+    set height(newHeight) {
+        if (newHeight === undefined) {
+            this.#height = undefined
+            return
+        }
+        if (isNaN(newHeight)) {
+            throw new TypeError("Incorrect type of height, it has to be a number!")
+        }
+        this.#height = Number(newHeight)
+    }
+    get height() {return this.#height}
+    #rotation = 0
+    set rotation(newRotation) {
+        if (newRotation === undefined) {
+            this.#rotation = 0
+            return
+        }
+        if (isNaN(newRotation)) {
+            throw new TypeError("Incorrect type of rotation, it has to be a number!")
+        }
+        this.#rotation = Number(newRotation)
+    }
+    get rotation() {return this.#rotation}
+    #visible = true
+    set visible(newVisible) {
+        if (newVisible === undefined) {
+            this.#visible = true
+            return
+        }
+        if (newVisible instanceof Boolean) {
+            throw new TypeError("Incorrect type for visible, it has to be a boolean!")
+        }
+        this.#visible = newVisible
+    }
+    get visible() {return this.#visible}
+    #hScale = 1
+    set hScale(newScale) {
+        if (newScale === undefined) {
+            this.#hScale = 1
+            return
+        }
+        if (isNaN(newScale)) {
+            throw new TypeError("Incorrect type of hScale, it has to be a number!")
+        }
+        this.#hScale = Number(newScale)
+    }
+    get hScale() {return this.#hScale}
+    #vScale = 1
+    set vScale(newScale) {
+        if (newScale === undefined) {
+            this.#vScale = 1
+            return
+        }
+        if (isNaN(newScale)) {
+            throw new TypeError("Incorrect type of vScale, it has to be a number!")
+        }
+        this.#vScale = Number(newScale)
+    }
+    get vScale() {return this.#vScale}
+
     /**
      * @param {Object} attrs Attributes of new Drawable.
      */
     constructor(attrs={}) {
-        this.name = attrs.name;
-        this.level = (attrs.level === undefined) ? 0 : Number(attrs.level);
-        this.dx = (attrs.dx === undefined) ? 0 : Number(attrs.dx);
-        this.dy = (attrs.dy === undefined) ? 0 : Number(attrs.dy);
+        this.#name = attrs.name;
+        this.level = attrs.level
+        this.dx = attrs.dx
+        this.dy = attrs.dy
         this.width = attrs.width;
         this.height = attrs.height;
-        this.rotation = (attrs.rotation === undefined) ? 0 : Number(attrs.rotation);
-        this.visible = (attrs.visible === undefined) ? true : attrs.visible;
-        this.hScale = (attrs.hScale === undefined) ? 1 : Number(attrs.hScale);
-        this.vScale = (attrs.vScale === undefined) ? 1 : Number(attrs.vScale);
+        this.rotation = attrs.rotation
+        this.visible = attrs.visible
+        this.hScale = attrs.hScale
+        this.vScale = attrs.vScale
     }
 
     /**
