@@ -8,30 +8,32 @@ import {GameShape} from "../drawables/GameShape.js";
  *
  * @property {number} width Width of the canvas element
  * @property {number} height Height of the canvas element
- * @property {GameShape} current line that is currently being expanded (drawing). Undefined when not drawing
+ * @property {GameShape} currentLine line that is currently being expanded (drawing). Undefined when not drawing
  * @property {number} lineWidth Width of the drawing line
  * @property {number} stroke Color of the "pencil". Default is "random"
  * @property {GameShape} background Rectangular canvas background
  */
 class GameCanvas extends GameElement {
     #drawingInterval = undefined
+    #currentLine = undefined
+    get currentLine() {return this.#currentLine}
 
     #startDrawing = (event) => {
         const mouse = this.shared.mousePos
         const position = new Point(mouse.x-this.center.x,mouse.y-this.center.y)
             .rotateAround(new Point(0,0),-this.rotation)
-        this.current = new GameShape('line',{
+        this.#currentLine = new GameShape('line',{
             level:0,
             coords:[...position.asArray(),...position.asArray()],
             stroke:this.stroke,
             lineWidth:this.lineWidth,
         })
-        this.addChild(this.current,false)
+        this.addChild(this.#currentLine,false)
 
         this.#drawingInterval = setInterval(this.#continueDrawing,20)
     }
     #continueDrawing = () => {
-        if (this.current === undefined) {
+        if (this.#currentLine === undefined) {
             return;
         }
         const mouse = this.shared.mousePos
@@ -39,22 +41,22 @@ class GameCanvas extends GameElement {
         position = position.rotateAround(new Point(0, 0), -this.rotation)
 
         if (!this.isInside(mouse)) {
-            this.current = undefined
+            this.#currentLine = undefined
             clearInterval(this.#drawingInterval)
             return
         }
 
-        this.current.addPoint(position)
+        this.#currentLine.addPoint(position)
     }
     #finishDrawing = (event) => {
-        if (this.current === undefined) {
+        if (this.#currentLine === undefined) {
             return;
         }
         const mouse = this.shared.mousePos
         let position = new Point(mouse.x-this.center.x,mouse.y-this.center.y)
         position = position.rotateAround(new Point(0,0),-this.rotation)
-        this.current.addPoint(position)
-        this.current = undefined;
+        this.#currentLine.addPoint(position)
+        this.#currentLine = undefined;
         clearInterval(this.#drawingInterval)
     }
 

@@ -224,12 +224,12 @@ class GameElement {
     /**
      * Removes element from elements array and returns it, or throws an error
      * @param {string} name Name of element to be removed
-     * @returns {GameElement} Removed element
+     * @returns {GameDrawable} Removed element
      */
     popChildByName(name) {
         const el = this.getChildByName(name)
         this.children = this.children.filter(e => e.name !== name)
-        return el[0]
+        return el
     }
 
     /**

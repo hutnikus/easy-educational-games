@@ -8,7 +8,6 @@ import {Point} from "../Misc.js";
  * Is used to manage multiple elements at once
  * @extends GameElement
  *
- * @property {Object} shared Shared object passed from Game
  * @property {Array<{
  *             element: GameElement,
  *             clickable: boolean,
@@ -21,9 +20,9 @@ class GameComposite extends GameElement {
     elements = []
 
     set center(newCenter) {
-        this.subtractPosition()
+        this._subtractPosition()
         super.center = newCenter
-        this.addPosition()
+        this._addPosition()
     }
     get center() {
         return super.center
@@ -62,7 +61,18 @@ class GameComposite extends GameElement {
     popChildByName(name) {
         throw new Error('Incorrect method call in GameComposite "popChildByName"!')
     }
-
+    createText(text, attrs) {
+        throw new Error('Incorrect method call in GameComposite "createText"!')
+    }
+    createShape(type, attrs) {
+        throw new Error('Incorrect method call in GameComposite "createShape"!')
+    }
+    createImage(imageName, attrs) {
+        throw new Error('Incorrect method call in GameComposite "createImage"!')
+    }
+    createGif(gifName, attrs) {
+        throw new Error('Incorrect method call in GameComposite "createGif"!')
+    }
 
     /**
      * Adds element to composite, silences some of its functions
@@ -108,9 +118,10 @@ class GameComposite extends GameElement {
     }
 
     /**
+     * @protected
      * Subtracts position of composite from elements
      */
-    subtractPosition() {
+    _subtractPosition() {
         if (this.elements === undefined) {
             return
         }
@@ -120,9 +131,10 @@ class GameComposite extends GameElement {
     }
 
     /**
+     * @protected
      * Adds position of composite to elements
      */
-    addPosition() {
+    _addPosition() {
         if (this.elements === undefined) {
             return
         }
@@ -137,9 +149,9 @@ class GameComposite extends GameElement {
      * @param y
      */
     setPosition(x, y) {
-        this.subtractPosition()
+        this._subtractPosition()
         super.setPosition(x, y);
-        this.addPosition()
+        this._addPosition()
     }
 
     /**
