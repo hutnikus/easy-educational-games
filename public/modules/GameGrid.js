@@ -107,6 +107,7 @@ class GameGrid {
     }
 
     /**
+     * @private
      * Creates grid image
      * @param {CanvasRenderingContext2D} ctx Context
      */
@@ -137,6 +138,12 @@ class GameGrid {
         this.#img.src = dataURL
     }
 
+    /**
+     * @private
+     * Checks correctness of input
+     * @param {number} col
+     * @param {number} row
+     */
     #checkColRowRange(col,row) {
         if (col < 0 || col >= this.columns) {
             throw new RangeError(`Column value (${col}) out of range!`)
@@ -146,7 +153,14 @@ class GameGrid {
         }
     }
 
-
+    /**
+     * Constructor of GameGrid
+     * @param {Point} position Top left position on cavas
+     * @param {number} width Width in pixels
+     * @param {number} height Height in pixels
+     * @param {number} cols Number of columns
+     * @param {number} rows Number of rows
+     */
     constructor(position,width,height,cols,rows) {
         this.position = position || new Point(0,0)
         this.width = width || 200
