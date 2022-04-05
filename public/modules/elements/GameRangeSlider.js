@@ -6,7 +6,6 @@ import {Point, randomColor} from "../Misc.js";
  * @extends GameElement
  *
  * @property {number} width Width of slider in pixels
- * @property {number} height Height of slider in pixels
  * @property {string} color Color of the whole slider
  * @property {Array<function>} onChange Events to be trigerred on change of slider value
  * @property {GameShape} scaleElement Line that represents slider scale
@@ -119,7 +118,6 @@ class GameRangeSlider extends GameElement{
     getAttrs() {
         return Object.assign({
             width: this.width,
-            height: this.height,
             color: this.color,
         },super.getAttrs())
     }

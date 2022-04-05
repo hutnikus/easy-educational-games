@@ -512,6 +512,14 @@ class Game {
     }
 
     /**
+     * Removes multiple elements from elements array
+     * @param {GameElement} elements Element instances
+     */
+    removeElements(...elements) {
+        this.#elements = this.#elements.filter(e => !elements.includes(e))
+    }
+
+    /**
      * @private
      * Calls the draw function of all elements
      */

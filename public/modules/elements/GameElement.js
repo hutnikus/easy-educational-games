@@ -120,7 +120,7 @@ class GameElement {
      * @param {Object} attrs Attributes
      * @returns {GameGif} Newly created instance
      */
-    createGif(gifName,attrs) {
+    createGif(gifName,attrs={}) {
         const gif = new GameGif(gifName,attrs)
         this.addChild(gif)
         return gif
@@ -132,7 +132,7 @@ class GameElement {
      * @param {Object} attrs Attributes
      * @returns {GameImage} Newly created instance
      */
-    createImage(imageName,attrs) {
+    createImage(imageName,attrs={}) {
         const img = new GameImage(imageName,attrs)
         this.addChild(img)
         return img
@@ -144,7 +144,7 @@ class GameElement {
      * @param {Object} attrs Attributes, line and polygon require coords attribute
      * @returns {GameShape} Newly created instance
      */
-    createShape(type,attrs) {
+    createShape(type,attrs={}) {
         const shape = new GameShape(type,attrs)
         this.addChild(shape)
         return shape
@@ -156,7 +156,7 @@ class GameElement {
      * @param {Object} attrs Attributes
      * @returns {GameText} Newly created instance
      */
-    createText(text,attrs) {
+    createText(text,attrs={}) {
         const textElement = new GameText(text,attrs)
         this.addChild(textElement)
         return textElement
@@ -209,7 +209,7 @@ class GameElement {
     /**
      * Returns child drawable with input name or throws an error
      * @param {string} name Searched name
-     * @returns {GameDrawable} Found child drawable
+     * @returns {GameDrawable|GameGif|GameShape|GameText|GameImage} Found child drawable
      */
     getChildByName(name) {
         let child = this.children.filter(child => child.name === name)
