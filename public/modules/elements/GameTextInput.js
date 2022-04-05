@@ -82,6 +82,8 @@ class GameTextInput extends GameElement {
     get text() {
         return this.#text
     }
+    #onEnter = []
+    get onEnter() {return [...this.#onEnter]}
 
     #clickOnInput = (event) => {
         const entered = window.prompt(this.message, this.text);
@@ -93,7 +95,7 @@ class GameTextInput extends GameElement {
         const mouse = this.shared.mousePos
 
         if (this.isInside(mouse)) {
-            for (const callback of this.onEnter) {
+            for (const callback of this.#onEnter) {
                 // callback(event)
                 callback.call(this,event)
             }
@@ -108,7 +110,7 @@ class GameTextInput extends GameElement {
     constructor(center,attrs={}) {
         super(center,[],attrs)
         // init elements
-        this.onEnter = (Array.isArray(attrs.onEnter)) ? attrs.onEnter : []
+        this.#onEnter = (Array.isArray(attrs.onEnter)) ? attrs.onEnter : []
         const text = new GameText("",{level:0,name:"text"})
         this.addChild(text)
         const rectangle = new GameShape('rectangle',{
@@ -139,7 +141,7 @@ class GameTextInput extends GameElement {
      * @param {function} callback function to be called
      */
     addOnEnterTextListener(callback) {
-        this.onEnter.push(callback)
+        this.#onEnter.push(callback)
     }
 
     /**
@@ -147,7 +149,7 @@ class GameTextInput extends GameElement {
      * @param {function} callback function you want to remove
      */
     removeOnEnterTextListener(callback) {
-        this.onEnter = this.onEnter.filter(item=>item!==callback)
+        this.#onEnter = this.#onEnter.filter(item=>item!==callback)
     }
 
     /**

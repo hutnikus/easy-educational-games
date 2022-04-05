@@ -76,12 +76,15 @@ class GameButton extends GameElement {
         this.highlight.visible = false
 
         if (this.isInside(mouse)) {
-            for (const callback of this.onPress) {
+            for (const callback of this.#onPress) {
                 callback.call(this,event)
                 // callback(event)
             }
         }
     }
+
+    #onPress = []
+    get onPress() {return [...this.#onPress]}
 
     /**
      * Constructor for GameButton
@@ -90,7 +93,7 @@ class GameButton extends GameElement {
      */
     constructor(center,attrs={}) {
         super(center,[],attrs)
-        this.onPress = attrs.onPress || []
+        this.#onPress = attrs.onPress || []
 
         this.text = attrs.text;
 
@@ -141,7 +144,7 @@ class GameButton extends GameElement {
      * @param {function} callback Function to be called
      */
     addOnButtonPressListener(callback) {
-        this.onPress.push(callback)
+        this.#onPress.push(callback)
     }
 
     /**
@@ -149,7 +152,7 @@ class GameButton extends GameElement {
      * @param {function} callback function you want to remove
      */
     removeOnButtonPressListener(callback) {
-        this.onPress = this.onPress.filter(item=>item!==callback)
+        this.#onPress = this.#onPress.filter(item=>item!==callback)
     }
 
     /**

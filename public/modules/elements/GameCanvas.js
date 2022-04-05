@@ -12,9 +12,10 @@ import {GameShape} from "../drawables/GameShape.js";
  * @property {number} lineWidth Width of the drawing line
  * @property {number} stroke Color of the "pencil". Default is "random"
  * @property {GameShape} background Rectangular canvas background
- * @property {NodeJS.Timer} interval Value returned from setInterval() call. Used to stop drawing [clearInterval()]
  */
 class GameCanvas extends GameElement {
+    #drawingInterval = undefined
+
     #startDrawing = (event) => {
         const mouse = this.shared.mousePos
         const position = new Point(mouse.x-this.center.x,mouse.y-this.center.y)
@@ -27,7 +28,7 @@ class GameCanvas extends GameElement {
         })
         this.addChild(this.current,false)
 
-        this.interval = setInterval(this.#continueDrawing,20)
+        this.#drawingInterval = setInterval(this.#continueDrawing,20)
     }
     #continueDrawing = () => {
         if (this.current === undefined) {
@@ -39,7 +40,7 @@ class GameCanvas extends GameElement {
 
         if (!this.isInside(mouse)) {
             this.current = undefined
-            clearInterval(this.interval)
+            clearInterval(this.#drawingInterval)
             return
         }
 
@@ -54,7 +55,7 @@ class GameCanvas extends GameElement {
         position = position.rotateAround(new Point(0,0),-this.rotation)
         this.current.addPoint(position)
         this.current = undefined;
-        clearInterval(this.interval)
+        clearInterval(this.#drawingInterval)
     }
 
     /**

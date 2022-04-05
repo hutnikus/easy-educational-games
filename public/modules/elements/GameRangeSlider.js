@@ -50,11 +50,13 @@ class GameRangeSlider extends GameElement{
     get color() {
         return this.#color
     }
+    #onChange = []
+    get onChange() {return [...this.#onChange]}
 
     constructor(center,attrs={}) {
         super(center,[],attrs);
         this.width = attrs.width || 100
-        this.onChange = attrs.onChange || []
+        this.#onChange = attrs.onChange || []
         this.color = attrs.color || "red"
 
         this.scale = this.createShape("line", {coords:[-this.width/2,0,this.width/2,0],level:-2, stroke:this.color})
@@ -92,7 +94,7 @@ class GameRangeSlider extends GameElement{
         this.handle.dx = (value * this.width) - this.width/2
 
         if (change) {
-            for (const callback of this.onChange) {
+            for (const callback of this.#onChange) {
                 callback.call(this)
             }
         }
@@ -103,7 +105,7 @@ class GameRangeSlider extends GameElement{
      * @param {function} callback function to be called
      */
     addOnChangeListener(callback) {
-        this.onChange.push(callback)
+        this.#onChange.push(callback)
     }
 
     /**
@@ -111,7 +113,7 @@ class GameRangeSlider extends GameElement{
      * @param {function} callback function you want to remove
      */
     removeOnChangeListener(callback) {
-        this.onChange = this.onChange.filter(item=>item!==callback)
+        this.#onChange = this.#onChange.filter(item=>item!==callback)
     }
 
     getAttrs() {

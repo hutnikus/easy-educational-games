@@ -216,7 +216,7 @@ class Game {
      * @param {number} rows Number of rows
      * @returns {GameGrid} New instance
      */
-    createGrid(dx=0,dy=0,width,height,cols,rows) {
+    createGrid(dx=0,dy=0,width=undefined,height=undefined,cols=undefined,rows=undefined) {
         const grid = new GameGrid(new Point(dx,dy),width,height,cols,rows)
         this.#grids.push(grid)
         return grid

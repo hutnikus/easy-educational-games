@@ -1,5 +1,5 @@
 import {GameDrawable} from "./GameDrawable.js";
-import {randomColor} from "../Misc";
+import {randomColor} from "../Misc.js";
 
 /**
  * Text drawable class.

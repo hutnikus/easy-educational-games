@@ -548,6 +548,7 @@ class GameElement {
 
     /**
      * Calls the functions in the onKeyUp array and resets stagger values for onKeyHold
+     * @param event
      */
     keyUp(event) {
         for (const callback of this.onKeyUp) {
