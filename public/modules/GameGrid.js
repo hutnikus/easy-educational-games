@@ -2,10 +2,16 @@ import {Point} from "./Misc.js";
 import {loadImage} from "./drawables/GameDrawable.js";
 
 class EmptyError extends Error {
-
+    constructor(message) {
+        super(message);
+        this.name = "EmptyError"
+    }
 }
 class FullError extends Error {
-
+    constructor(message) {
+        super(message);
+        this.name = "FullError"
+    }
 }
 
 /**
@@ -24,20 +30,87 @@ class GameGrid {
     EmptyError = EmptyError
     FullError = FullError
 
-
-    elements = []
-    img = undefined
+    #elements = []
+    get elements() {
+        return [...this.#elements]
+    }
+    #img = undefined
+    get img() {
+        return this.#img
+    }
     #position
+    set position(newPos) {
+        if (!(newPos instanceof Point)) {
+            throw new TypeError("Incorrect instance for position setter. Must be Point!")
+        }
+        this.#position = newPos
+        this.#img = undefined
+    }
+    get position() {
+        return this.#position
+    }
     #width
+    set width(newWidth) {
+        if (isNaN(newWidth)) {
+            throw new TypeError("Entered width value is not a number!")
+        }
+        if (newWidth <= 0) {
+            throw new RangeError(`Trying to set width to ${newWidth}`)
+        }
+        this.#width = newWidth
+        this.#img = undefined
+    }
+    get width() {
+        return this.#width
+    }
     #height
+    set height(newHeight) {
+        if (isNaN(newHeight)) {
+            throw new TypeError("Entered height value is not a number!")
+        }
+        if (newHeight <= 0) {
+            throw new RangeError(`Trying to set height to ${newHeight}`)
+        }
+        this.#height = newHeight
+        this.#img = undefined
+    }
+    get height() {
+        return this.#height
+    }
     #columns
+    set columns(newCols) {
+        if (isNaN(newCols)) {
+            throw new TypeError("Entered columns value is not a number!")
+        }
+        if (newCols <= 0) {
+            throw new RangeError(`Trying to set number of columns to ${newCols}`)
+        }
+        this.#columns = newCols
+        this.#img = undefined
+    }
+    get columns() {
+        return this.#columns
+    }
     #rows
+    set rows(newRows) {
+        if (isNaN(newRows)) {
+            throw new TypeError("Entered rows value is not a number!")
+        }
+        if (newRows <= 0) {
+            throw new RangeError(`Trying to set number of rows to ${newRows}`)
+        }
+        this.#rows = newRows
+        this.#img = undefined
+    }
+    get rows() {
+        return this.#rows
+    }
 
     /**
      * Creates grid image
      * @param {CanvasRenderingContext2D} ctx Context
      */
-    createImg(ctx) {
+    #createImg(ctx) {
         const left = this.position.x
         const right = this.position.x + this.width
         const top = this.position.y
@@ -60,71 +133,8 @@ class GameGrid {
         ctx.stroke()
 
         const dataURL = ctx.canvas.toDataURL()
-        this.img = new Image()
-        this.img.src = dataURL
-    }
-
-    set position(newPos) {
-        if (!(newPos instanceof Point)) {
-            throw new TypeError("Incorrect instance for position setter. Must be Point!")
-        }
-        this.#position = newPos
-        this.img = undefined
-    }
-    get position() {
-        return this.#position
-    }
-    set width(newWidth) {
-        if (isNaN(newWidth)) {
-            throw new TypeError("Entered width value is not a number!")
-        }
-        if (newWidth <= 0) {
-            throw new RangeError(`Trying to set width to ${newWidth}`)
-        }
-        this.#width = newWidth
-        this.img = undefined
-    }
-    get width() {
-        return this.#width
-    }
-    set height(newHeight) {
-        if (isNaN(newHeight)) {
-            throw new TypeError("Entered height value is not a number!")
-        }
-        if (newHeight <= 0) {
-            throw new RangeError(`Trying to set height to ${newHeight}`)
-        }
-        this.#height = newHeight
-        this.img = undefined
-    }
-    get height() {
-        return this.#height
-    }
-    set columns(newCols) {
-        if (isNaN(newCols)) {
-            throw new TypeError("Entered columns value is not a number!")
-        }
-        if (newCols <= 0) {
-            throw new RangeError(`Trying to set number of columns to ${newCols}`)
-        }
-        this.#columns = newCols
-        this.img = undefined
-    }
-    get columns() {
-        return this.#columns
-    }
-    set rows(newRows) {
-        if (isNaN(newRows)) {
-            throw new TypeError("Entered rows value is not a number!")
-        }
-        if (newRows <= 0) {
-            throw new RangeError(`Trying to set number of rows to ${newRows}`)
-        }
-        this.#rows = newRows
-        this.img = undefined
-    }
-    get rows() {
-        return this.#rows
+        this.#img = new Image()
+        this.#img.src = dataURL
     }
 
     #checkColRowRange(col,row) {
@@ -144,9 +154,9 @@ class GameGrid {
         this.columns = cols || 10
         this.rows = rows || 10
 
-        this.elements = new Array(this.columns)
+        this.#elements = new Array(this.columns)
         for (let i = 0; i < this.columns; i++) {
-            this.elements[i] = new Array(this.rows).fill(undefined)
+            this.#elements[i] = new Array(this.rows).fill(undefined)
         }
     }
 
@@ -159,7 +169,7 @@ class GameGrid {
         this.position.x = x
         this.position.y = y
 
-        this.img = undefined
+        this.#img = undefined
     }
 
     /**
@@ -175,15 +185,15 @@ class GameGrid {
             throw new FullError(`Element already in grid at position ${pos.asString()}!`)
         } catch (e) {
             if (e instanceof RangeError) {
-                //all g
+                //element is not in grid
             } else {
                 throw e
             }
         }
         if (this.getElementAtPos(col,row)) {
-            throw new FullError(`Position [${col},${row}] is occupied by ${this.getElementAtPos(col,row)}!`)
+            throw new FullError(`Position [${col},${row}] is occupied!`)
         }
-        this.elements[col][row] = element
+        this.#elements[col][row] = element
         element.center = this.getBoxCenter(col,row)
         element.grid = this
     }
@@ -199,8 +209,8 @@ class GameGrid {
         if (!this.getElementAtPos(col,row)) {
             throw new EmptyError(`Position [${col},${row}] is empty!`)
         }
-        const element = this.elements[col][row]
-        this.elements[col][row] = undefined
+        const element = this.#elements[col][row]
+        this.#elements[col][row] = undefined
         element.grid = undefined
         return element
     }
@@ -222,7 +232,7 @@ class GameGrid {
     removeElements(...elements) {
         for (let col = 0; col < this.columns; col++) {
             for (let row = 0; row < this.rows; row++) {
-                if (elements.includes(this.elements[col][row])) {
+                if (elements.includes(this.#elements[col][row])) {
                     this.removeElementAtPosition(col,row)
                 }
             }
@@ -237,12 +247,12 @@ class GameGrid {
      */
     moveElement(targetCol,targetRow,element) {
         this.#checkColRowRange(targetCol,targetRow)
-        if (this.elements[targetCol][targetRow]) {
+        if (this.#elements[targetCol][targetRow]) {
             throw new FullError(`Position (${targetRow},${targetCol}) is occupied!`)
         }
         const currentPos = this.getElementPosition(element)
-        this.elements[currentPos.x][currentPos.y] = undefined
-        this.elements[targetCol][targetRow] = element
+        this.#elements[currentPos.x][currentPos.y] = undefined
+        this.#elements[targetCol][targetRow] = element
         element.center = this.getBoxCenter(targetCol,targetRow)
     }
 
@@ -254,7 +264,7 @@ class GameGrid {
      */
     getElementAtPos(col,row) {
         this.#checkColRowRange(col,row)
-        return this.elements[col][row]
+        return this.#elements[col][row]
     }
 
     /**
@@ -305,7 +315,7 @@ class GameGrid {
     getElementPosition(element) {
         for (let col = 0; col < this.columns; col++) {
             for (let row = 0; row < this.rows; row++) {
-                if (this.elements[col][row] === element) {
+                if (this.#elements[col][row] === element) {
                     return new Point(col,row)
                 }
             }
@@ -342,13 +352,18 @@ class GameGrid {
      * @param {CanvasRenderingContext2D} ctx
      */
     draw(ctx) {
-        if (this.img === undefined) {
-            this.createImg(ctx)
+        if (this.#img === undefined) {
+            this.#createImg(ctx)
         }
 
-        ctx.drawImage(this.img,0,0)
+        ctx.drawImage(this.#img,0,0)
     }
 
+    /**
+     * Returns true when input position lies on the grid
+     * @param {Point} position position in pixels
+     * @returns {boolean}
+     */
     isInside(position) {
         return (this.position.x <= position.x && position.x <= this.position.x + this.width ) &&
             (this.position.y <= position.y && position.y <= this.position.y + this.height)
@@ -364,7 +379,7 @@ class GameGrid {
         if (!this.getElementAtPos(col,row)) {
             return new Point(col,row)
         }
-        for (const column of this.elements) {
+        for (const column of this.#elements) {
             if (column.includes(undefined)) {
                 return this.randomFreePosition()
             }
