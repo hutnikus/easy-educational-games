@@ -1,4 +1,5 @@
 import {GameDrawable} from "./GameDrawable.js";
+import {randomColor} from "../Misc";
 
 /**
  * Text drawable class.
@@ -10,7 +11,17 @@ import {GameDrawable} from "./GameDrawable.js";
  * @property {number} maxWidth Shrink text width to this size
  */
 class GameText extends GameDrawable {
-    color = undefined;
+    #color = undefined;
+    set color(newColor) {
+        if (newColor === "random") {
+            this.#color = randomColor()
+            return
+        }
+        this.#color = newColor
+    }
+    get color() {
+        return this.#color
+    }
     text = undefined;
     font = undefined;
     maxWidth = undefined;
@@ -23,7 +34,7 @@ class GameText extends GameDrawable {
     constructor(text='sample text',attrs={}) {
         super(attrs)
         this.text = text;
-        this.color = (attrs.color === undefined) ? 'black' : attrs.color;
+        this.#color = attrs.color || "black"
         this.font = (attrs.font === undefined) ? '20px arial' : attrs.font;
         this.maxWidth = attrs.maxWidth
     }
@@ -34,8 +45,8 @@ class GameText extends GameDrawable {
      */
     drawFunction(ctx) {
         ctx.font = this.font;
-        ctx.color = this.color
-        ctx.fillStyle = this.color;
+        ctx.color = this.#color
+        ctx.fillStyle = this.#color;
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         ctx.fillText(this.text,0,0,this.maxWidth)
@@ -74,7 +85,7 @@ class GameText extends GameDrawable {
      */
     getAttrs() {
         return Object.assign({
-            color : this.color,
+            color : this.#color,
             text : this.text,
             font : this.font,
             maxWidth : this.maxWidth,

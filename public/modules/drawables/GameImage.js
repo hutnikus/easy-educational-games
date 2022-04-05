@@ -10,6 +10,9 @@ import {GameDrawable, loadImage} from "./GameDrawable.js";
  * @property {Image} img Image to be drawn.
  */
 class GameImage extends GameDrawable {
+    #img = undefined
+    get img() {return this.#img}
+
     /**
      * Constructor of Image drawable
      * @param {string} imageName Name of the image in resources
@@ -19,15 +22,14 @@ class GameImage extends GameDrawable {
         super(attrs)
 
         if (imageName === undefined) {
-            this.img = attrs.img
+            this.#img = attrs.img
             return
         }
 
         const url = `resources/${imageName}`
-        // this.img = loadImage(url)
 
         loadImage(url).then(value => {
-            this.img = value
+            this.#img = value
         })
     }
 

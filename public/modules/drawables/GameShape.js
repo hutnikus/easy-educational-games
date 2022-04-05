@@ -23,51 +23,51 @@ const shapes = ["rectangle","oval","polygon","line"]
  * @property {Array<number>} coords Array of points in line/polygon in format [x1,y1,...,xn,yn]
  */
 class GameShape extends GameDrawable {
-    #typeValue;
-    #fillValue;
-    #strokeValue;
-    #lineWidthValue;
+    #type;
     set type(newType) {
         if (!shapes.includes(newType)) {
             throw new Error(`Incorrect type name. Should be of "${shapes}", is ${newType}`)
         }
-        this.#typeValue = newType
+        this.#type = newType
     }
     get type() {
-        return this.#typeValue
+        return this.#type
     }
+    #fill;
     set fill(newFill) {
         if (newFill === "random") {
-            this.#fillValue = randomColor()
+            this.#fill = randomColor()
             return
         }
-        this.#fillValue = newFill
+        this.#fill = newFill
     }
     get fill() {
-        return this.#fillValue
+        return this.#fill
     }
+    #stroke;
     set stroke(newStroke) {
         if (newStroke === "random") {
-            this.#strokeValue = randomColor()
+            this.#stroke = randomColor()
             return
         }
-        this.#strokeValue = newStroke
+        this.#stroke = newStroke
     }
     get stroke() {
-        return this.#strokeValue
+        return this.#stroke
     }
+    #lineWidth;
     set lineWidth(newLineWidth) {
         if (newLineWidth === undefined) {
-            this.#lineWidthValue = 0
+            this.#lineWidth = 0
             return
         }
         if (isNaN(newLineWidth)) {
             throw new Error("Line width value is not a number!")
         }
-        this.#lineWidthValue = newLineWidth
+        this.#lineWidth = newLineWidth
     }
     get lineWidth() {
-        return this.#lineWidthValue
+        return this.#lineWidth
     }
 
     initRectangle() {
