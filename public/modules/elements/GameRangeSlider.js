@@ -9,8 +9,8 @@ import {Point, randomColor} from "../Misc.js";
  * @property {number} height Height of slider in pixels
  * @property {string} color Color of the whole slider
  * @property {Array<function>} onChange Events to be trigerred on change of slider value
- * @property {GameShape} scale Line that represents slider scale
- * @property {GameShape} handle Rectangle that represents slider handle
+ * @property {GameShape} scaleElement Line that represents slider scale
+ * @property {GameShape} handleElement Rectangle that represents slider handle
  *
  */
 class GameRangeSlider extends GameElement{
@@ -23,12 +23,12 @@ class GameRangeSlider extends GameElement{
             throw new Error("Width has to be larger than 0!")
         }
         let percent = 50
-        if (this.scale && this.handle) {
+        if (this.scaleElement && this.handleElement) {
             percent = this.getValue()
-            this.scale.setLine(new Point(-newWidth/2,0),new Point(newWidth/2,0))
+            this.scaleElement.setLine(new Point(-newWidth/2,0),new Point(newWidth/2,0))
         }
         this.#width = newWidth
-        if (this.scale && this.handle) {
+        if (this.scaleElement && this.handleElement) {
             this.setValue(percent,false)
         }
     }
@@ -42,9 +42,9 @@ class GameRangeSlider extends GameElement{
         } else {
             this.#color = newColor
         }
-        if (this.scale && this.handle) {
-            this.scale.stroke = this.#color
-            this.handle.fill = this.#color
+        if (this.scaleElement && this.handleElement) {
+            this.scaleElement.stroke = this.#color
+            this.handleElement.fill = this.#color
         }
     }
     get color() {
@@ -59,8 +59,8 @@ class GameRangeSlider extends GameElement{
         this.#onChange = attrs.onChange || []
         this.color = attrs.color || "red"
 
-        this.scale = this.createShape("line", {coords:[-this.width/2,0,this.width/2,0],level:-2, stroke:this.color})
-        this.handle = this.createShape("rectangle",{width:10,height:20,level:-1,fill:this.color})
+        this.scaleElement = this.createShape("line", {coords:[-this.width/2,0,this.width/2,0],level:-2, stroke:this.color})
+        this.handleElement = this.createShape("rectangle",{width:10,height:20,level:-1,fill:this.color})
 
         this.draggable = true
         this.stationary = true
@@ -83,7 +83,7 @@ class GameRangeSlider extends GameElement{
      * @returns {number}
      */
     getValue() {
-        return Number.parseFloat(((this.handle.dx + (this.width/2)) / this.width).toFixed(3))
+        return Number.parseFloat(((this.handleElement.dx + (this.width/2)) / this.width).toFixed(3))
     }
 
     setValue(value,change=true) {
@@ -91,7 +91,7 @@ class GameRangeSlider extends GameElement{
             throw new RangeError("Value has to be between 0 and 1!")
         }
 
-        this.handle.dx = (value * this.width) - this.width/2
+        this.handleElement.dx = (value * this.width) - this.width/2
 
         if (change) {
             for (const callback of this.#onChange) {

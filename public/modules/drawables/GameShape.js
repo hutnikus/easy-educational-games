@@ -18,8 +18,8 @@ const shapes = ["rectangle","oval","polygon","line"]
  * @property {string} fill Fill of the shape. Can be CSS color or "random"
  * @property {string} stroke Stroke of the shape. Can be CSS color or "random"
  * @property {number} lineWidth Width of the line/outline
- * @property {number} rX Radius of oval on X axis
- * @property {number} rY Radius of oval on Y axis
+ * @property {number} rx Radius of oval on X axis
+ * @property {number} ry Radius of oval on Y axis
  * @property {Array<number>} coords Array of points in line/polygon in format [x1,y1,...,xn,yn]
  */
 class GameShape extends GameDrawable {
@@ -75,8 +75,8 @@ class GameShape extends GameDrawable {
         this.height = this.height || 100
     }
     initOval(rx,ry) {
-        this.rX = rx || ry || 50
-        this.rY = ry || rx || 50
+        this.rx = rx || ry || 50
+        this.ry = ry || rx || 50
     }
     initPolygon(coords) {
         if (!Array.isArray(coords)) {
@@ -122,8 +122,8 @@ class GameShape extends GameDrawable {
             this.fill = attrs.fill
             this.stroke = attrs.stroke
             this.lineWidth = attrs.lineWidth
-            this.rX = attrs.rX
-            this.rY = attrs.rY
+            this.rx = attrs.rx
+            this.ry = attrs.ry
             this.coords = attrs.coords
             return
         }
@@ -138,7 +138,7 @@ class GameShape extends GameDrawable {
             this.initRectangle()
         }
         else if (type === 'oval') {
-            this.initOval(attrs.rX,attrs.rY)
+            this.initOval(attrs.rx,attrs.ry)
         }
         else if (type === 'polygon') {
             this.initPolygon(attrs.coords)
@@ -200,7 +200,7 @@ class GameShape extends GameDrawable {
         }
         else if (this.type === 'oval') {
             ctx.beginPath();
-            ctx.ellipse(0,0,this.rX,this.rY,0,0,2*Math.PI);
+            ctx.ellipse(0,0,this.rx,this.ry,0,0,2*Math.PI);
         }
         else if (this.type === 'polygon' || this.type === 'line') {
             ctx.beginPath();
@@ -260,8 +260,8 @@ class GameShape extends GameDrawable {
             fill : this.fill,
             stroke : this.stroke,
             lineWidth : this.lineWidth,
-            rX : this.rX,
-            rY : this.rY,
+            rx : this.rx,
+            ry : this.ry,
             coords : (this.coords === undefined) ? undefined : [...this.coords],
         },super.getAttrs())
     }
