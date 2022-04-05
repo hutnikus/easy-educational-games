@@ -70,15 +70,15 @@ class GameShape extends GameDrawable {
         return this.#lineWidth
     }
 
-    initRectangle() {
+    #initRectangle() {
         this.width = this.width || 100
         this.height = this.height || 100
     }
-    initOval(rx,ry) {
+    #initOval(rx, ry) {
         this.rx = rx || ry || 50
         this.ry = ry || rx || 50
     }
-    initPolygon(coords) {
+    #initPolygon(coords) {
         if (!Array.isArray(coords)) {
             throw new Error("Polygon needs a defined coords array!")
         }
@@ -93,7 +93,7 @@ class GameShape extends GameDrawable {
             this.addPoint(new Point(coords[i],coords[i+1]))
         }
     }
-    initLine(coords) {
+    #initLine(coords) {
         if (!Array.isArray(coords)) {
             throw new Error("Line needs a defined coords array!")
         }
@@ -135,16 +135,16 @@ class GameShape extends GameDrawable {
 
 
         if (type === 'rectangle') {
-            this.initRectangle()
+            this.#initRectangle()
         }
         else if (type === 'oval') {
-            this.initOval(attrs.rx,attrs.ry)
+            this.#initOval(attrs.rx,attrs.ry)
         }
         else if (type === 'polygon') {
-            this.initPolygon(attrs.coords)
+            this.#initPolygon(attrs.coords)
         }
         else if (type === 'line') {
-            this.initLine(attrs.coords)
+            this.#initLine(attrs.coords)
         }
 
         if (!this.fill && !this.stroke) {
@@ -165,7 +165,7 @@ class GameShape extends GameDrawable {
         if (this.type !== "line") {
             throw new Error(`You're trying to call setLine() on ${this.type}!`)
         }
-        this.initLine([...from.asArray(),...to.asArray()])
+        this.#initLine([...from.asArray(),...to.asArray()])
     }
 
     /**
