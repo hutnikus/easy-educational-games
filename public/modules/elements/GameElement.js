@@ -446,10 +446,19 @@ class GameElement {
         this.onMove = this.onMove.filter(item=>item!==callback)
     }
 
+    /**
+     * Adds a listener to the array of listeners for mouse hold
+     * @param {function} callback function to be called
+     * @param {number} stagger how many calls are skipped (higher = slower execution)
+     */
     addOnMouseHoldListener(callback,stagger=0) {
         this.onMouseHold.push({callback,stagger,stg:0})
     }
 
+    /**
+     * Removes listener for mouse hold
+     * @param {function} callback function you want to remove
+     */
     removeOnMouseHoldListener(callback) {
         this.onMouseHold = this.onMouseHold.filter(item=>item.callback!==callback)
     }

@@ -21,70 +21,100 @@ import {
 
 /**
  * Game class. It manages the game state and elements within it.
- * @property {number} animationInterval Loop for drawing
  * @property {Array<GameElement>} elements Array of GameElement objects
- * @property {GameElement} selectedElement Selected element when dragging
- * @property {Point} delta Distance from mouse to center of dragged element
+ * @property {Array<GameGrid>} grids Array of grids
+ * @property {GameElement} selectedElement Element that is being dragged or held
+ * @property {Point} selectedDelta Distance from mouse to center of dragged element
  * @property {Array<string>} pressedKeys Array of currently pressed keys
  * @property {{mousePos:Point,tempContext:CanvasRenderingContext2D}} shared Last recorded mouse position and temporary context shared with elements
  * @property {HTMLCanvasElement} canvas HTML canvas on which the game is played
  * @property {CanvasRenderingContext2D} context Rendering context for the canvas
- * @property {HTMLCanvasElement} tempCanvas Canvas on which the isInside() methods are checked. It can be optionally passed on construction
- * @property {CanvasRenderingContext2D} tempContext Rendering context for the tempCanvas
  * @property {Array<function>} onClear What happens on clear() in addition to removing elements
- * @property {Array<GameGrid>} grids Array of grids
- * @property {Array<function>} onClickCallbacks Array of functions triggered on click
- * @property {Array<function>} onDragCallbacks Array of functions triggered on drag
- * @property {Array<function>} onFinishDraggingCallbacks Array of functions triggered on finish dragging
+ * @property {Array<function>} onClick Array of functions triggered on click
+ * @property {Array<function>} onDrag Array of functions triggered on drag
+ * @property {Array<function>} onMouseUp Array of functions triggered on finish dragging
  */
 class Game {
-    animationInterval
+    #animationInterval = undefined
+    #elements = []
+    get elements() {
+        return [...this.#elements]
+    }
+    #selectedElement = undefined
+    get selectedElement() {
+        return this.#selectedElement
+    }
+    #selectedDelta = undefined
+    get selectedDelta() {
+        return this.#selectedDelta.copy()
+    }
+    #pressedKeys = []
+    get pressedKeys() {
+        return [...this.#pressedKeys]
+    }
+    #shared = {
+        tempContext: undefined,
+        mousePos: undefined
+    }
+    get shared() {
+        return this.#shared
+    }
+    #grids = []
+    get grids() {
+        return [...this.#grids]
+    }
+    #onClear = []
+    get onClear() {
+        return [...this.#onClear]
+    }
+    #onClick = []
+    get onClick() {
+        return [...this.#onClick]
+    }
+    #onMove = []
+    get onMove() {
+        return [...this.#onMove]
+    }
+    #onMouseUp = []
+    get onMouseUp() {
+        return [...this.#onMouseUp]
+    }
+
+
+
     /**
      * Constructor of the Game class
      * @param canvas Canvas on which the game is played
-     * @param tempCanvas (optional) Hidden canvas where isInside() is calculated
+     * @param tempCanvas (optional) Canvas used for click detection of elements
      */
     constructor(canvas,tempCanvas=undefined) {
         canvas.addEventListener("contextmenu",e=>e.preventDefault()) //prevent context menu
-        this.elements = []
-        this.grids = []
-        this.pressedKeys = []
-        this.onClear = []
-        this.onClickCallbacks = []
-        this.onDragCallbacks = []
-        this.onFinishDraggingCallbacks = []
         this.canvas = canvas;
         this.context = canvas.getContext('2d');
-        this.shared = {
-            tempContext: undefined,
-            mousePos: undefined
-        }
 
-        if (tempCanvas === undefined) {
-            this.tempCanvas = document.createElement('canvas')
-        } else {
-            this.tempCanvas = tempCanvas
-        }
-        this.tempCanvas.width = this.canvas.width
-        this.tempCanvas.height = this.canvas.height
-        this.shared.tempContext = this.tempContext = this.tempCanvas.getContext('2d');
+        tempCanvas = tempCanvas || document.createElement('canvas')
+        tempCanvas.width = this.canvas.width
+        tempCanvas.height = this.canvas.height
+        this.#shared.tempContext = tempCanvas.getContext('2d');
 
-        // canvas.addEventListener('click',(event) => this.onClick(event))
+        canvas.addEventListener('mousedown',(ev => this.#mouseDown(ev)))
+        canvas.addEventListener('touchstart',(ev => this.#mouseDown(ev)),false)
+        canvas.addEventListener('mousemove',(ev => this.#mouseMove(ev)))
+        canvas.addEventListener('touchmove',(ev => this.#mouseMove(ev)),false)
+        canvas.addEventListener('mouseup',(ev => this.#mouseUp(ev)))
+        canvas.addEventListener('touchend',(ev => this.#mouseUp(ev)),false)
+        document.addEventListener('keydown',(ev => this.#keyDown(ev)))
+        document.addEventListener('keyup',(ev => this.#keyUp(ev)))
 
-        canvas.addEventListener('mousedown',(ev => this.onClick(ev)))
-        canvas.addEventListener('touchstart',(ev => this.onClick(ev)),false)
-        canvas.addEventListener('mousemove',(ev => this.onDrag(ev)))
-        canvas.addEventListener('touchmove',(ev => this.onDrag(ev)),false)
-        canvas.addEventListener('mouseup',(ev => this.onFinishDragging(ev)))
-        canvas.addEventListener('touchend',(ev => this.onFinishDragging(ev)),false)
-        document.addEventListener('keydown',(ev => this.onKeyDown(ev)))
-        document.addEventListener('keyup',(ev => this.onKeyUp(ev)))
-
-        setInterval(()=>this.keyHoldLoop(),30)
+        setInterval(()=>this.#keyHoldLoop(),30)
 
         this.animate()
     }
 
+    /**
+     * Returns center of the game canvas
+     * @returns {Point} center of canvas
+     */
     getCenter() {
         return new Point(
             this.canvas.width/2,
@@ -97,7 +127,7 @@ class Game {
      * @param {Object} attrs Element attributes
      * @returns {GameElement} New instance
      */
-    createElement(attrs) {
+    createElement(attrs={}) {
         const el = new GameElement(this.getCenter(),[],attrs)
         this.addElement(el)
         return el
@@ -108,7 +138,7 @@ class Game {
      * @param {Object} attrs Element attributes
      * @returns {GameButton} New instance
      */
-    createButton(attrs) {
+    createButton(attrs={}) {
         const button = new GameButton(this.getCenter(),attrs)
         this.addElement(button)
         return button
@@ -119,7 +149,7 @@ class Game {
      * @param {Object} attrs Element attributes
      * @returns {GameTextInput} New instance
      */
-    createTextInput(attrs) {
+    createTextInput(attrs={}) {
         const input = new GameTextInput(this.getCenter(),attrs)
         this.addElement(input)
         return input
@@ -130,7 +160,7 @@ class Game {
      * @param {Object} attrs Element attributes
      * @returns {GameCanvas} New instance
      */
-    createCanvas(attrs) {
+    createCanvas(attrs={}) {
         const canvas = new GameCanvas(this.getCenter(),attrs)
         this.addElement(canvas)
         return canvas
@@ -141,7 +171,7 @@ class Game {
      * @param {Object} attrs Element attributes
      * @returns {GameRangeSlider} New instance
      */
-    createRangeSlider(attrs) {
+    createRangeSlider(attrs={}) {
         const slider = new GameRangeSlider(this.getCenter(),attrs)
         this.addElement(slider)
         return slider
@@ -152,7 +182,7 @@ class Game {
      * @param {Object} attrs Element attributes
      * @returns {GameComposite} New instance
      */
-    createComposite(attrs) {
+    createComposite(attrs={}) {
         const composite = new GameComposite([],attrs)
         this.addElement(composite)
         return composite
@@ -161,10 +191,11 @@ class Game {
     /**
      * Calls the copy function of element and adds it to game
      * @param {GameElement|GameCanvas|GameButton|GameComposite|GameTextInput} element Element to copy
+     * @param {string} newName Name of the newly created copy
      * @returns {GameElement|GameCanvas|GameButton|GameComposite|GameTextInput} New instance
      */
-    copyElement(element) {
-        const copy = element.copy()
+    copyElement(element,newName=undefined) {
+        const copy = element.copy(newName)
         this.addElement(copy)
 
         if (copy instanceof GameComposite) {
@@ -187,7 +218,7 @@ class Game {
      */
     createGrid(dx=0,dy=0,width,height,cols,rows) {
         const grid = new GameGrid(new Point(dx,dy),width,height,cols,rows)
-        this.grids.push(grid)
+        this.#grids.push(grid)
         return grid
     }
 
@@ -195,7 +226,7 @@ class Game {
      * Sorts array of elements by level
      */
     updateLevels() {
-        this.elements = this.elements.sort(((a, b) => a.level - b.level))
+        this.#elements = this.#elements.sort(((a, b) => a.level - b.level))
     }
 
     /**
@@ -203,7 +234,7 @@ class Game {
      * @returns {number} Currently highest level
      */
     highestLevel() {
-        return Math.max(...this.elements.map(el => el.level))
+        return Math.max(...this.#elements.map(el => el.level))
     }
 
     /**
@@ -217,40 +248,11 @@ class Game {
     }
 
     /**
-     * Debugging listener function for checking if mouse is within an element. Draws red or green circles depending on whether the mouse is inside or not.
-     * @param {MouseEvent} event Mouse event passed
-     */
-    drawInside(event) {
-        const mousePos = this.getMousePos(event)
-
-        let wasInside = false
-        for (const el of this.elements.filter((e)=>e.name!=="drawInside")) {
-            const insideElement = el.isInside(mousePos,this.tempContext)
-            if (insideElement) {
-                wasInside = true
-            }
-        }
-
-        let drawElement;
-        try {
-            drawElement = this.getElementByName("drawInside")
-        } catch (e) {
-            drawElement = new GameElement(
-                new Point(0,0),
-                [],
-                {level:100,clickable:false,name:"drawInside"}
-            )
-            this.addElement(drawElement)
-        }
-        drawElement.addChild(new GameShape('oval',{rX:2,rY:2,dx:mousePos.x,dy:mousePos.y,fill:(wasInside) ? 'green' : 'red',level:100}))
-    }
-
-    /**
      * Adds a listener to the array onClickCallbacks
      * @param {function} callback function to be called
      */
     addOnMouseDownListener(callback) {
-        this.onClickCallbacks.push(callback)
+        this.#onClick.push(callback)
     }
 
     /**
@@ -258,16 +260,17 @@ class Game {
      * @param {function} callback function you want to remove
      */
     removeOnMouseDownListener(callback) {
-        this.onClickCallbacks = this.onClickCallbacks.filter(item=>item!==callback)
+        this.#onClick = this.#onClick.filter(item=>item!==callback)
     }
 
     /**
+     * @private
      * Handler for mouse click. Passes the event to relevant elements.
      * @param {MouseEvent|TouchEvent} event Mouse event passed
      */
-    onClick(event) {
+    #mouseDown(event) {
         // one click at a time
-        if (this.selectedElement) {
+        if (this.#selectedElement) {
             return
         }
         // prevent scrolling on touch
@@ -280,7 +283,7 @@ class Game {
             return
         }
         //call functions in onClickCallbacks
-        for (const callback of this.onClickCallbacks) {
+        for (const callback of this.#onClick) {
             callback.call(this,event)
         }
 
@@ -292,9 +295,9 @@ class Game {
             el.click(event)
         }
         if (el.draggable || el.holdable) {
-            this.selectedElement = el
+            this.#selectedElement = el
             if (el.draggable) {
-                this.delta = new Point(
+                this.#selectedDelta = new Point(
                     mousePos.x - el.center.x,
                     mousePos.y - el.center.y
                 )
@@ -310,7 +313,7 @@ class Game {
      * @param {function} callback function to be called
      */
     addOnMouseMoveListener(callback) {
-        this.onDragCallbacks.push(callback)
+        this.#onMove.push(callback)
     }
 
     /**
@@ -318,27 +321,26 @@ class Game {
      * @param {function} callback function you want to remove
      */
     removeOnMouseMoveListener(callback) {
-        this.onDragCallbacks = this.onDragCallbacks.filter(item=>item!==callback)
+        this.#onMove = this.#onMove.filter(item=>item!==callback)
     }
 
     /**
+     * @private
      * Handler for dragging. Triggers every time the mouse is dragged and will pass the event to the selected element (if one exists)
      * @param {MouseEvent|TouchEvent} event Mouse event passed
      */
-    onDrag(event) {
+    #mouseMove(event) {
         if (!(event instanceof MouseEvent)) {
             event.preventDefault()
         }
-        for (const callback of this.onDragCallbacks) {
+        for (const callback of this.#onMove) {
             callback.call(this,event)
         }
-
-        if (this.selectedElement === undefined || !this.selectedElement.draggable) {
+        this.#shared.mousePos = this.getMousePos(event)
+        if (this.#selectedElement === undefined || !this.#selectedElement.draggable) {
             return
         }
-        const mousePos = this.getMousePos(event)
-
-        this.selectedElement.drag(mousePos,this.delta,event)
+        this.#selectedElement.drag(this.#shared.mousePos,this.#selectedDelta,event)
     }
 
     /**
@@ -346,7 +348,7 @@ class Game {
      * @param {function} callback function to be called
      */
     addOnMouseUpListener(callback) {
-        this.onFinishDraggingCallbacks.push(callback)
+        this.#onMouseUp.push(callback)
     }
 
     /**
@@ -354,42 +356,44 @@ class Game {
      * @param {function} callback function you want to remove
      */
     removeOnMouseUpListener(callback) {
-        this.onFinishDraggingCallbacks = this.onFinishDraggingCallbacks.filter(item=>item!==callback)
+        this.#onMouseUp = this.#onMouseUp.filter(item=>item!==callback)
     }
 
     /**
+     * @private
      * Handler for finishing dragging. Triggers on mouseup and will pass the event to the selected element (if one exists)
      * @param {MouseEvent|TouchEvent} event Mouse event passed
      */
-    onFinishDragging(event) {
+    #mouseUp(event) {
         if (!(event instanceof MouseEvent)) {
             event.preventDefault()
         }
 
-        for (const callback of this.onFinishDraggingCallbacks) {
+        for (const callback of this.#onMouseUp) {
             callback.call(this,event)
         }
 
-        if (this.selectedElement === undefined) {
+        if (this.#selectedElement === undefined) {
             return
         }
 
-        this.selectedElement.finishDragging(event)
-        this.selectedElement.finishMouseHold(event)
+        this.#selectedElement.finishDragging(event)
+        this.#selectedElement.finishMouseHold(event)
 
-        this.selectedElement = undefined
-        this.delta = undefined
+        this.#selectedElement = undefined
+        this.#selectedDelta = undefined
     }
 
     /**
+     * @private
      * Handler for key press. Allows for multiple keys to be pressed. Triggers keyHold() function in relevant elements
      */
-    keyHoldLoop() {
-        if (this.pressedKeys.length === 0) {
+    #keyHoldLoop() {
+        if (this.#pressedKeys.length === 0) {
             return
         }
-        for (const key of this.pressedKeys) {
-            const objects = this.elements.filter((el) => Object.keys(el.onKeyHold).includes(key))
+        for (const key of this.#pressedKeys) {
+            const objects = this.#elements.filter((el) => Object.keys(el.onKeyHold).includes(key))
             for (const element of objects) {
                 element.keyHold(key)
             }
@@ -397,39 +401,43 @@ class Game {
     }
 
     /**
+     * @private
      * Handler for key press. Adds key to the pressedKeys array and triggers keyPress() function in relevant elements
      * @param {KeyboardEvent} event Event with pressed key
      */
-    onKeyDown(event) {
+    #keyDown(event) {
         const key = event.key
-        if (!this.pressedKeys.includes(key)) {
-            //if not yet pressed - add to array
-            this.pressedKeys.push(key)
 
-            //first press
-            const listeners = this.elements.filter((el) => {
-                const keys = Object.keys(el.onKeyPress)
-                return keys.filter(value => key === value)
-            })
+        if (this.#pressedKeys.includes(key)) {
+            return
+        }
 
-            for (const el of listeners) {
-                el.keyPress(key,event)
-            }
+        this.#pressedKeys.push(key)
+
+        //first press
+        const listeners = this.#elements.filter((el) => {
+            const keys = Object.keys(el.onKeyPress)
+            return keys.filter(value => key === value)
+        })
+
+        for (const el of listeners) {
+            el.keyPress(key,event)
         }
     }
 
     /**
+     * @private
      * Handler for key press. Removes key from the pressedKeys array
      * @param {KeyboardEvent} event Event with pressed key
      */
-    onKeyUp(event) {
+    #keyUp(event) {
         const key = event.key
-        const indexInArray = this.pressedKeys.indexOf(key)
+        const indexInArray = this.#pressedKeys.indexOf(key)
         if (indexInArray !== -1) {
-            //if pressed
-            this.pressedKeys.splice(indexInArray,1)
+            //if pressed remove from array of pressed keys
+            this.#pressedKeys.splice(indexInArray,1)
         }
-        for (const element of this.elements.filter(el=>el.pressable)) {
+        for (const element of this.#elements.filter(el=>el.pressable)) {
             element.keyUp(event)
         }
     }
@@ -441,19 +449,18 @@ class Game {
      */
     addElement(element,sort=true) {
         if (!(element instanceof GameElement)) {
-            console.log(element)
-            throw new Error("Incorrect element instance!")
+            throw new TypeError("Incorrect element instance!")
         }
-        if (this.elements.some(el=>el===element)) {
+        if (this.#elements.some(el=>el===element)) {
             throw new Error("Trying to add already added object!")
         }
 
-        const nameIsUsed = this.elements.filter(c => c.name === element.name && element.name !== undefined).length > 0
+        const nameIsUsed = this.#elements.filter(c => c.name === element.name && element.name !== undefined).length > 0
         if (nameIsUsed) {
-            throw new Error(`used name "${element.name}"`);
+            throw new Error(`Used name "${element.name}"`);
         }
         element.shared = this.shared
-        this.elements.push(element)
+        this.#elements.push(element)
         if (sort) {
             this.updateLevels()
         }
@@ -476,11 +483,11 @@ class Game {
      * @returns {GameElement} Found element
      */
     getElementByName(name) {
-        let el = this.elements.filter(e => e.name === name)
+        let el = this.#elements.filter(e => e.name === name)
         if (el.length === 0) {
-            throw `No child of ${this} has name:${name}`
+            throw new Error(`No element has name "${name}"`)
         } else if (el.length > 1) {
-            throw `There are multiple children with name:${name} in ${this}`
+            throw new Error(`There are multiple elements with name:"${name}".`)
         }
         return el[0]
     }
@@ -492,8 +499,8 @@ class Game {
      */
     popElementByName(name) {
         const el = this.getElementByName(name)
-        this.elements = this.elements.filter(e => e.name !== name)
-        return el[0]
+        this.#elements = this.#elements.filter(e => e.name !== name)
+        return el
     }
 
     /**
@@ -501,21 +508,22 @@ class Game {
      * @param {GameElement} element Element instance
      */
     removeElement(element) {
-        this.elements = this.elements.filter(e => e !== element)
+        this.#elements = this.#elements.filter(e => e !== element)
     }
 
     /**
+     * @private
      * Calls the draw function of all elements
      */
-    draw() {
+    #draw() {
         this.context.setTransform(1,0,0,1,0,0);
         this.context.clearRect(0,0,this.canvas.width,this.canvas.width)
 
-        for (const grid of this.grids) {
+        for (const grid of this.#grids) {
             grid.draw(this.context)
         }
 
-        for (const obj of this.elements) {
+        for (const obj of this.#elements) {
             obj.draw(this.context)
         }
     }
@@ -524,24 +532,31 @@ class Game {
      * Starts the animation loop
      */
     animate() {
-        this.animationInterval = setInterval(()=>this.#animationLoop(this),30)
+        this.#animationInterval = setInterval(this.#animationLoop.bind(this),30)
     }
 
     /**
-     * Calls this.draw() on next animation frame, also calls animate() on Gif drawables
-     * @param {Game} game instance of the Game object
+     * Stops the animation loop
      */
-    #animationLoop(game) {
-        const animation = function () {
-            game.draw()
+    stopAnimation() {
+        clearInterval(this.#animationInterval)
+    }
 
-            game.elements
+    /**
+     * @private
+     * Calls this.draw() on next animation frame, also calls animate() on Gif drawables
+     */
+    #animationLoop() {
+        const animation = function () {
+            this.#draw()
+
+            this.#elements
                 .forEach(obj => {
                     obj.animate()
                 })
         }
 
-        window.requestAnimationFrame(animation)
+        window.requestAnimationFrame(animation.bind(this))
     }
 
     /**
@@ -562,7 +577,7 @@ class Game {
             pos = new Point(touch.clientX - rect.left, touch.clientY - rect.top);
         }
 
-        this.shared.mousePos = pos.copy()
+        this.#shared.mousePos = pos.copy()
 
         return pos
     }
@@ -577,12 +592,12 @@ class Game {
      * @returns {null|GameElement} Element at position or null
      */
     getElementAtPos(position) {
-        for (const i in this.elements) {
-            const el = this.elements[this.elements.length-1-i]
+        for (const i in this.#elements) {
+            const el = this.#elements[this.#elements.length-1-i]
             if (!el.clickable && !el.draggable && !el.holdable) {
                 continue
             }
-            if (el.isInside(position, this.tempContext)) {
+            if (el.isInside(position)) {
                 return el
             }
         }
@@ -595,30 +610,30 @@ class Game {
      * @param callback function to call on clear
      */
     addOnClearListener(callback) {
-        this.onClear.push(callback)
+        this.#onClear.push(callback)
     }
 
     /**
      * Resets game to initial state
      */
     clear() {
-        this.grids = []
-        this.elements = []
-        this.pressedKeys = []
-        for (const callback of this.onClear) {
+        this.#grids = []
+        this.#elements = []
+        this.#pressedKeys = []
+        for (const callback of this.#onClear) {
             callback.call(this)
-            // callback()
         }
+        this.#onClear = []
     }
 
     /**
      * Returns an array of elements that collide with input element
      * @param {GameElement} element Element for which the collisions are checked
-     * @returns {Array<GameElement>}
+     * @returns {Array<GameElement>} Array of elements that collide with input element
      */
     checkCollisions(element) {
         const collisions = []
-        for (const other of this.elements) {
+        for (const other of this.#elements) {
             if (element === other) {
                 continue
             }
