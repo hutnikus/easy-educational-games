@@ -56,7 +56,7 @@ class GameDrawable {
         if (isNaN(newDY)) {
             throw new TypeError("Incorrect type of dy, it has to be a number!")
         }
-        this.#dx = Number(newDY)
+        this.#dy = Number(newDY)
     }
     get dy() {return this.#dy}
     #width = undefined
