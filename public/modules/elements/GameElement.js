@@ -68,6 +68,41 @@ class GameElement {
         }
         this.#name = newName
     }
+
+    /**
+     * @returns {number} X coordinate
+     */
+    get x() {
+        return this.center.x
+    }
+    /**
+     * Sets X position
+     * @param {number} newX new X position
+     */
+    set x(newX) {
+        if (isNaN(newX)) {
+            throw new TypeError("Invalid type for x position!")
+        }
+        this.center.x = newX
+    }
+    /**
+     * @returns {number} Y coordinate
+     */
+    get y() {
+        return this.center.y
+    }
+    /**
+     * Sets Y position
+     * @param {number} newY new Y position
+     */
+    set y(newY) {
+        if (isNaN(newY)) {
+            throw new TypeError("Invalid type for y position!")
+        }
+        this.center.y = newY
+    }
+
+
     /**
      * Constructor of the GameElement class
      * @param {Point} center Absolute position of the element
