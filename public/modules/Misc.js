@@ -1,3 +1,6 @@
+import {Game} from "./Game.js";
+import {GameElement} from "./elements/GameElement.js";
+
 /**
  * Point class. Represents a point defined by its X and Y coordinates.
  * @property {number} x X coordinate
@@ -80,7 +83,7 @@ class Point {
 
     /**
      * Returns coordinates in array format
-     * @returns {Array<number>} Array in format [x,y]
+     * @returns {[number,number]} Array in format [x,y]
      */
     asArray() {
         return [this.x,this.y]
@@ -134,4 +137,44 @@ function randomColor() {
     return "#"+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)
 }
 
-export { Point, randomColor }
+/**
+ * Returns string of random light HEX color
+ * @returns {string} Random color value
+ */
+function randomLightColor() {
+    const red = Math.floor(Math.random() * 50) + 200
+    const green = Math.floor(Math.random() * 50) + 200
+    const blue = Math.floor(Math.random() * 50) + 200
+
+    return "#" + red.toString(16) + green.toString(16) + blue.toString(16)
+}
+
+/**
+ * Returns new instance of array shuffled randomly
+ * @param {*[]} array
+ * @returns {*[]} New instance of array
+ */
+function shuffleArray(array) {
+    const a = [...array]
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+/**
+ * Returns a selection of random elements in array of set length
+ * @param {*[]} arr
+ * @param {number} length
+ * @returns {*[]}
+ */
+function randomSelection(arr,length) {
+    if (arr.length < length) {
+        throw new RangeError(`Incorrect length of selection: array length: ${arr.length}, required length: ${length}!`)
+    }
+    return shuffleArray(arr).slice(0,length)
+}
+
+
+export { Point, randomColor, shuffleArray, randomSelection, randomLightColor }

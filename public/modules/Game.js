@@ -297,6 +297,7 @@ class Game {
         if (el.draggable || el.holdable) {
             this.#selectedElement = el
             if (el.draggable) {
+                el.startDragging(event)
                 this.#selectedDelta = new Point(
                     mousePos.x - el.center.x,
                     mousePos.y - el.center.y
@@ -305,6 +306,27 @@ class Game {
             if (el.holdable) {
                 el.startMouseHold(event)
             }
+        }
+    }
+
+    /**
+     * Keeps dragged element on top of group
+     * Adds or replaces the listener for starting dragging
+     * @param {GameElement[]} elementArray Array of elements in a group
+     */
+    moveToTopWhenDragging(elementArray) {
+        const game = this
+        function moveToTop() {
+            const maxLevel = Math.max(...elementArray.map(el=>el.level))
+            const topLevelElements = elementArray.filter(el=>el.level === maxLevel)
+            if (!topLevelElements.includes(this) || topLevelElements.length > 1) {
+                game.changeLevelOfElement(this, maxLevel+1)
+            }
+        }
+
+        for (const element of elementArray) {
+            element.removeOnStartDraggingListener(moveToTop)
+            element.addOnStartDraggingListener(moveToTop)
         }
     }
 

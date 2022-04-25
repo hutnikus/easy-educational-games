@@ -22,6 +22,7 @@ import {GameText} from "../drawables/GameText.js";
  * @property {Array<function>} onClick Array of callbacks called on click
  * @property {Array<function>} onDrag Array of callbacks called on dragging/holding
  * @property {Array<function>} onFinishDragging Array of callbacks called when finished dragging/holding
+ * @property {Array<function>} onStartDragging Array of callbacks called when starting dragging/holding
  * @property {Array<function>} onFinishMouseHold Array of callbacks called when finished mouseHold
  * @property {Object} onKeyPress Map of (keyboard) keys mapped to an array of callbacks called on key press
  * @property {Object} onKeyHold Map of (keyboard) keys mapped to an array of callbacks called on key hold
@@ -116,6 +117,7 @@ class GameElement {
         this.onClick = (attrs.onClick === undefined) ? [] : attrs.onClick
         this.onDrag = (attrs.onDrag === undefined) ? [] : attrs.onDrag
         this.onFinishDragging = (attrs.onFinishDragging === undefined) ? [] : attrs.onFinishDragging
+        this.onStartDragging = (attrs.onStartDragging === undefined) ? [] : attrs.onStartDragging
         this.onKeyPress = (attrs.onKeyPress === undefined) ? {} : attrs.onKeyPress
         this.onKeyHold = (attrs.onKeyHold === undefined) ? {} : attrs.onKeyHold
         this.onKeyUp = attrs.onKeyUp || []
@@ -217,7 +219,7 @@ class GameElement {
      * @param {number} dx Deviation on X axis
      * @param {number} dy Deviation on Y axis
      */
-    addHitbox(radius,dx,dy) {
+    addHitbox(radius,dx=0,dy=0) {
         this.hitboxes.push(new GameHitbox(radius,dx,dy))
     }
 
@@ -362,6 +364,22 @@ class GameElement {
      */
     removeOnDragListener(callback) {
         this.onDrag = this.onDrag.filter(item=>item!==callback)
+    }
+
+    /**
+     * Adds a listener to the array of listeners for onStartDragging
+     * @param {function} callback function to be called
+     */
+    addOnStartDraggingListener(callback) {
+        this.onStartDragging.push(callback)
+    }
+
+    /**
+     * Removes listener for the onStartDragging event
+     * @param {function} callback function you want to remove
+     */
+    removeOnStartDraggingListener(callback) {
+        this.onStartDragging = this.onStartDragging.filter(item=>item!==callback)
     }
 
     /**
@@ -529,6 +547,15 @@ class GameElement {
         for (const callback of this.onDrag) {
             callback.call(this,event)
             // callback(event)
+        }
+    }
+
+    /**
+     * Calls the functions in the onStartDragging array
+     */
+    startDragging(event) {
+        for (const callback of this.onStartDragging) {
+            callback.call(this,event)
         }
     }
 
