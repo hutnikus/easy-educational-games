@@ -1,6 +1,3 @@
-import {Game} from "./Game.js";
-import {GameElement} from "./elements/GameElement.js";
-
 /**
  * Point class. Represents a point defined by its X and Y coordinates.
  * @property {number} x X coordinate
@@ -83,7 +80,7 @@ class Point {
 
     /**
      * Returns coordinates in array format
-     * @returns {[number,number]} Array in format [x,y]
+     * @returns {Array<number>} Array in format [x,y]
      */
     asArray() {
         return [this.x,this.y]
@@ -151,8 +148,8 @@ function randomLightColor() {
 
 /**
  * Returns new instance of array shuffled randomly
- * @param {*[]} array
- * @returns {*[]} New instance of array
+ * @param {Array} array
+ * @returns {Array} New instance of array
  */
 function shuffleArray(array) {
     const a = [...array]
@@ -165,9 +162,9 @@ function shuffleArray(array) {
 
 /**
  * Returns a selection of random elements in array of set length
- * @param {*[]} arr
+ * @param {Array} arr
  * @param {number} length
- * @returns {*[]}
+ * @returns {Array}
  */
 function randomSelection(arr,length) {
     if (arr.length < length) {
