@@ -31,7 +31,7 @@ import {
  * @property {CanvasRenderingContext2D} context Rendering context for the canvas
  * @property {Array<function>} onClear What happens on clear() in addition to removing elements
  * @property {Array<function>} onClick Array of functions triggered on click
- * @property {Array<function>} onDrag Array of functions triggered on drag
+ * @property {Array<function>} onMove Array of functions triggered on drag
  * @property {Array<function>} onMouseUp Array of functions triggered on finish dragging
  */
 class Game {
