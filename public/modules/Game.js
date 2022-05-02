@@ -84,8 +84,8 @@ class Game {
 
     /**
      * Constructor of the Game class
-     * @param canvas Canvas on which the game is played
-     * @param tempCanvas (optional) Canvas used for click detection of elements
+     * @param {HTMLCanvasElement} canvas Canvas on which the game is played
+     * @param {HTMLCanvasElement} tempCanvas (optional) Canvas used for click detection of elements
      */
     constructor(canvas,tempCanvas=undefined) {
         canvas.addEventListener("contextmenu",e=>e.preventDefault()) //prevent context menu

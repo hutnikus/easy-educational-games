@@ -14,6 +14,19 @@ class GameImage extends GameDrawable {
     get img() {return this.#img}
 
     /**
+     * Setter for images
+     * @param {string} imageName Name of image in the resource folder
+     */
+    setImg(imageName) {
+        this.#img = undefined
+        const url = `resources/${imageName}`
+
+        loadImage(url).then(value => {
+            this.#img = value
+        })
+    }
+
+    /**
      * Constructor of Image drawable
      * @param {string} imageName Name of the image in resources
      * @param {Object} attrs Attribute object
@@ -26,11 +39,7 @@ class GameImage extends GameDrawable {
             return
         }
 
-        const url = `resources/${imageName}`
-
-        loadImage(url).then(value => {
-            this.#img = value
-        })
+        this.setImg(imageName)
     }
 
     /**
