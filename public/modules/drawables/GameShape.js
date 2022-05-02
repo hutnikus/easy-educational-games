@@ -14,7 +14,7 @@ const shapes = ["rectangle","oval","polygon","line"]
  * Shape drawable class. Draws rectangles, ovals, polygons and lines
  * @extends GameDrawable
  *
- * @property {string} type Type of shape: rectangle, oval, polygon, line
+ * @property {TYPE} type Type of shape: rectangle, oval, polygon, line
  * @property {string} fill Fill of the shape. Can be CSS color or "random"
  * @property {string} stroke Stroke of the shape. Can be CSS color or "random"
  * @property {number} lineWidth Width of the line/outline
