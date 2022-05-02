@@ -10,7 +10,7 @@ import {Point, randomColor} from "../Misc.js";
  * @property {Array<function>} onChange Events to be trigerred on change of slider value
  * @property {GameShape} scaleElement Line that represents slider scale
  * @property {GameShape} handleElement Rectangle that represents slider handle
- *
+ * @property {{min:number, max:number}} bounds Maximum value of slider
  */
 class GameRangeSlider extends GameElement{
     #width = undefined
@@ -23,12 +23,13 @@ class GameRangeSlider extends GameElement{
         }
         let percent = 50
         if (this.scaleElement && this.handleElement) {
-            percent = this.getValue()
+            percent = this.getPercentValue()
             this.scaleElement.setLine(new Point(-newWidth/2,0),new Point(newWidth/2,0))
         }
         this.#width = newWidth
         if (this.scaleElement && this.handleElement) {
-            this.setValue(percent,false)
+            const value = (percent * (this.max - this.min)) + this.min
+            this.setValue(value,false)
         }
     }
     get width() {
@@ -52,11 +53,31 @@ class GameRangeSlider extends GameElement{
     #onChange = []
     get onChange() {return [...this.#onChange]}
 
+    #bounds = {
+        min: 0,
+        max: 10
+    }
+    get max() {return this.bounds.max}
+    get min() {return this.bounds.min}
+    get bounds() {
+        return {
+            min: this.#bounds.min,
+            max: this.#bounds.max
+        }
+    }
+
+
     constructor(center,attrs={}) {
         super(center,[],attrs);
         this.width = attrs.width || 100
         this.#onChange = attrs.onChange || []
         this.color = attrs.color || "red"
+
+        this.floating = (attrs.floating === undefined) ? false : attrs.floating
+        this.setBounds(
+            attrs.min || 0,
+            attrs.max || 10
+        )
 
         this.scaleElement = this.createShape("line", {coords:[-this.width/2,0,this.width/2,0],level:-2, stroke:this.color})
         this.handleElement = this.createShape("rectangle",{width:10,height:20,level:-1,fill:this.color})
@@ -71,26 +92,69 @@ class GameRangeSlider extends GameElement{
             const dx = Math.min(Math.max(-this.width/2,delta.x),this.width/2)
             const percent = Number.parseFloat(((dx + (this.width/2)) / this.width).toFixed(3))
 
-            this.setValue(percent)
+            const value = (percent * (this.max - this.min)) + this.min
+
+            this.setValue(value)
         }
 
         this.addOnDragListener(dragHandle)
     }
 
     /**
-     * Returns % value of slider state
+     * Returns percent value of the slider based on handle position
+     * @returns {number}
+     */
+    getPercentValue() {
+        return (this.handleElement.dx + (this.width/2)) / this.width
+    }
+
+    /**
+     * Sets minimum and maximum bounds for slider
+     * @param {number} min
+     * @param {number} max
+     */
+    setBounds(min=0, max=10) {
+        if (Number.isNaN(min) || Number.isNaN(max)) {
+            throw new TypeError("Incorrect type for method setBounds()!")
+        }
+        if (min >= max) {
+            throw new RangeError("Min value has to be larger than max value!")
+        }
+        this.#bounds.min = min
+        this.#bounds.max = max
+    }
+
+    /**
+     * Returns value of slider
      * @returns {number}
      */
     getValue() {
-        return Number.parseFloat(((this.handleElement.dx + (this.width/2)) / this.width).toFixed(3))
+        const percent = this.getPercentValue()
+        const value = (percent * (this.max - this.min)) + this.min
+
+        if (this.floating) {
+            return Number.parseFloat((value).toFixed(3))
+        }
+        return Math.round(value)
     }
 
+    /**
+     * Sets value of slider and updates position of the handle
+     * @param {number} value Value to be set
+     * @param {boolean} change False prevents triggering onChange events
+     */
     setValue(value,change=true) {
-        if (value < 0 || value > 1) {
-            throw new RangeError("Value has to be between 0 and 1!")
+        if (value < this.min || value > this.max) {
+            throw new RangeError(`Value has to be between ${this.min} and ${this.max}!`)
         }
 
-        this.handleElement.dx = (value * this.width) - this.width/2
+        if (!this.floating) {
+            value = Math.round(value)
+        }
+
+        const percent = (value - this.min) / (this.max - this.min)
+
+        this.handleElement.dx = (percent * this.width) - this.width/2
 
         if (change) {
             for (const callback of this.#onChange) {
