@@ -18,6 +18,27 @@ class GameGif extends GameDrawable {
     #imgData = undefined
     get imgData() {return this.#imgData}
 
+    /**
+     * Setter for displayed gif.
+     * Requires presence of both name_sheet.png and name_data.json in resources/ directory
+     * @param {string} gifName Name of gif without extension
+     */
+    setImg(gifName) {
+        const dataUrl = `resources/${gifName}_data.json`
+        const imageUrl = `resources/${gifName}_sheet.png`
+
+        //load data from ${gifName}_data.json
+        fetch(dataUrl).then(response => {
+            response.json().then(value => {
+                this.#imgData = value
+            })
+        })
+
+        loadImage(imageUrl).then(value => {
+            this.#img = value
+        })
+    }
+
 
     /**
      * Constructor of Gif drawable
@@ -34,18 +55,7 @@ class GameGif extends GameDrawable {
             return
         }
 
-        const url = `resources/${gifName}_sheet.png`
-
-        //load data from ${gifName}_data.json
-        fetch(`resources/${gifName}_data.json`).then(response => {
-            response.json().then(value => {
-                this.#imgData = value
-            })
-        })
-
-        loadImage(url).then(value => {
-            this.#img = value
-        })
+        this.setImg(gifName)
     }
 
     /**
