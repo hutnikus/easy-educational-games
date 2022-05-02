@@ -239,8 +239,15 @@ class GameElement {
         }
         this.children.push(child)
         if (sort) {
-            this.children = this.children.sort(((a, b) => a.level - b.level))
+            this.sortChildren()
         }
+    }
+
+    /**
+     * Sorts children array by level
+     */
+    sortChildren() {
+        this.children = this.children.sort(((a, b) => a.level - b.level))
     }
 
     /**
