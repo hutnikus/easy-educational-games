@@ -562,6 +562,9 @@ class Game {
      * Starts the animation loop
      */
     animate() {
+        if (this.#animationInterval) {
+            this.stopAnimation()
+        }
         this.#animationInterval = setInterval(this.#animationLoop.bind(this),30)
     }
 
