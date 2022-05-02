@@ -7,6 +7,7 @@ import {Point} from "../Misc.js";
  *
  * @property {Image} img Image to be drawn. File generated from python script (NAME_sheet.png)
  * @property {{frame_count:number,frame_width:number,frame_height:number}} imgData Data from resources/GIFNAME_data.json
+ * @property {number} stagger Number of frames skipped while redrawing the context
  * @property {number} currentFrame Current frame of image
  */
 class GameGif extends GameDrawable {
