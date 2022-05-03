@@ -1,10 +1,3 @@
-// const Game = require("./public/modules/Game.js")
-// const GameElement = require("./public/modules/GameElement.js")
-// const GameGif = require("./public/modules/drawables/GameGif.js")
-// const GameImage = require("./public/modules/drawables/GameImage.js")
-// const GameShape = require("./public/modules/drawables/GameShape.js")
-// const GameText = require("./public/modules/drawables/GameText.js")
-
 import {Game} from "./Game.js";
 import {GameElement} from "./elements/GameElement.js";
 import {GameGif} from "./drawables/GameGif.js";

@@ -1,6 +1,3 @@
-// const Misc = require("../Misc.js")
-// const Point = Misc.Point
-
 import {GameDrawable, loadImage} from "./GameDrawable.js";
 
 /**
@@ -117,7 +114,5 @@ class GameImage extends GameDrawable {
         return new GameImage(undefined,attrs)
     }
 }
-
-// module.exports = GameImage
 
 export { GameImage }

@@ -282,7 +282,6 @@ class GameElement {
      */
     draw(ctx) {
         if (!this.visible) {
-            //skip drawing
             return
         }
 
@@ -321,7 +320,6 @@ class GameElement {
      */
     isInside(mouse) {
         if (!this.visible) {
-            // only clickable when visible
             return false
         }
 
@@ -332,9 +330,7 @@ class GameElement {
             this.shared.tempContext.save()
             const insideChild = child.isInside(mouse, this.shared.tempContext, this.center)
             this.shared.tempContext.restore()
-            // console.log('inside child',insideChild, child)
             if (insideChild) {
-                // console.error("was inside", child)
                 return true;
             }
         }
@@ -529,7 +525,6 @@ class GameElement {
      */
     click(event) {
         for (const callback of this.onClick) {
-            // callback(event)
             callback.call(this,event)
         }
     }
@@ -548,12 +543,10 @@ class GameElement {
             )
             for (const callback of this.onMove) {
                 callback.call(this,event)
-                // callback(event)
             }
         }
         for (const callback of this.onDrag) {
             callback.call(this,event)
-            // callback(event)
         }
     }
 
@@ -572,7 +565,6 @@ class GameElement {
     finishDragging(event) {
         for (const callback of this.onFinishDragging) {
             callback.call(this,event)
-            // callback(event)
         }
     }
 
@@ -589,7 +581,6 @@ class GameElement {
         if (events !== undefined && events.length !== 0) {
             for (const callback of events) {
                 callback.call(this,event)
-                // callback(event)
             }
         }
     }
@@ -815,7 +806,5 @@ class GameElement {
         )
     }
 }
-
-// module.exports = GameElement
 
 export { GameElement }

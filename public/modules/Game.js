@@ -1,12 +1,3 @@
-// const GameShape = require("./drawables/GameShape.js")
-// const GameElement = require("./GameElement.js")
-// const Misc = require("./Misc.js")
-// const Point = Misc.Point
-
-// import {GameShape} from "./drawables/GameShape.js";
-// import {Point} from "./Misc.js";
-// import {GameElement} from "./GameElement.js";
-
 import {
     GameShape,
     GameElement,
@@ -677,7 +668,5 @@ class Game {
         return collisions
     }
 }
-
-// module.exports = Game
 
 export { Game }

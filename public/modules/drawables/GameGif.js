@@ -166,6 +166,4 @@ class GameGif extends GameDrawable {
     }
 }
 
-// module.exports = GameGif
-
 export { GameGif }

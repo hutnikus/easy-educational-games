@@ -282,48 +282,10 @@ class GameShape extends GameDrawable {
     }
 }
 
-function getDistanceLinePoint(lp1, lp2, p) {
-    return ((Math.abs((lp2.y - lp1.y) * p.x - (lp2.x - lp1.x) * p.y + lp2.x * lp1.y - lp2.y * lp1.x)) / lp1.distanceTo(lp2))
-}
-
-function getLineAngle(lp1, lp2) {
-    const x = lp2.x - lp1.x
-    const y = lp2.y - lp1.y
-
-    return Math.atan2(y,x)
-}
-
-function triangleArea(p1, p2, p3) {
-    return Math.abs((p1.x * (p2.y - p3.y) + p2.x * (p3.y - p1.y)+ p3.x * (p1.y - p2.y))/2);
-}
-
-function insidePolygon(point, vs) {
-    // ray-casting algorithm based on
-    // https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html/pnpoly.html
-
-    const x = point.x, y = point.y;
-
-    let inside = false;
-    for (let i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-        const xi = vs[i][0], yi = vs[i][1];
-        const xj = vs[j][0], yj = vs[j][1];
-
-        const intersect = ((yi > y) !== (yj > y))
-            && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-        if (intersect) inside = !inside;
-    }
-
-    return inside;
-}
-
-
-
 function isColor(strColor) {
     const s = new Option().style;
     s.color = strColor;
     return s.color !== '';
 }
-
-// module.exports = GameShape
 
 export {GameShape}

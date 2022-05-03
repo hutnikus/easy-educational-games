@@ -78,7 +78,6 @@ class GameButton extends GameElement {
         if (this.isInside(mouse)) {
             for (const callback of this.#onPress) {
                 callback.call(this,event)
-                // callback(event)
             }
         }
     }

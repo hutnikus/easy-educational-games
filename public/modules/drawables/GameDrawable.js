@@ -164,15 +164,9 @@ class GameDrawable {
      */
     draw(ctx,center,drawable) {
         ctx.save()
-        // let t = getTransform(ctx);
-        // let rad = Math.atan2(t.b, t.a);
         ctx.transform(this.hScale,0,0,this.vScale,this.dx,this.dy);
-
-        // ctx.rotate(rad)
         ctx.rotate(this.rotation)
-
         drawable.drawFunction(ctx)
-
         ctx.restore()
     }
 
@@ -259,7 +253,5 @@ async function loadImage(imageUrl) {
     await imageLoadPromise;
     return img;
 }
-
-// module.exports = GameImage
 
 export { GameDrawable, loadImage }

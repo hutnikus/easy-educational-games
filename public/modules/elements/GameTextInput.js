@@ -96,7 +96,6 @@ class GameTextInput extends GameElement {
 
         if (this.isInside(mouse)) {
             for (const callback of this.#onEnter) {
-                // callback(event)
                 callback.call(this,event)
             }
         }

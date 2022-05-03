@@ -39,14 +39,6 @@ class GameComposite extends GameElement {
         for (const element of elements) {
             this.addElement(element)
         }
-
-        //get rid of unnecessary things
-        // delete this.children
-        // delete this.rotation
-        // delete this.addHitbox
-        // delete this.addChild
-        // delete this.getChildByName
-        // delete this.popChildByName
     }
 
     addHitbox(radius,dx,dy) {
@@ -176,7 +168,6 @@ class GameComposite extends GameElement {
     isInside(mouse) {
         for (const element of this.elements.map(e=>e.element)) {
             const inside = element.isInside(mouse)
-            // console.log(inside)
             if (inside) {
                 return true
             }

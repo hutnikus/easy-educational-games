@@ -120,6 +120,4 @@ class GameText extends GameDrawable {
     }
 }
 
-// module.exports = GameText
-
 export { GameText }
