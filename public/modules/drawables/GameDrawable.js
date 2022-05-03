@@ -175,8 +175,8 @@ class GameDrawable {
      * @returns {boolean} True when mouse is inside drawable, false otherwise.
      */
     isInside(mouse, tempContext) {
-        // call the draw function in subclass drawables
-        this.drawFunction(tempContext)
+        // draws the object to invisible context
+        this.draw(tempContext)
         // get the pixel array
         const imageData = tempContext.getImageData(0, 0,tempContext.canvas.width,tempContext.canvas.height);
         // get the index of clicked pixel in pixel array
