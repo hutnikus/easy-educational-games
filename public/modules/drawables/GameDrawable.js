@@ -175,24 +175,14 @@ class GameDrawable {
      * @returns {boolean} True when mouse is inside drawable, false otherwise.
      */
     isInside(mouse, tempContext) {
-        tempContext.save()
-        tempContext.setTransform(1,0,0,1,0,0);
-        //clear the temp context
-        tempContext.clearRect(0, 0,tempContext.canvas.width,tempContext.canvas.height);
-        tempContext.restore()
-
         // call the draw function in subclass drawables
         this.drawFunction(tempContext)
-
         // get the pixel array
         const imageData = tempContext.getImageData(0, 0,tempContext.canvas.width,tempContext.canvas.height);
-
         // get the index of clicked pixel in pixel array
         const pixelIndex = Math.floor(mouse.x) * 4 + Math.floor(mouse.y) * 4 * Math.floor(tempContext.canvas.width);
-
         // get alpha at clicked pixel
         const alpha=imageData.data[pixelIndex+3];
-
         // clicked pixel is not empty
         return alpha !== 0
     }

@@ -322,14 +322,18 @@ class GameElement {
         if (!this.visible) {
             return false
         }
+        const ctx = this.shared.tempContext
+        //clear the temp context
+        ctx.setTransform(1,0,0,1,0,0);
+        ctx.clearRect(0, 0,ctx.canvas.width,ctx.canvas.height);
 
-        this.shared.tempContext.setTransform(1,0,0,1,this.center.x,this.center.y);
-        this.shared.tempContext.rotate(this.rotation)
+        ctx.setTransform(1,0,0,1,this.center.x,this.center.y);
+        ctx.rotate(this.rotation)
 
         for (const child of this.children) {
-            this.shared.tempContext.save()
-            const insideChild = child.isInside(mouse, this.shared.tempContext)
-            this.shared.tempContext.restore()
+            ctx.save()
+            const insideChild = child.isInside(mouse, ctx)
+            ctx.restore()
             if (insideChild) {
                 return true;
             }
