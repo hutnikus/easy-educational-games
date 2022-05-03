@@ -149,6 +149,14 @@ class GameDrawable {
     }
 
     /**
+     * Draws the object on the supplied context
+     * @param {CanvasRenderingContext2D} ctx Rendering context on which the method draws
+     */
+    drawFunction(ctx) {
+        console.error("Calling drawFunction in class GameDrawable. Use a subclass!")
+    }
+
+    /**
      * Transforms input context and calls draw function of passed drawable.
      * @param {CanvasRenderingContext2D} ctx Rendering context.
      */
@@ -156,7 +164,6 @@ class GameDrawable {
         ctx.save()
         ctx.transform(this.hScale,0,0,this.vScale,this.dx,this.dy);
         ctx.rotate(this.rotation)
-        // declared in child elements
         this.drawFunction(ctx)
         ctx.restore()
     }
@@ -174,7 +181,7 @@ class GameDrawable {
         tempContext.clearRect(0, 0,tempContext.canvas.width,tempContext.canvas.height);
         tempContext.restore()
 
-        // call the draw function in child drawables
+        // call the draw function in subclass drawables
         this.drawFunction(tempContext)
 
         // get the pixel array
