@@ -224,33 +224,6 @@ class GameShape extends GameDrawable {
     }
 
     /**
-     * Calls parent draw function
-     * @param {CanvasRenderingContext2D} ctx Rendering context on which the method draws
-     * @param {Point} center Center Point of parent Element
-     */
-    draw(ctx,center) {
-        super.draw(ctx,center,this)
-    }
-
-    /**
-     * Returns true when mouse is inside drawable.
-     * @param {Point} mouse Mouse position on canvas.
-     * @param {CanvasRenderingContext2D} tempContext Hidden rendering context to check pixel state.
-     * @param {Point} center Center Point of parent Element
-     * @returns {boolean} True when mouse is inside drawable, false otherwise.
-     */
-    isInside(mouse, tempContext, center) {
-        const drawFunction = function (ctx, attrs) {
-            attrs.obj.draw(ctx,attrs.center)
-        }
-        const drawAttrs = {
-            obj: this,
-            center: center
-        }
-        return super.isInside(mouse, tempContext, drawFunction, drawAttrs)
-    }
-
-    /**
      * Returns object of attributes of current instance.
      * @returns {Object} Attribute object.
      */

@@ -292,7 +292,7 @@ class GameElement {
 
         for (const drawable of this.children) {
             if (drawable.visible) {
-                drawable.draw(ctx, this.center);
+                drawable.draw(ctx);
             }
         }
         if (this.hitboxVisible) {
@@ -328,7 +328,7 @@ class GameElement {
 
         for (const child of this.children) {
             this.shared.tempContext.save()
-            const insideChild = child.isInside(mouse, this.shared.tempContext, this.center)
+            const insideChild = child.isInside(mouse, this.shared.tempContext)
             this.shared.tempContext.restore()
             if (insideChild) {
                 return true;

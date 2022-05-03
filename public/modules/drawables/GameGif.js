@@ -82,58 +82,22 @@ class GameGif extends GameDrawable {
      * @param {CanvasRenderingContext2D} ctx Rendering context on which the method draws
      */
     drawFunction(ctx) {
-        if (!this.img) {
+        if (!this.img || !this.imgData) {
             return
         }
         let fw = this.imgData.frame_width
         let fh = this.imgData.frame_height
+        if (this.width === undefined) {
+            this.width = fw
+        }
+        if (this.height === undefined) {
+            this.height = fh
+        }
         ctx.drawImage(
             this.img,
             this.#currentFrame * fw, 0, fw, fh,
             -(this.width / 2), -(this.height / 2),this.width,this.height
         );
-    }
-
-    /**
-     * Checks parameters and calls parent draw() method
-     * @param {CanvasRenderingContext2D} ctx Rendering context on which the method draws
-     * @param {Point} center Center Point of parent Element
-     */
-    draw(ctx,center) {
-        if (!this.imgData) {
-            return
-        }
-        let fw = this.imgData.frame_width
-        let fh = this.imgData.frame_height
-        if (this.width !== undefined && this.height !== undefined) {
-            super.draw(ctx,center,this)
-        } else {
-            if (this.width === undefined) {
-                this.width = fw
-            }
-            if (this.height === undefined) {
-                this.height = fh
-            }
-            this.draw(ctx, center)
-        }
-    }
-
-    /**
-     * Returns true when mouse is inside drawable.
-     * @param {Point} mouse Mouse position on canvas.
-     * @param {CanvasRenderingContext2D} tempContext Hidden rendering context to check pixel state.
-     * @param {Point} center Center Point of parent Element
-     * @returns {boolean} True when mouse is inside drawable, false otherwise.
-     */
-    isInside(mouse, tempContext, center) {
-        const drawFunction = function (ctx, attrs) {
-            attrs.obj.draw(ctx,attrs.center)
-        }
-        const drawAttrs = {
-            obj: this,
-            center: center
-        }
-        return super.isInside(mouse, tempContext, drawFunction, drawAttrs)
     }
 
     /**

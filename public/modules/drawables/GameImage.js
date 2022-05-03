@@ -47,46 +47,16 @@ class GameImage extends GameDrawable {
         if (!this.img) {
             return
         }
+        if (this.width === undefined) {
+            this.width = this.img.width
+        }
+        if (this.height === undefined) {
+            this.height = this.img.height
+        }
         ctx.drawImage(
             this.img,
             -(this.width / 2), -(this.height / 2),this.width,this.height
         );
-    }
-
-    /**
-     * Checks parameters and calls parent draw() method
-     * @param {CanvasRenderingContext2D} ctx Rendering context on which the method draws
-     * @param {Point} center Center Point of parent Element
-     */
-    draw(ctx,center) {
-        if (this.width !== undefined && this.height !== undefined) {
-            super.draw(ctx,center,this)
-        } else {
-            if (!this.img) {
-                return
-            }
-            this.width = this.img.width
-            this.height = this.img.height
-            this.draw(ctx, center)
-        }
-    }
-
-    /**
-     * Returns true when mouse is inside drawable.
-     * @param {Point} mouse Mouse position on canvas.
-     * @param {CanvasRenderingContext2D} tempContext Hidden rendering context to check pixel state.
-     * @param {Point} center Center Point of parent Element
-     * @returns {boolean} True when mouse is inside drawable, false otherwise.
-     */
-    isInside(mouse, tempContext, center) {
-        const drawFunction = function (ctx, attrs) {
-            attrs.obj.draw(ctx,attrs.center.x,attrs.center.y)
-        }
-        const drawAttrs = {
-            obj: this,
-            center: center.copy()
-        }
-        return super.isInside(mouse, tempContext, drawFunction, drawAttrs)
     }
 
     /**
