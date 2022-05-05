@@ -541,10 +541,7 @@ class GameElement {
      */
     drag(mousePos,delta,event) {
         if (!this.stationary) {
-            this.center = new Point(
-                mousePos.x - delta.x,
-                mousePos.y - delta.y
-            )
+            this.center = mousePos.subtract(delta)
             for (const callback of this.onMove) {
                 callback.call(this,event)
             }
@@ -673,21 +670,19 @@ class GameElement {
      * @returns {boolean} True on colision else false
      */
     collidesWith(other) {
-        if (this.hitboxes.length === 0) {
-            return false
-        }
-        if (other.hitboxes.length === 0) {
-            return false
-        }
+        if (this.hitboxes.length === 0) {return false}
+        if (other.hitboxes.length === 0) {return false}
         for (const hb1 of this.hitboxes) {
-            const pos1 = this.center.add(hb1.delta).rotateAround(this.center,this.rotation)
+            const pos1 = this.center
+                             .add(hb1.delta)
+                             .rotateAround(this.center,this.rotation)
             for (const hb2 of other.hitboxes) {
-                const pos2 = other.center.add(hb2.delta).rotateAround(other.center,other.rotation)
-
+                const pos2 = other.center
+                                  .add(hb2.delta)
+                                  .rotateAround(other.center,other.rotation)
                 const distance = pos1.distanceTo(pos2)
-                if (distance < hb1.r + hb2.r) {
-                    return true
-                }
+
+                if (distance < hb1.r + hb2.r) {return true}
             }
         }
         return false

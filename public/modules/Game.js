@@ -261,27 +261,22 @@ class Game {
      */
     #mouseDown(event) {
         // one click at a time
-        if (this.#selectedElement) {
-            return
-        }
+        if (this.#selectedElement) {return}
         // prevent scrolling on touch
         if (!(event instanceof MouseEvent)) {
             event.preventDefault()
         }
-        //get topmost element
+        //get correct mouse position
         const mousePos = this.getMousePos(event)
-        if (!this.mouseInBounds(mousePos)) {
-            return
-        }
-        //call functions in onClickCallbacks
+        if (!this.mouseInBounds(mousePos)) {return}
+        //call generic onClick functions for game
         for (const callback of this.#onClick) {
             callback.call(this,event)
         }
-
+        // get clicked element
         const el = this.getElementAtPos(mousePos)
-        if (el === null) {
-            return
-        }
+        if (el === null) {return}
+
         if (el.clickable) {
             el.click(event)
         }
@@ -289,10 +284,7 @@ class Game {
             this.#selectedElement = el
             if (el.draggable) {
                 el.startDragging(event)
-                this.#selectedDelta = new Point(
-                    mousePos.x - el.center.x,
-                    mousePos.y - el.center.y
-                )
+                this.#selectedDelta = mousePos.subtract(el.center)
             }
             if (el.holdable) {
                 el.startMouseHold(event)
@@ -381,18 +373,18 @@ class Game {
         if (!(event instanceof MouseEvent)) {
             event.preventDefault()
         }
-
         for (const callback of this.#onMouseUp) {
             callback.call(this,event)
         }
-
         if (this.#selectedElement === undefined) {
             return
         }
-
-        this.#selectedElement.finishDragging(event)
-        this.#selectedElement.finishMouseHold(event)
-
+        if (this.#selectedElement.draggable) {
+            this.#selectedElement.finishDragging(event)
+        }
+        if (this.#selectedElement.holdable) {
+            this.#selectedElement.finishMouseHold(event)
+        }
         this.#selectedElement = undefined
         this.#selectedDelta = undefined
     }
@@ -590,20 +582,19 @@ class Game {
      */
     getMousePos(event) {
         const rect = this.canvas.getBoundingClientRect();
-        let pos;
-        if (event instanceof MouseEvent) {
-            pos = new Point(event.clientX - rect.left, event.clientY - rect.top);
-        } else if (event instanceof TouchEvent) {
-            const touch = event.touches.item(0)
-            if (touch === null) {
+        let e = event
+        if (!(event instanceof MouseEvent)) {
+            // TouchEvent not defined in desktop browser
+            e = event.touches.item(0)
+            if (e === null) {
                 return undefined
             }
-            pos = new Point(touch.clientX - rect.left, touch.clientY - rect.top);
         }
-
-        this.#shared.mousePos = pos.copy()
-
-        return pos
+        this.#shared.mousePos = new Point(
+            e.clientX - rect.left,
+            e.clientY - rect.top
+        )
+        return this.#shared.mousePos
     }
 
     mouseInBounds(mousePos) {
