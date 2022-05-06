@@ -218,6 +218,10 @@ class Game {
      */
     updateLevels() {
         this.#elements = this.#elements.sort(((a, b) => a.level - b.level))
+
+        this.#elements
+            .filter(el=>el instanceof GameComposite)
+            .forEach(el => el.sortElements())
     }
 
     /**
@@ -465,6 +469,7 @@ class Game {
             throw new Error(`Used name "${element.name}"`);
         }
         element.shared = this.shared
+        element.game = this
         this.#elements.push(element)
         if (sort) {
             this.updateLevels()
@@ -513,6 +518,10 @@ class Game {
      * @param {GameElement} element Element instance
      */
     removeElement(element) {
+        this.#elements
+            .filter(e => e instanceof GameComposite)
+            .forEach(e => e.removeElement(element))
+
         this.#elements = this.#elements.filter(e => e !== element)
     }
 

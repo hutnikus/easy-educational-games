@@ -67,6 +67,13 @@ class GameComposite extends GameElement {
     }
 
     /**
+     * Sorts elements by level
+     */
+    sortElements() {
+        this.elements = this.elements.sort(((a, b) => a.element.level - b.element.level))
+    }
+
+    /**
      * Adds element to composite, silences some of its functions
      * @param {GameElement} element
      */
@@ -74,6 +81,8 @@ class GameComposite extends GameElement {
         if (!(element instanceof GameElement)) {
             throw new Error("Incorrect instance of element added to composite!")
         }
+        this.game.removeElement(element)
+
         this.elements.push({
             element: element,
             clickable: element.clickable,
@@ -84,6 +93,8 @@ class GameComposite extends GameElement {
         element.clickable = false
         element.draggable = false
         element.pressable = false
+
+        this.sortElements()
     }
 
     /**
@@ -101,12 +112,22 @@ class GameComposite extends GameElement {
      * @param {GameElement} element
      */
     removeElement(element) {
+        if (!this.elements.map(obj=>obj.element).includes(element)) {
+            this.elements
+                .map(e => e.element)
+                .filter(e => e instanceof GameComposite)
+                .forEach(e => e.removeElement(element))
+            return
+        }
+
         const el = this.elements.filter(el=>el.element === element)[0]
         this.elements = this.elements.filter(el=>el.element !== element)
 
         element.clickable = el.clickable
         element.draggable = el.draggable
         element.pressable = el.pressable
+
+        this.game.addElement(element)
     }
 
     /**
@@ -147,17 +168,23 @@ class GameComposite extends GameElement {
     }
 
     /**
-     * Does nothing, skips drawing
+     * Draws elements
      */
     draw(ctx) {
-        //skip drawing
+        for (const obj of this.elements) {
+            const el = obj.element
+            el.draw(ctx)
+        }
     }
 
     /**
-     * Does nothing, skips animation
+     * Animates elements
      */
     animate() {
-        //skip animating
+        for (const obj of this.elements) {
+            const el = obj.element
+            el.animate()
+        }
     }
 
     /**
@@ -196,9 +223,7 @@ class GameComposite extends GameElement {
         for (const el of this.elements) {
             const element = el.element
 
-            element.clickable = el.clickable
-            element.draggable = el.draggable
-            element.pressable = el.pressable
+            this.removeElement(element)
         }
         this.elements = []
         this.onClick = []
