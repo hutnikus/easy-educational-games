@@ -663,16 +663,16 @@ class Game {
      * Downloads a screenshot of the game area
      */
     screenShot() {
-        const tctx = this.shared.tempContext
-        tctx.setTransform(1,0,0,1,0,0)
-
-        tctx.fillStyle = "white"
-        tctx.fillRect(0,0,this.canvas.width,this.canvas.height)
-
         const blankImg = new Image()
         blankImg.src = this.canvas.toDataURL('image/png')
 
         blankImg.addEventListener("load",()=>{
+            const tctx = this.shared.tempContext
+            tctx.setTransform(1,0,0,1,0,0)
+
+            tctx.fillStyle = "white"
+            tctx.fillRect(0,0,this.canvas.width,this.canvas.height)
+
             tctx.drawImage(blankImg,0,0)
             const image = tctx.canvas.toDataURL('image/png')
 
