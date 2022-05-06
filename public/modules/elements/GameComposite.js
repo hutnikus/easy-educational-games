@@ -241,6 +241,10 @@ class GameComposite extends GameElement {
      */
     rotateElements(origin,angle,keepOrientation=false) {
         for (const element of this.elements.map(e=>e.element)) {
+            if (element instanceof GameComposite) {
+                element.rotateElements(origin,angle,keepOrientation)
+                continue
+            }
             element.center = element.center.rotateAround(origin,angle)
             if (!keepOrientation) {
                 element.rotation += angle
