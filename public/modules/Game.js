@@ -658,6 +658,34 @@ class Game {
         }
         return collisions
     }
+
+    /**
+     * Downloads a screenshot of the game area
+     */
+    screenShot() {
+        const tctx = this.shared.tempContext
+        tctx.setTransform(1,0,0,1,0,0)
+
+        tctx.fillStyle = "white"
+        tctx.fillRect(0,0,this.canvas.width,this.canvas.height)
+
+        const blankImg = new Image()
+        blankImg.src = this.canvas.toDataURL('image/png')
+
+        blankImg.addEventListener("load",()=>{
+            tctx.drawImage(blankImg,0,0)
+            const image = tctx.canvas.toDataURL('image/png')
+
+            tctx.clearRect(0,0,this.canvas.width,this.canvas.height)
+
+            const element = document.createElement("a")
+            element.setAttribute("href",image)
+            element.setAttribute("download","screenshot"+Date.now()+".png")
+            document.body.appendChild(element)
+            element.click()
+            document.body.removeChild(element)
+        })
+    }
 }
 
 export { Game }
