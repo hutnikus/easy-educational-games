@@ -92,12 +92,8 @@ class GameTextInput extends GameElement {
         }
         this.text = entered
 
-        const mouse = this.shared.mousePos
-
-        if (this.isInside(mouse)) {
-            for (const callback of this.#onEnter) {
-                callback.call(this,event)
-            }
+        for (const callback of this.#onEnter) {
+            callback.call(this,event)
         }
     }
 
