@@ -71,6 +71,10 @@ class GameComposite extends GameElement {
      */
     sortElements() {
         this.elements = this.elements.sort(((a, b) => a.element.level - b.element.level))
+        this.elements
+            .map(e=>e.element)
+            .filter(e=>e instanceof GameComposite)
+            .forEach(e=>e.sortElements())
     }
 
     /**
@@ -157,9 +161,18 @@ class GameComposite extends GameElement {
     }
 
     /**
+     * Sets center of composite without moving child elements
+     * @param {number} x
+     * @param {number} y
+     */
+    setCenter(x, y) {
+        super.setPosition(x, y);
+    }
+
+    /**
      * Sets position of composite.
-     * @param x
-     * @param y
+     * @param {number} x
+     * @param {number} y
      */
     setPosition(x, y) {
         this._subtractPosition()
@@ -241,13 +254,13 @@ class GameComposite extends GameElement {
      */
     rotateElements(origin,angle,keepOrientation=false) {
         for (const element of this.elements.map(e=>e.element)) {
-            if (element instanceof GameComposite) {
-                element.rotateElements(origin,angle,keepOrientation)
-                continue
-            }
             element.center = element.center.rotateAround(origin,angle)
             if (!keepOrientation) {
-                element.rotation += angle
+                if (element instanceof GameComposite) {
+                    element.rotateElements(element.center,angle,keepOrientation)
+                } else {
+                    element.rotation += angle
+                }
             }
         }
     }
