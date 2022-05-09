@@ -124,6 +124,23 @@ class Point {
         }
         return top <= this.y && this.y <= bottom
     }
+
+    /**
+     * Calculates average position of multiple points
+     * @param {Point} points Points to average
+     * @returns {Point} Average point
+     */
+    static average(...points) {
+        if (points.length === 0) {
+            throw new Error("No points provided")
+        }
+        let sumX = 0, sumY = 0
+        for (const point of points) {
+            sumX += point.x
+            sumY += point.y
+        }
+        return new Point(sumX/points.length,sumY/points.length)
+    }
 }
 
 /**
