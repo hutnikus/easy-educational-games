@@ -113,6 +113,12 @@ class GameElement {
     constructor(center,children,attrs={}) {
         this.#name = attrs.name;
         this.center = center;
+        if (attrs.x !== undefined) {
+            this.center.x = attrs.x
+        }
+        if (attrs.y !== undefined) {
+            this.center.y = attrs.y
+        }
         this.children = []
         this.onClick = (attrs.onClick === undefined) ? [] : attrs.onClick
         this.onDrag = (attrs.onDrag === undefined) ? [] : attrs.onDrag
