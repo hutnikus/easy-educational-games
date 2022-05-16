@@ -3,7 +3,7 @@
  * @property {number} x X coordinate
  * @property {number} y Y coordinate
  */
-class Point {
+export class Point {
     #xValue = undefined
     set x(newX) {
         if (isNaN(newX)) {
@@ -147,7 +147,7 @@ class Point {
  * Returns string of random HEX color
  * @returns {string} Random color value
  */
-function randomColor() {
+export function randomColor() {
     return "#"+('00000'+(Math.random()*(1<<24)|0).toString(16)).slice(-6)
 }
 
@@ -155,7 +155,7 @@ function randomColor() {
  * Returns string of random light HEX color
  * @returns {string} Random color value
  */
-function randomLightColor() {
+export function randomLightColor() {
     const red = Math.floor(Math.random() * 50) + 200
     const green = Math.floor(Math.random() * 50) + 200
     const blue = Math.floor(Math.random() * 50) + 200
@@ -168,7 +168,7 @@ function randomLightColor() {
  * @param {Array} array
  * @returns {Array} New instance of array
  */
-function shuffleArray(array) {
+export function shuffleArray(array) {
     const a = [...array]
     for (let i = a.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -179,16 +179,51 @@ function shuffleArray(array) {
 
 /**
  * Returns a selection of random elements in array of set length
- * @param {Array} arr
- * @param {number} length
- * @returns {Array}
+ * @param {Array} arr Array to select from
+ * @param {number} length Number of elements to select
+ * @returns {Array} Array of selected elements
  */
-function randomSelection(arr,length) {
+export function randomSelection(arr,length) {
     if (arr.length < length) {
         throw new RangeError(`Incorrect length of selection: array length: ${arr.length}, required length: ${length}!`)
     }
-    return shuffleArray(arr).slice(0,length)
+    if (length < 0) {
+        throw new RangeError(`Incorrect length of selection: required length: ${length}, has to be non negative!`)
+    }
+    if (length > arr.length / 2) { // optimization
+        return shuffleArray(arr).slice(0,length)
+
+    }
+    const retSet = new Set()
+    while (retSet.size < length) {
+        retSet.add(arr[Math.floor(Math.random() * arr.length)])
+    }
+    return [...retSet]
 }
 
+/**
+ * Returns a random integer in bounds
+ * @param {number} min
+ * @param {number} max
+ * @returns {*}
+ */
+export function randomInt(min,max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min
+}
 
-export { Point, randomColor, shuffleArray, randomSelection, randomLightColor }
+/**
+ * Removes element from array in place
+ * @param {Array} array Array to remove element from
+ * @param {Object} element Element to remove
+ * @param {boolean} removeAll If true, all instances of element will be removed
+ */
+export function removeFromArray(array,element,removeAll = false) {
+    let index = array.indexOf(element)
+    while (index > -1) {
+        array.splice(index,1)
+        if (!removeAll) {
+            break
+        }
+        index = array.indexOf(element)
+    }
+}

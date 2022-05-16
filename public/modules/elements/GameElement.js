@@ -13,6 +13,7 @@ import {GameText} from "../drawables/GameText.js";
  * @property {string} name Name of the element. Undefined or unique
  * @property {number} level Level of the element in relation to its siblings
  * @property {Point} center Center of the element. Absolute value
+ * @property {Point} homePosition Home position of the element. Element moves here on home() call
  * @property {Array<GameDrawable>} children Array of drawables linked to the element
  * @property {boolean} clickable Element will respond to click
  * @property {boolean} draggable Element will respond to holding
@@ -119,6 +120,7 @@ class GameElement {
         if (attrs.y !== undefined) {
             this.center.y = attrs.y
         }
+        this.homePosition = attrs.homePosition || center.copy()
         this.children = []
         this.onClick = (attrs.onClick === undefined) ? [] : attrs.onClick
         this.onDrag = (attrs.onDrag === undefined) ? [] : attrs.onDrag
@@ -155,6 +157,20 @@ class GameElement {
 
         this.isAnimating = false
         this.animationQueue = []
+    }
+
+    /**
+     * Sets home position
+     * @param {number} x
+     * @param {number} y
+     */
+    setHome(x,y) {
+        this.homePosition.x = x
+        this.homePosition.y = y
+    }
+
+    home() {
+        this.center = this.homePosition.copy()
     }
 
     /**

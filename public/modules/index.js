@@ -4,7 +4,7 @@ import {GameGif} from "./drawables/GameGif.js";
 import {GameImage} from "./drawables/GameImage.js";
 import {GameText} from "./drawables/GameText.js";
 import {GameShape} from "./drawables/GameShape.js";
-import {Point, shuffleArray, randomSelection, randomLightColor, randomColor} from "./Misc.js";
+import {Point, shuffleArray, randomSelection, randomLightColor, randomColor, randomInt, removeFromArray} from "./Misc.js";
 import {GameCanvas} from "./elements/GameCanvas.js";
 import {GameButton} from "./elements/GameButton.js";
 import {GameHitbox} from "./GameHitbox.js";
@@ -25,6 +25,8 @@ export {
     randomSelection,
     randomLightColor,
     randomColor,
+    randomInt,
+    removeFromArray,
     GameCanvas,
     GameButton,
     GameHitbox,
