@@ -46,6 +46,17 @@ class GameElement {
     get name() {
         return this.#name
     }
+    set name(value) {
+        if (!this.game) {
+            this.#name = value
+            return
+        }
+        const gameHasName = this.game.elements.filter(el=>el.name===value).length > 0
+        if (gameHasName) {
+            throw new Error(`Name "${value}" is not unique!`)
+        }
+        this.#name = value
+    }
     #centerValue
     set center(newCenter) {
         if (!(newCenter instanceof Point)) {
@@ -55,22 +66,6 @@ class GameElement {
     }
     get center() {
         return this.#centerValue
-    }
-
-    /**
-     * Checks if name is unique within the context and sets it
-     * @param {Game} game Game instance
-     * @param {string} newName New name
-     */
-    setName(game,newName) {
-        if (!(game instanceof Game)) {
-            throw new Error("Incorrect instance of Game!")
-        }
-        const gameHasName = game.elements.filter(el=>el.name===newName).length > 0
-        if (gameHasName) {
-            throw new Error(`Name "${newName}" is not unique!`)
-        }
-        this.#name = newName
     }
 
     /**

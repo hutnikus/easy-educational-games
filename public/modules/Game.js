@@ -71,8 +71,6 @@ class Game {
         return [...this.#onMouseUp]
     }
 
-
-
     /**
      * Constructor of the Game class
      * @param {HTMLCanvasElement} canvas Canvas on which the game is played
@@ -245,7 +243,12 @@ class Game {
      * @returns {number} Currently highest level
      */
     highestLevel() {
-        return Math.max(...this.#elements.filter(e => !isInteractive(e)).map(el => el.level))
+        return Math.max(
+            ...this.#elements
+                .filter(e => !isInteractive(e))
+                .map(el => el.level)
+                .filter(l => l !== Number.POSITIVE_INFINITY)
+        )
     }
 
     /**
@@ -253,7 +256,12 @@ class Game {
      * @returns {number} Currently lowest level
      */
     lowestLevel() {
-        return Math.min(...this.#elements.filter(e => !isInteractive(e)).map(el => el.level))
+        return Math.min(
+            ...this.#elements
+                .filter(e => !isInteractive(e))
+                .map(el => el.level)
+                .filter(l => l !== Number.NEGATIVE_INFINITY)
+        )
     }
 
     /**
@@ -644,16 +652,21 @@ class Game {
      * @returns {null|GameElement} Element at position or null
      */
     getElementAtPos(position) {
-        for (const i in this.#elements) {
-            const el = this.#elements[this.#elements.length-1-i]
-            if (!el.clickable && !el.draggable && !el.holdable) {
-                continue
+        const interactive = this.#elements.filter(e => isInteractive(e))
+        const uninteractive = this.#elements.filter(e => !isInteractive(e))
+        function isInside(array) {
+            for (const i in array) {
+                const el = array[array.length-1-i]
+                if (!el.clickable && !el.draggable && !el.holdable) {
+                    continue
+                }
+                if (el.isInside(position)) {
+                    return el
+                }
             }
-            if (el.isInside(position)) {
-                return el
-            }
+            return null
         }
-        return null
+        return isInside(interactive) || isInside(uninteractive)
     }
 
 
