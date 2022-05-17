@@ -375,19 +375,24 @@ class GameElement {
         //clear the temp context
         ctx.setTransform(1,0,0,1,0,0);
         ctx.clearRect(0, 0,ctx.canvas.width,ctx.canvas.height);
-
+        //set center and rotation
         ctx.setTransform(1,0,0,1,this.center.x,this.center.y);
         ctx.rotate(this.rotation)
-
-        for (const child of this.children) {
-            ctx.save()
-            const insideChild = child.isInside(mouse, ctx)
-            ctx.restore()
-            if (insideChild) {
-                return true;
+        ctx.save()
+        for (const drawable of this.children) {
+            if (drawable.visible) {
+                drawable.draw(ctx);
             }
         }
-        return false;
+        // create pixel array
+        const imageData = ctx.getImageData(0, 0,ctx.canvas.width,ctx.canvas.height);
+        ctx.restore()
+        // get the index of clicked pixel in pixel array
+        const pixelIndex = Math.floor(mouse.x) * 4 + Math.floor(mouse.y) * 4 * Math.floor(ctx.canvas.width);
+        // get alpha at clicked pixel
+        const alpha=imageData.data[pixelIndex+3];
+        // clicked pixel is not empty
+        return alpha !== 0
     }
 
     /**

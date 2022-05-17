@@ -169,25 +169,6 @@ class GameDrawable {
     }
 
     /**
-     * Returns true when mouse is inside drawable.
-     * @param {Point} mouse Mouse position on canvas.
-     * @param {CanvasRenderingContext2D} tempContext Hidden rendering context to check pixel state.
-     * @returns {boolean} True when mouse is inside drawable, false otherwise.
-     */
-    isInside(mouse, tempContext) {
-        // draws the object to invisible context
-        this.draw(tempContext)
-        // get the pixel array
-        const imageData = tempContext.getImageData(0, 0,tempContext.canvas.width,tempContext.canvas.height);
-        // get the index of clicked pixel in pixel array
-        const pixelIndex = Math.floor(mouse.x) * 4 + Math.floor(mouse.y) * 4 * Math.floor(tempContext.canvas.width);
-        // get alpha at clicked pixel
-        const alpha=imageData.data[pixelIndex+3];
-        // clicked pixel is not empty
-        return alpha !== 0
-    }
-
-    /**
      * Returns object of attributes of current instance.
      * @returns {Object} Attribute object.
      */

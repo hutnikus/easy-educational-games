@@ -271,7 +271,6 @@ class Game {
      */
     changeLevelOfElement(element,newLevel) {
         element.level = newLevel
-        this.updateLevels()
     }
 
     /**
