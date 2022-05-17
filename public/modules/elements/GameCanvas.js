@@ -30,7 +30,7 @@ class GameCanvas extends GameElement {
         })
         this.addChild(this.#currentLine,false)
 
-        this.#drawingInterval = setInterval(this.#continueDrawing,20)
+        this.#drawingInterval = setInterval(this.#continueDrawing,10)
     }
     #continueDrawing = () => {
         if (this.#currentLine === undefined) {
@@ -96,6 +96,15 @@ class GameCanvas extends GameElement {
      */
     clear() {
         this.children = [this.background]
+    }
+
+    /**
+     * Returns the last line that was drawn
+     * @returns {GameShape|undefined}
+     */
+    lastLine() {
+        const line = this.children[this.children.length-1]
+        return (line.type === 'line') ? line : undefined
     }
 
     /**
