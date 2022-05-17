@@ -188,6 +188,10 @@ class GameShape extends GameDrawable {
         return retPath.map(p => p.asArray()).flat(1)
     }
 
+    /**
+     * Sets coords from path
+     * @param {string} path
+     */
     setPath(path) {
         this.coords = this.parsePath(path)
     }
