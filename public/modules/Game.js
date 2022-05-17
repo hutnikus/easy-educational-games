@@ -305,12 +305,16 @@ class Game {
         //get correct mouse position
         const mousePos = this.getMousePos(event)
         if (!this.mouseInBounds(mousePos)) {return}
-        //call generic onClick functions for game
-        for (const callback of this.#onClick) {
-            callback.call(this,event)
-        }
         // get clicked element
-        const el = this.getElementAtPos(mousePos)
+        let el = this.getElementAtPos(mousePos)
+        if (el === null) {
+            //call generic onClick functions for game
+            for (const callback of this.#onClick) {
+                callback.call(this,event)
+            }
+        }
+        // check if onClick created new element
+        el = this.getElementAtPos(mousePos)
         if (el === null) {return}
 
         if (el.clickable) {
