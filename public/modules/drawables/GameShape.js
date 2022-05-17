@@ -70,45 +70,6 @@ class GameShape extends GameDrawable {
         return this.#lineWidth
     }
 
-    #initRectangle() {
-        this.width = this.width || 100
-        this.height = this.height || 100
-    }
-    #initOval(rx, ry) {
-        this.rx = rx || ry || 50
-        this.ry = ry || rx || 50
-    }
-    #initPolygon(coords) {
-        if (!Array.isArray(coords)) {
-            throw new Error("Polygon needs a defined coords array!")
-        }
-        if (coords.length < 6) {
-            throw new Error("Array of coords must be at least 3 points (6 items) long!")
-        }
-        if (coords.length % 2 !== 0) {
-            throw new Error("Array of coords needs to be of even size!")
-        }
-        this.coords = []
-        for (let i = 0; i < coords.length; i+=2) {
-            this.addPoint(new Point(coords[i],coords[i+1]))
-        }
-    }
-    #initLine(coords) {
-        if (!Array.isArray(coords)) {
-            throw new Error("Line needs a defined coords array!")
-        }
-        if (coords.length < 4) {
-            throw new Error("Array of coords must be at least 2 points (4 items) long!")
-        }
-        if (coords.length % 2 !== 0) {
-            throw new Error("Array of coords needs to be of even size!")
-        }
-        this.coords = []
-        for (let i = 0; i < coords.length; i+=2) {
-            this.addPoint(new Point(coords[i],coords[i+1]))
-        }
-    }
-
     /**
      * Constructor of Shape drawable
      * @param {TYPE} type Type of shape: rectangle, oval, polygon, line
@@ -135,16 +96,19 @@ class GameShape extends GameDrawable {
 
 
         if (type === 'rectangle') {
-            this.#initRectangle()
+            this.width = this.width || 100
+            this.height = this.height || 100
         }
         else if (type === 'oval') {
-            this.#initOval(attrs.rx,attrs.ry)
+            this.rx = attrs.rx || attrs.ry || 50
+            this.ry = attrs.ry || attrs.rx || 50
         }
-        else if (type === 'polygon') {
-            this.#initPolygon(attrs.coords)
-        }
-        else if (type === 'line') {
-            this.#initLine(attrs.coords)
+        else if (["polygon","line"].includes(type)) {
+            const coords = attrs.coords || this.parsePath(attrs.path) || []
+            if (!Array.isArray(coords) || coords.some(x => isNaN(x))) {
+                throw new Error("Wrong type of coords!")
+            }
+            this.coords = coords || []
         }
 
         if (!this.fill && !this.stroke) {
@@ -157,15 +121,87 @@ class GameShape extends GameDrawable {
     }
 
     /**
+     * Parses path in format "x y command number c n c n ..."
+     * @param {string} path
+     * @returns {Array<Number>}
+     */
+    parsePath(path) {
+        if (path === undefined) {
+            return []
+        }
+        const pathArray = path.trim().split(/\s+/)
+        const retPath = []
+
+        function getNumber() {
+            const raw = pathArray.shift()
+            const value = parseFloat(raw)
+            if (isNaN(value)) {
+                throw new Error("Invalid number in path! " + raw)
+            }
+            return value
+        }
+        function getLetter() {
+            const value = pathArray.shift()
+            if (!"fbrl".includes(value)) {
+                throw new Error("Invalid letter in path! " + value)
+            }
+            return value
+        }
+        function move(dist) {
+            let newPoint = lastPoint.add(new Point(dist,0))
+            newPoint = newPoint.rotateAround(lastPoint,rotation)
+            return newPoint
+        }
+        function rotate(angle) {
+            rotation += angle * (Math.PI / 180)
+        }
+
+        let lastPoint
+        try {
+            lastPoint = new Point(getNumber(), getNumber())
+        } catch (e) {
+            throw new Error("Path is not in correct format, it has to start with \"x y\" as values (0 0 for example)!")
+        }
+        retPath.push(lastPoint)
+        let rotation = 0
+        while (pathArray.length) {
+            const command = getLetter()
+            const number = getNumber()
+            if (command === "f") {
+                lastPoint = move(number)
+                retPath.push(lastPoint)
+            }
+            else if (command === "b") {
+                lastPoint = move(-number)
+                retPath.push(lastPoint)
+            }
+            else if (command === "l") {
+                rotate(-number)
+            }
+            else if (command === "r") {
+                rotate(number)
+            }
+            else {
+                throw new Error(`Unknown command "${command}"!`)
+            }
+        }
+        return retPath.map(p => p.asArray()).flat(1)
+    }
+
+    setPath(path) {
+        this.coords = this.parsePath(path)
+    }
+
+    /**
      * Replaces coords array property with two points
      * @param {Point} from Start Point
      * @param {Point} to End Point
      */
     setLine(from,to) {
-        if (this.type !== "line") {
-            throw new Error(`You're trying to call setLine() on ${this.type}!`)
+        if (!(from instanceof Point) || !(to instanceof Point)) {
+            throw new Error("From and to have to be Point objects!")
         }
-        this.#initLine([...from.asArray(),...to.asArray()])
+        this.coords = [...from.asArray(),...to.asArray()]
     }
 
     /**
