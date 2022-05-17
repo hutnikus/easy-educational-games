@@ -169,6 +169,9 @@ class GameElement {
         this.homePosition.y = y
     }
 
+    /**
+     * Returns element to home position
+     */
     home() {
         this.center = this.homePosition.copy()
     }
