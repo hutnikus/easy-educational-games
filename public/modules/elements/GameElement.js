@@ -15,6 +15,7 @@ import {GameText} from "../drawables/GameText.js";
  * @property {Point} center Center of the element. Absolute value
  * @property {Point} homePosition Home position of the element. Element moves here on home() call
  * @property {Array<GameDrawable>} children Array of drawables linked to the element
+ * @property {boolean} keepOnTop Keeps the element on top of its siblings
  * @property {boolean} clickable Element will respond to click
  * @property {boolean} draggable Element will respond to holding
  * @property {boolean} pressable Element will respond to key press
@@ -31,6 +32,7 @@ import {GameText} from "../drawables/GameText.js";
  * @property {Array<function>} onMove Array of callbacks called on move
  * @property {Array<Object>} onMouseHold Array of callbacks called on mouse hold
  * @property {Object} shared Shared object passed from Game
+ * @property {Game} game Reference to the game (passed on game.addElement)
  * @property {Array<GameHitbox>} hitboxes Array of hitboxes linked to the element
  * @property {boolean} hitboxVisible Hitboxes are drawn on true, else are hidden
  * @property {number} rotation Rotation of element in radians
@@ -104,6 +106,20 @@ class GameElement {
         this.center.y = newY
     }
 
+    #level = undefined
+    get level() {
+        return this.#level
+    }
+    set level(newLevel) {
+        if (isNaN(newLevel)) {
+            throw new TypeError("Invalid type for level!")
+        }
+        this.#level = newLevel
+        if (this.game) {
+            this.game.updateLevels()
+        }
+    }
+
 
     /**
      * Constructor of the GameElement class
@@ -122,6 +138,7 @@ class GameElement {
         }
         this.homePosition = attrs.homePosition || center.copy()
         this.children = []
+        this.keepOnTop = attrs.keepOnTop || false
         this.onClick = (attrs.onClick === undefined) ? [] : attrs.onClick
         this.onDrag = (attrs.onDrag === undefined) ? [] : attrs.onDrag
         this.onFinishDragging = (attrs.onFinishDragging === undefined) ? [] : attrs.onFinishDragging
@@ -157,6 +174,18 @@ class GameElement {
 
         this.isAnimating = false
         this.animationQueue = []
+    }
+
+    moveToTop() {
+        if (this.game) {
+            this.game.moveElementToTop(this)
+        }
+    }
+
+    moveToBottom() {
+        if (this.game) {
+            this.game.moveElementToBottom(this)
+        }
     }
 
     /**
@@ -580,6 +609,9 @@ class GameElement {
      * Calls the functions in the onStartDragging array
      */
     startDragging(event) {
+        if (this.keepOnTop) {
+            this.moveToTop()
+        }
         for (const callback of this.onStartDragging) {
             callback.call(this,event)
         }

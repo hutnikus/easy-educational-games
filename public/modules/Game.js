@@ -225,11 +225,35 @@ class Game {
     }
 
     /**
+     * Moves element to top
+     * @param {GameElement} element
+     */
+    moveElementToTop(element) {
+        this.changeLevelOfElement(element,this.highestLevel()+1)
+    }
+
+    /**
+     * Moves element to bottom
+     * @param {GameElement} element
+     */
+    moveElementToBottom(element) {
+        this.changeLevelOfElement(element,this.lowestLevel()-1)
+    }
+
+    /**
      * Returns the highest current level value
      * @returns {number} Currently highest level
      */
     highestLevel() {
-        return Math.max(...this.#elements.map(el => el.level))
+        return Math.max(...this.#elements.filter(e => !isInteractive(e)).map(el => el.level))
+    }
+
+    /**
+     * Returns the lowest current level value
+     * @returns {number} Currently lowest level
+     */
+    lowestLevel() {
+        return Math.min(...this.#elements.filter(e => !isInteractive(e)).map(el => el.level))
     }
 
     /**
@@ -545,9 +569,13 @@ class Game {
             grid.draw(this.context)
         }
 
-        for (const obj of this.#elements) {
-            obj.draw(this.context)
-        }
+        this.#elements  // draw elements
+            .filter(e => !isInteractive(e))
+            .forEach(e => e.draw(this.context))
+
+        this.#elements  // draw interactive elements (buttons and so on)
+            .filter(e => isInteractive(e))
+            .forEach(e => e.draw(this.context))
     }
 
     /**
@@ -695,6 +723,10 @@ class Game {
             document.body.removeChild(element)
         })
     }
+}
+
+function isInteractive(element) {
+    return element instanceof GameButton || element instanceof GameRangeSlider || element instanceof GameTextInput
 }
 
 export { Game }
