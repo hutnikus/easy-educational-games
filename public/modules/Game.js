@@ -692,6 +692,9 @@ class Game {
             callback.call(this)
         }
         this.#onClear = []
+        this.#onMove = []
+        this.#onClick = []
+        this.#onMouseUp = []
     }
 
     /**
