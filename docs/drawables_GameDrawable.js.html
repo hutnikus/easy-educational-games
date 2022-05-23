@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: drawables/GameDrawable.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: drawables/GameDrawable.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {Point} from "../Misc.js";
+
+/**
+ * Parent Drawable class, handles shared attributes and actions of drawables.
+ *
+ * @property {string} name Name of the drawable, used for searching for it within element.
+ * @property {number} level Depth of drawable within element. Higher number will be on top.
+ * @property {number} dx Deviation on X axis in pixels from center of parent Element.
+ * @property {number} dy Deviation on Y axis in pixels from center of parent Element.
+ * @property {number} width Width of the drawable in pixels. Used for rectangles and images.
+ * @property {number} height Height of the drawable in pixels. Used for rectangles and images.
+ * @property {number} rotation Rotation of the drawable. Measured in radians.
+ * @property {boolean} visible Visibility of drawable. Skips drawing on false.
+ * @property {number} hScale Scale of drawable on horizontal axis. 1 is default, -1 is mirrored.
+ * @property {number} vScale Scale of drawable on vertical axis. 1 is default, -1 is mirrored.
+ */
+class GameDrawable {
+    #name = undefined
+    get name() {
+        return this.#name
+    }
+    #level = 0
+    set level(newLevel) {
+        if (newLevel === undefined) {
+            this.#level = 0
+            return
+        }
+        if (isNaN(newLevel)) {
+            throw new TypeError("Incorrect type of level, it has to be a number!")
+        }
+        this.#level = Number(newLevel)
+    }
+    get level() {
+        return this.#level
+    }
+    #dx = 0
+    set dx(newDX) {
+        if (newDX === undefined) {
+            this.#dx = 0
+            return
+        }
+        if (isNaN(newDX)) {
+            throw new TypeError("Incorrect type of dx, it has to be a number!")
+        }
+        this.#dx = Number(newDX)
+    }
+    get dx() {
+        return this.#dx
+    }
+    #dy = 0
+    set dy(newDY) {
+        if (newDY === undefined) {
+            this.#dy = 0
+            return
+        }
+        if (isNaN(newDY)) {
+            throw new TypeError("Incorrect type of dy, it has to be a number!")
+        }
+        this.#dy = Number(newDY)
+    }
+    get dy() {return this.#dy}
+    #width = undefined
+    set width(newWidth) {
+        if (newWidth === undefined) {
+            this.#width = undefined
+            return
+        }
+        if (isNaN(newWidth)) {
+            throw new TypeError("Incorrect type of width, it has to be a number!")
+        }
+        this.#width = Number(newWidth)
+    }
+    get width() {return this.#width}
+    #height = undefined
+    set height(newHeight) {
+        if (newHeight === undefined) {
+            this.#height = undefined
+            return
+        }
+        if (isNaN(newHeight)) {
+            throw new TypeError("Incorrect type of height, it has to be a number!")
+        }
+        this.#height = Number(newHeight)
+    }
+    get height() {return this.#height}
+    #rotation = 0
+    set rotation(newRotation) {
+        if (newRotation === undefined) {
+            this.#rotation = 0
+            return
+        }
+        if (isNaN(newRotation)) {
+            throw new TypeError("Incorrect type of rotation, it has to be a number!")
+        }
+        this.#rotation = Number(newRotation)
+    }
+    get rotation() {return this.#rotation}
+    #visible = true
+    set visible(newVisible) {
+        if (newVisible === undefined) {
+            this.#visible = true
+            return
+        }
+        if (newVisible instanceof Boolean) {
+            throw new TypeError("Incorrect type for visible, it has to be a boolean!")
+        }
+        this.#visible = newVisible
+    }
+    get visible() {return this.#visible}
+    #hScale = 1
+    set hScale(newScale) {
+        if (newScale === undefined) {
+            this.#hScale = 1
+            return
+        }
+        if (isNaN(newScale)) {
+            throw new TypeError("Incorrect type of hScale, it has to be a number!")
+        }
+        this.#hScale = Number(newScale)
+    }
+    get hScale() {return this.#hScale}
+    #vScale = 1
+    set vScale(newScale) {
+        if (newScale === undefined) {
+            this.#vScale = 1
+            return
+        }
+        if (isNaN(newScale)) {
+            throw new TypeError("Incorrect type of vScale, it has to be a number!")
+        }
+        this.#vScale = Number(newScale)
+    }
+    get vScale() {return this.#vScale}
+
+    /**
+     * @param {Object} attrs Attributes of new Drawable.
+     */
+    constructor(attrs={}) {
+        this.#name = attrs.name;
+        this.level = attrs.level
+        this.dx = attrs.dx
+        this.dy = attrs.dy
+        this.width = attrs.width;
+        this.height = attrs.height;
+        this.rotation = attrs.rotation
+        this.visible = attrs.visible
+        this.hScale = attrs.hScale
+        this.vScale = attrs.vScale
+    }
+
+    /**
+     * Draws the object on the supplied context
+     * @param {CanvasRenderingContext2D} ctx Rendering context on which the method draws
+     */
+    drawFunction(ctx) {
+        console.error("Calling drawFunction in class GameDrawable. Use a subclass!")
+    }
+
+    /**
+     * Transforms input context and calls draw function of passed drawable.
+     * @param {CanvasRenderingContext2D} ctx Rendering context.
+     */
+    draw(ctx) {
+        ctx.save()
+        ctx.transform(this.hScale,0,0,this.vScale,this.dx,this.dy);
+        ctx.rotate(this.rotation)
+        this.drawFunction(ctx)
+        ctx.restore()
+    }
+
+    /**
+     * Returns object of attributes of current instance.
+     * @returns {Object} Attribute object.
+     */
+    getAttrs() {
+        return {
+            name : this.name,
+            level : this.level,
+            dx : this.dx,
+            dy : this.dy,
+            width : this.width,
+            height : this.height,
+            rotation : this.rotation,
+            hScale : this.hScale,
+            vScale : this.vScale,
+            visible : this.visible,
+        }
+    }
+
+    /**
+     * Returns copy of current instance.
+     * @param {string} newName Name of the newly created instance. Names have to be unique.
+     * @returns {GameDrawable} New instance of Drawable with the same attributes.
+     */
+    copy(newName) {
+        const attrs = this.getAttrs()
+        if (newName === undefined) {
+            attrs.name = (attrs.name === undefined) ? undefined : attrs.name + "_copy"
+        } else {
+            attrs.name = newName
+        }
+        return new GameDrawable(attrs)
+    }
+}
+
+/**
+ * Loads image from url.
+ * @param {string} imageUrl Source url.
+ * @returns {Promise&lt;Image>} Image object.
+ * @function
+ */
+async function loadImage(imageUrl) {
+    let img;
+    const imageLoadPromise = new Promise(resolve => {
+        img = new Image();
+        img.onload = resolve;
+        img.src = imageUrl;
+    });
+
+    await imageLoadPromise;
+    return img;
+}
+
+export { GameDrawable, loadImage }</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Game.html">Game</a></li><li><a href="GameButton.html">GameButton</a></li><li><a href="GameCanvas.html">GameCanvas</a></li><li><a href="GameComposite.html">GameComposite</a></li><li><a href="GameDrawable.html">GameDrawable</a></li><li><a href="GameElement.html">GameElement</a></li><li><a href="GameGif.html">GameGif</a></li><li><a href="GameGrid.html">GameGrid</a></li><li><a href="GameHitbox.html">GameHitbox</a></li><li><a href="GameImage.html">GameImage</a></li><li><a href="GameRangeSlider.html">GameRangeSlider</a></li><li><a href="GameShape.html">GameShape</a></li><li><a href="GameText.html">GameText</a></li><li><a href="GameTextInput.html">GameTextInput</a></li><li><a href="Point.html">Point</a></li></ul><h3>Global</h3><ul><li><a href="global.html#loadImage">loadImage</a></li><li><a href="global.html#randomColor">randomColor</a></li><li><a href="global.html#randomInt">randomInt</a></li><li><a href="global.html#randomLightColor">randomLightColor</a></li><li><a href="global.html#randomSelection">randomSelection</a></li><li><a href="global.html#removeFromArray">removeFromArray</a></li><li><a href="global.html#shuffleArray">shuffleArray</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon May 23 2022 10:53:40 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
