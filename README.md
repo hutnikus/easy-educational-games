@@ -1,5 +1,9 @@
 # Easy educational games
 
+# Documentation
+
+https://hutnikus.github.io/easy-educational-games/
+
 # Template project
 
 You can find the template project repository at
