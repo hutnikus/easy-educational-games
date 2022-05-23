@@ -51,8 +51,7 @@ This is what is exported with require("easy-educational-games")
 
 ```javascript
 module.exports = {
-    app,express,PORT,
-    modulesPath: "./node_modules/easy-educational-games/public/modules"
+    app,express,PORT,modulesPath
 }
 ```
 
